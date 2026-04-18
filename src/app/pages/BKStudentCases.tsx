@@ -5,7 +5,7 @@ import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { useAuth } from '../context/AuthContext';
-import { getStudentsNeedingAttention } from '../data/dummyData';
+import { getStudentsNeedingAttention, searchStudents, getStudentDetailBySearch } from '../data/dummyData';
 import {
   Heart, Search, Filter, TrendingUp, TrendingDown, Minus, Phone, Mail,
   AlertTriangle, FileText, Calendar, User
@@ -31,7 +31,8 @@ export const BKStudentCases: React.FC = () => {
   const filteredStudents = students.filter(s => {
     const matchesSearch = 
       s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.npm.includes(searchTerm) ||
+      s.nim.includes(searchTerm) ||
+      (s.nik && s.nik.includes(searchTerm)) ||
       s.faculty.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesLevel = filterLevel === 'all' || s.latestTest.level === filterLevel;
@@ -70,7 +71,7 @@ export const BKStudentCases: React.FC = () => {
           <div className="flex items-start justify-between mb-6">
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-2">{student.name}</h2>
-              <p className="text-gray-600">NPM: {student.npm}</p>
+              <p className="text-gray-600">NIM: {student.nim} | NIK: {student.nik}</p>
             </div>
             <Button onClick={() => setSelectedStudent(null)} variant="outline">
               Tutup
@@ -294,7 +295,7 @@ export const BKStudentCases: React.FC = () => {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Cari nama, NPM, atau fakultas..."
+                  placeholder="Cari nama, NIM, NIK, atau fakultas..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
@@ -345,7 +346,8 @@ export const BKStudentCases: React.FC = () => {
                       {getTrendIcon(student.trend)}
                     </div>
                     <div className="grid md:grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-600 mb-4">
-                      <p><span className="font-medium">NPM:</span> {student.npm}</p>
+                      <p><span className="font-medium">NIM:</span> {student.nim}</p>
+                      <p><span className="font-medium">NIK:</span> {student.nik}</p>
                       <p><span className="font-medium">Fakultas:</span> {student.faculty}</p>
                       <p><span className="font-medium">Prodi:</span> {student.major}</p>
                       <p><span className="font-medium">Semester:</span> {student.semester}</p>

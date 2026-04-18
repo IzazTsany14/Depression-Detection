@@ -24,7 +24,8 @@ export const AdminUserManagement: React.FC = () => {
     const matchesSearch = 
       u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       u.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (u.npm && u.npm.includes(searchTerm));
+      (u.nik && u.nik.includes(searchTerm)) ||
+      (u.nim && u.nim.includes(searchTerm));
     
     const matchesRole = filterRole === 'all' || u.role === filterRole;
     
@@ -137,7 +138,7 @@ export const AdminUserManagement: React.FC = () => {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Cari nama, email, atau NPM..."
+                  placeholder="Cari nama, email, NIM, atau NIK..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -189,7 +190,7 @@ export const AdminUserManagement: React.FC = () => {
                   <tr>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Nama</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Email</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">NPM</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">NIM</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Role</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Fakultas</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Status</th>
@@ -206,7 +207,7 @@ export const AdminUserManagement: React.FC = () => {
                         <div className="text-sm text-gray-600">{u.email}</div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-sm text-gray-600">{u.npm || '-'}</div>
+                        <div className="text-sm text-gray-600">{u.nim || '-'}</div>
                       </td>
                       <td className="px-6 py-4">
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${getRoleBadge(u.role)}`}>

@@ -17,7 +17,8 @@ interface MedicalRecordFormProps {
 export interface MedicalRecord {
   id: string;
   studentName: string;
-  npm: string;
+  nik: string;
+  nim: string;
   faculty: string;
   major: string;
   semester: string;
@@ -51,7 +52,7 @@ export const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ onSave, on
     e.preventDefault();
     
     // Validasi form
-    if (!formData.studentName || !formData.npm || !formData.consultationDate) {
+    if (!formData.studentName || !formData.nim || !formData.nik || !formData.consultationDate) {
       toast.error('Mohon lengkapi data yang wajib diisi');
       return;
     }
@@ -59,7 +60,8 @@ export const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ onSave, on
     const record: MedicalRecord = {
       id: `RM-${Date.now()}`,
       studentName: formData.studentName || '',
-      npm: formData.npm || '',
+      nik: formData.nik || '',
+      nim: formData.nim || '',
       faculty: formData.faculty || '',
       major: formData.major || '',
       semester: formData.semester || '',
@@ -110,12 +112,23 @@ export const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ onSave, on
             </div>
             
             <div>
-              <Label htmlFor="npm">NPM *</Label>
+              <Label htmlFor="nim">NIM *</Label>
               <Input
-                id="npm"
-                value={formData.npm || ''}
-                onChange={(e) => handleChange('npm', e.target.value)}
+                id="nim"
+                value={formData.nim || ''}
+                onChange={(e) => handleChange('nim', e.target.value)}
                 placeholder="Contoh: 2024001"
+                required
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="nik">NIK *</Label>
+              <Input
+                id="nik"
+                value={formData.nik || ''}
+                onChange={(e) => handleChange('nik', e.target.value)}
+                placeholder="Contoh: 3201051998123001"
                 required
               />
             </div>

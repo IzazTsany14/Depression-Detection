@@ -6,7 +6,8 @@ export interface User {
   password: string;
   name: string;
   role: 'student' | 'admin' | 'bk';
-  npm?: string; // Nomor Pokok Mahasiswa
+  nik?: string; // Nomor Induk Kependudukan
+  nim?: string; // Nomor Induk Mahasiswa
   faculty?: string;
   major?: string;
   semester?: number;
@@ -54,7 +55,8 @@ export const dummyUsers: User[] = [
     password: 'student123',
     name: 'Ahmad Fauzi',
     role: 'student',
-    npm: '2021110001',
+    nik: '3201051998123001',
+    nim: '2021110001',
     faculty: 'Fakultas Ilmu Komputer',
     major: 'Teknik Informatika',
     semester: 6
@@ -65,7 +67,8 @@ export const dummyUsers: User[] = [
     password: 'student123',
     name: 'Siti Rahmawati',
     role: 'student',
-    npm: '2021110002',
+    nik: '3206021999234002',
+    nim: '2021110002',
     faculty: 'Fakultas Ilmu Komputer',
     major: 'Sistem Informasi',
     semester: 6
@@ -76,7 +79,8 @@ export const dummyUsers: User[] = [
     password: 'student123',
     name: 'Budi Hartono',
     role: 'student',
-    npm: '2020110015',
+    nik: '3571021996345003',
+    nim: '2020110015',
     faculty: 'Fakultas Teknik',
     major: 'Teknik Elektro',
     semester: 8
@@ -87,7 +91,8 @@ export const dummyUsers: User[] = [
     password: 'student123',
     name: 'Dewi Kusuma',
     role: 'student',
-    npm: '2022110030',
+    nik: '3502031997456004',
+    nim: '2022110030',
     faculty: 'Fakultas Psikologi',
     major: 'Psikologi',
     semester: 4
@@ -98,7 +103,8 @@ export const dummyUsers: User[] = [
     password: 'student123',
     name: 'Eko Prasetyo',
     role: 'student',
-    npm: '2021110045',
+    nik: '3514121995567005',
+    nim: '2021110045',
     faculty: 'Fakultas Ekonomi',
     major: 'Manajemen',
     semester: 6
@@ -254,6 +260,48 @@ export const getStudentsNeedingAttention = () => {
           : 'new'
       };
     });
+};
+
+// Search helper - mencari mahasiswa berdasarkan NIK, NIM, atau nama
+export const searchStudents = (query: string) => {
+  const searchTerm = query.toLowerCase().trim();
+  
+  if (!searchTerm) {
+    return [];
+  }
+
+  return dummyUsers.filter(u => {
+    if (u.role !== 'student') return false;
+    
+    return (
+      (u.nik && u.nik.includes(searchTerm)) ||
+      (u.nim && u.nim.includes(searchTerm)) ||
+      (u.name && u.name.toLowerCase().includes(searchTerm))
+    );
+  });
+};
+
+// Cari dan ambil detail student dengan test history
+export const getStudentDetailBySearch = (query: string) => {
+  const students = searchStudents(query);
+  
+  return students.map(student => {
+    const studentTests = dummyTestResults
+      .filter(t => t.userId === student.id)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    const latestTest = studentTests[0];
+
+    return {
+      ...student,
+      latestTest,
+      testHistory: studentTests,
+      totalTests: studentTests.length,
+      trend: studentTests.length > 1
+        ? (studentTests[0].score < studentTests[1].score ? 'improving' : 'worsening')
+        : 'new'
+    };
+  });
 };
 
 // Login helper

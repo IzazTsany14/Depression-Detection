@@ -9,7 +9,7 @@ import { Calendar, Clock, Plus, CheckCircle2, XCircle, AlertCircle, User, Phone,
 interface CounselingSession {
   id: string;
   studentName: string;
-  studentNpm: string;
+  studentNim: string;
   date: string;
   time: string;
   duration: number;
@@ -40,7 +40,7 @@ export const BKCounselingSchedule: React.FC = () => {
       {
         id: '1',
         studentName: 'Dewi Lestari',
-        studentNpm: '2021001',
+        studentNim: '2021001',
         date: '2026-04-18',
         time: '09:00',
         duration: 60,
@@ -52,7 +52,7 @@ export const BKCounselingSchedule: React.FC = () => {
       {
         id: '2',
         studentName: 'Ahmad Rizki',
-        studentNpm: '2021002',
+        studentNim: '2021002',
         date: '2026-04-18',
         time: '10:30',
         duration: 60,
@@ -63,7 +63,7 @@ export const BKCounselingSchedule: React.FC = () => {
       {
         id: '3',
         studentName: 'Siti Nurhaliza',
-        studentNpm: '2021003',
+        studentNim: '2021003',
         date: '2026-04-18',
         time: '13:00',
         duration: 45,
@@ -74,7 +74,7 @@ export const BKCounselingSchedule: React.FC = () => {
       {
         id: '4',
         studentName: 'Budi Santoso',
-        studentNpm: '2021004',
+        studentNim: '2021004',
         date: '2026-04-17',
         time: '09:00',
         duration: 60,
@@ -86,7 +86,7 @@ export const BKCounselingSchedule: React.FC = () => {
       {
         id: '5',
         studentName: 'Rina Wijaya',
-        studentNpm: '2021005',
+        studentNim: '2021005',
         date: '2026-04-17',
         time: '11:00',
         duration: 60,
@@ -97,7 +97,7 @@ export const BKCounselingSchedule: React.FC = () => {
       {
         id: '6',
         studentName: 'Group Session A',
-        studentNpm: 'GROUP-A',
+        studentNim: 'GROUP-A',
         date: '2026-04-19',
         time: '14:00',
         duration: 90,
@@ -339,7 +339,7 @@ export const BKCounselingSchedule: React.FC = () => {
                             <User className="w-4 h-4 text-gray-600" />
                             <h5 className="font-semibold text-gray-900">{session.studentName}</h5>
                             {session.type === 'individual' && (
-                              <span className="text-sm text-gray-600">({session.studentNpm})</span>
+                              <span className="text-sm text-gray-600">({session.studentNim})</span>
                             )}
                           </div>
 
@@ -407,7 +407,7 @@ export const BKCounselingSchedule: React.FC = () => {
                           </div>
                           <div>
                             <p className="font-medium text-gray-900">{session.studentName}</p>
-                            <p className="text-sm text-gray-600">{session.studentNpm}</p>
+                            <p className="text-sm text-gray-600">{session.studentNim}</p>
                           </div>
                         </div>
                         <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusBadge(session.status)}`}>

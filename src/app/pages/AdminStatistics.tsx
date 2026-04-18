@@ -49,7 +49,7 @@ export const AdminStatistics: React.FC = () => {
       }
       
       // Get latest test for this student
-      const studentTests = dummyTestResults.filter(t => t.userId === student.npm);
+      const studentTests = dummyTestResults.filter(t => t.userId === student.id);
       if (studentTests.length > 0) {
         const latestTest = studentTests.sort((a, b) => 
           new Date(b.date).getTime() - new Date(a.date).getTime()

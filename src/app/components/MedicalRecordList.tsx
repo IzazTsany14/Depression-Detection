@@ -68,7 +68,8 @@ export const MedicalRecordList: React.FC<MedicalRecordListProps> = ({ records, o
     addText('DATA MAHASISWA', 14, true);
     yPosition += 2;
     addText(`Nama: ${record.studentName}`, 11);
-    addText(`NPM: ${record.npm}`, 11);
+    addText(`NIM: ${record.nim}`, 11);
+    addText(`NIK: ${record.nik}`, 11);
     if (record.faculty) addText(`Fakultas: ${record.faculty}`, 11);
     if (record.major) addText(`Program Studi: ${record.major}`, 11);
     if (record.semester) addText(`Semester: ${record.semester}`, 11);
@@ -153,7 +154,7 @@ export const MedicalRecordList: React.FC<MedicalRecordListProps> = ({ records, o
     doc.text('Sistem Deteksi Dini Tingkat Depresi Mahasiswa', pageWidth / 2, footerY + 12, { align: 'center' });
 
     // Save PDF
-    const fileName = `Rekam_Medis_${record.npm}_${record.id}.pdf`;
+    const fileName = `Rekam_Medis_${record.nim}_${record.id}.pdf`;
     doc.save(fileName);
     toast.success('PDF berhasil diunduh');
   };
@@ -198,7 +199,8 @@ export const MedicalRecordList: React.FC<MedicalRecordListProps> = ({ records, o
                 </Badge>
               </div>
               <div className="grid md:grid-cols-2 gap-2 text-sm text-gray-600">
-                <p><span className="font-medium">NPM:</span> {record.npm}</p>
+                <p><span className="font-medium">NIM:</span> {record.nim}</p>
+                <p><span className="font-medium">NIK:</span> {record.nik}</p>
                 <p><span className="font-medium">No. RM:</span> {record.id}</p>
                 <p><span className="font-medium">Tanggal Konsultasi:</span> {new Date(record.consultationDate).toLocaleDateString('id-ID')}</p>
                 <p><span className="font-medium">Jenis:</span> {record.consultationType}</p>

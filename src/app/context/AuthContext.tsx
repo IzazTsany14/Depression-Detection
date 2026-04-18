@@ -6,7 +6,8 @@ interface User {
   name: string;
   email: string;
   role: 'student' | 'admin' | 'bk';
-  npm?: string;
+  nik?: string;
+  nim?: string;
   faculty?: string;
   major?: string;
   semester?: number;
@@ -79,7 +80,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         name: foundUser.name,
         email: foundUser.email,
         role: foundUser.role,
-        npm: foundUser.npm,
+        nik: foundUser.nik,
+        nim: foundUser.nim,
         faculty: foundUser.faculty,
         major: foundUser.major,
         semester: foundUser.semester

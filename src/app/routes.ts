@@ -15,6 +15,7 @@ import { AdminStatistics } from "./pages/AdminStatistics";
 import { BKDashboard } from "./pages/BKDashboard";
 import { BKStudentCases } from "./pages/BKStudentCases";
 import { BKCounselingSchedule } from "./pages/BKCounselingSchedule";
+import { BKMedicalRecords } from "./pages/BKMedicalRecords";
 
 export const router = createBrowserRouter([
   {
@@ -80,5 +81,9 @@ export const router = createBrowserRouter([
   {
     path: "/bk/schedule",
     Component: BKCounselingSchedule,
+  },
+  {
+    path: "/bk/medical-records",
+    Component: BKMedicalRecords,
   },
 ]);

@@ -6,9 +6,6 @@ import { Button } from '../components/ui/button';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { useAuth } from '../context/AuthContext';
 import { getStudentsNeedingAttention } from '../data/dummyData';
-import { MedicalRecordForm, MedicalRecord } from '../components/MedicalRecordForm';
-import { MedicalRecordList } from '../components/MedicalRecordList';
-import { MedicalRecordDetail } from '../components/MedicalRecordDetail';
 import {
   AlertTriangle,
   TrendingUp,
@@ -18,10 +15,7 @@ import {
   Heart,
   CheckCircle2,
   XCircle,
-  Minus,
-  Plus,
-  FolderOpen,
-  LayoutDashboard
+  Minus
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
@@ -31,10 +25,6 @@ export const BKDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [studentsNeedingAttention, setStudentsNeedingAttention] = useState<any[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
-  const [activeView, setActiveView] = useState<'dashboard' | 'medical-records'>('dashboard');
-  const [showMedicalRecordForm, setShowMedicalRecordForm] = useState(false);
-  const [medicalRecords, setMedicalRecords] = useState<MedicalRecord[]>([]);
-  const [selectedRecord, setSelectedRecord] = useState<MedicalRecord | null>(null);
 
   useEffect(() => {
     if (!user || user.role !== 'bk') {
@@ -44,25 +34,7 @@ export const BKDashboard: React.FC = () => {
 
     const students = getStudentsNeedingAttention();
     setStudentsNeedingAttention(students);
-
-    const savedRecords = localStorage.getItem('medicalRecords');
-    if (savedRecords) {
-      setMedicalRecords(JSON.parse(savedRecords));
-    }
   }, [user, navigate]);
-
-  const handleSaveMedicalRecord = (record: MedicalRecord) => {
-    const updatedRecords = [...medicalRecords, record];
-    setMedicalRecords(updatedRecords);
-    localStorage.setItem('medicalRecords', JSON.stringify(updatedRecords));
-    setShowMedicalRecordForm(false);
-  };
-
-  const handleDeleteMedicalRecord = (id: string) => {
-    const updatedRecords = medicalRecords.filter(r => r.id !== id);
-    setMedicalRecords(updatedRecords);
-    localStorage.setItem('medicalRecords', JSON.stringify(updatedRecords));
-  };
 
   const getTrendIcon = (trend: string) => {
     switch (trend) {
@@ -93,7 +65,7 @@ export const BKDashboard: React.FC = () => {
       .slice()
       .reverse()
       .map((test: any, index: number) => ({
-        id: `test-${student.npm}-${index}-${test.date}`,
+        id: `test-${student.nim}-${index}-${test.date}`,
         test: `Tes ${index + 1}`,
         skor: test.score,
         tanggal: new Date(test.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }),
@@ -106,7 +78,7 @@ export const BKDashboard: React.FC = () => {
           <div className="flex items-start justify-between mb-4">
             <div>
               <h3 className="text-2xl font-bold text-gray-900">{student.name}</h3>
-              <p className="text-gray-600">NPM: {student.npm}</p>
+              <p className="text-gray-600">NIM: {student.nim} | NIK: {student.nik}</p>
             </div>
             <Button onClick={() => setSelectedStudent(null)} variant="outline" size="sm">
               Tutup
@@ -115,8 +87,12 @@ export const BKDashboard: React.FC = () => {
 
           <div className="grid md:grid-cols-2 gap-4 mb-6">
             <div className="bg-gray-50 p-4 rounded-lg">
-              <p className="text-sm text-gray-600 mb-1">Fakultas</p>
-              <p className="font-semibold text-gray-900">{student.faculty}</p>
+              <p className="text-sm text-gray-600 mb-1">NIM</p>
+              <p className="font-semibold text-gray-900">{student.nim}</p>
+            </div>
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <p className="text-sm text-gray-600 mb-1">NIK</p>
+              <p className="font-semibold text-gray-900">{student.nik}</p>
             </div>
             <div className="bg-gray-50 p-4 rounded-lg">
               <p className="text-sm text-gray-600 mb-1">Program Studi</p>
@@ -151,7 +127,7 @@ export const BKDashboard: React.FC = () => {
 
           <div className="mb-6">
             <h4 className="text-lg font-semibold text-gray-900 mb-4">Riwayat Skor Tes</h4>
-            <ResponsiveContainer width="100%" height={250} key={`chart-${student.npm}`}>
+            <ResponsiveContainer width="100%" height={250} key={`chart-${student.nim}`}>
               <LineChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="id" tickFormatter={(value, index) => chartData[index]?.tanggal || ''} />
@@ -257,31 +233,10 @@ export const BKDashboard: React.FC = () => {
       <DashboardSidebar role="bk" />
 
       <div className="flex-1">
-        {/* Top Bar */}
-        <div className="bg-white border-b border-gray-200 px-8 py-4">
-          <div className="flex items-center gap-4">
-            <Button
-              variant={activeView === 'dashboard' ? 'default' : 'outline'}
-              onClick={() => setActiveView('dashboard')}
-              className={activeView === 'dashboard' ? 'bg-purple-600 hover:bg-purple-700' : ''}
-            >
-              <LayoutDashboard className="w-4 h-4 mr-2" />
-              Dashboard Kasus
-            </Button>
-            <Button
-              variant={activeView === 'medical-records' ? 'default' : 'outline'}
-              onClick={() => setActiveView('medical-records')}
-              className={activeView === 'medical-records' ? 'bg-purple-600 hover:bg-purple-700' : ''}
-            >
-              <FolderOpen className="w-4 h-4 mr-2" />
-              Rekam Medis
-            </Button>
-          </div>
-        </div>
+
 
         <main className="p-8">
-          {activeView === 'dashboard' ? (
-            <div>
+          <div>
               <div className="mb-8">
                 <h1 className="text-4xl font-bold text-gray-900 mb-2">
                   Dashboard Bimbingan Konseling
@@ -364,7 +319,8 @@ export const BKDashboard: React.FC = () => {
                                 {getTrendIcon(student.trend)}
                               </div>
                               <div className="grid md:grid-cols-2 gap-2 text-sm text-gray-600 mb-4">
-                                <p>NPM: {student.npm}</p>
+                                <p>NIM: {student.nim}</p>
+                                <p>NIK: {student.nik}</p>
                                 <p>Fakultas: {student.faculty}</p>
                                 <p>Prodi: {student.major}</p>
                                 <p>Semester: {student.semester}</p>
@@ -415,7 +371,8 @@ export const BKDashboard: React.FC = () => {
                                 {getTrendIcon(student.trend)}
                               </div>
                               <div className="grid md:grid-cols-2 gap-2 text-sm text-gray-600 mb-4">
-                                <p>NPM: {student.npm}</p>
+                                <p>NIM: {student.nim}</p>
+                                <p>NIK: {student.nik}</p>
                                 <p>Fakultas: {student.faculty}</p>
                                 <p>Prodi: {student.major}</p>
                                 <p>Semester: {student.semester}</p>
@@ -459,7 +416,8 @@ export const BKDashboard: React.FC = () => {
                               {getTrendIcon(student.trend)}
                             </div>
                             <div className="grid md:grid-cols-2 gap-2 text-sm text-gray-600 mb-4">
-                              <p>NPM: {student.npm}</p>
+                              <p>NIM: {student.nim}</p>
+                              <p>NIK: {student.nik}</p>
                               <p>Fakultas: {student.faculty}</p>
                               <p>Prodi: {student.major}</p>
                               <p>Semester: {student.semester}</p>
@@ -492,47 +450,6 @@ export const BKDashboard: React.FC = () => {
                 </Tabs>
               )}
             </div>
-          ) : (
-            <div>
-              <div className="mb-8 flex items-center justify-between">
-                <div>
-                  <h1 className="text-4xl font-bold text-gray-900 mb-2">Rekam Medis Konsultasi</h1>
-                  <p className="text-gray-600 text-lg">
-                    Kelola rekam medis mahasiswa yang telah berkonsultasi
-                  </p>
-                </div>
-                {!showMedicalRecordForm && (
-                  <Button
-                    onClick={() => setShowMedicalRecordForm(true)}
-                    className="bg-purple-600 hover:bg-purple-700"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Tambah Rekam Medis
-                  </Button>
-                )}
-              </div>
-
-              {showMedicalRecordForm ? (
-                <MedicalRecordForm
-                  onSave={handleSaveMedicalRecord}
-                  onCancel={() => setShowMedicalRecordForm(false)}
-                />
-              ) : (
-                <MedicalRecordList
-                  records={medicalRecords}
-                  onDelete={handleDeleteMedicalRecord}
-                  onView={(record) => setSelectedRecord(record)}
-                />
-              )}
-
-              {selectedRecord && (
-                <MedicalRecordDetail
-                  record={selectedRecord}
-                  onClose={() => setSelectedRecord(null)}
-                />
-              )}
-            </div>
-          )}
         </main>
       </div>
     </div>

@@ -63,7 +63,8 @@ export const MedicalRecordDetail: React.FC<MedicalRecordDetailProps> = ({ record
     addText('DATA MAHASISWA', 14, true);
     yPosition += 2;
     addText(`Nama: ${record.studentName}`, 11);
-    addText(`NPM: ${record.npm}`, 11);
+    addText(`NIM: ${record.nim}`, 11);
+    addText(`NIK: ${record.nik}`, 11);
     if (record.faculty) addText(`Fakultas: ${record.faculty}`, 11);
     if (record.major) addText(`Program Studi: ${record.major}`, 11);
     if (record.semester) addText(`Semester: ${record.semester}`, 11);
@@ -142,7 +143,7 @@ export const MedicalRecordDetail: React.FC<MedicalRecordDetailProps> = ({ record
     doc.text('Dokumen ini bersifat rahasia dan hanya untuk keperluan konseling', pageWidth / 2, footerY + 7, { align: 'center' });
     doc.text('Sistem Deteksi Dini Tingkat Depresi Mahasiswa', pageWidth / 2, footerY + 12, { align: 'center' });
 
-    const fileName = `Rekam_Medis_${record.npm}_${record.id}.pdf`;
+    const fileName = `Rekam_Medis_${record.nim}_${record.id}.pdf`;
     doc.save(fileName);
     toast.success('PDF berhasil diunduh');
   };
@@ -205,8 +206,12 @@ export const MedicalRecordDetail: React.FC<MedicalRecordDetailProps> = ({ record
                 <p className="font-semibold text-gray-900">{record.studentName}</p>
               </div>
               <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">NPM</p>
-                <p className="font-semibold text-gray-900">{record.npm}</p>
+                <p className="text-sm text-gray-600 mb-1">NIM</p>
+                <p className="font-semibold text-gray-900">{record.nim}</p>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <p className="text-sm text-gray-600 mb-1">NIK</p>
+                <p className="font-semibold text-gray-900">{record.nik}</p>
               </div>
               {record.faculty && (
                 <div className="bg-gray-50 p-4 rounded-lg">

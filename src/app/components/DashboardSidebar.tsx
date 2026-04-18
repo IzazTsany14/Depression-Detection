@@ -71,8 +71,8 @@ export const DashboardSidebar: React.FC<SidebarProps> = ({ role }) => {
     { 
       icon: FolderOpen, 
       label: 'Rekam Medis', 
-      path: '/bk',
-      active: false
+      path: '/bk/medical-records',
+      active: location.pathname === '/bk/medical-records'
     },
     { 
       icon: ClipboardList, 

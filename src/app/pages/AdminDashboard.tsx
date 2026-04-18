@@ -282,7 +282,7 @@ export const AdminDashboard: React.FC = () => {
                               {student?.name || 'Unknown Student'}
                             </p>
                             <p className="text-sm text-gray-600">
-                              {student?.npm} - {student?.major}
+                              NIM: {student?.nim} | NIK: {student?.nik} - {student?.major}
                             </p>
                           </div>
                         </div>
