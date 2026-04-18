@@ -68,8 +68,6 @@ export const MedicalRecordDetail: React.FC<MedicalRecordDetailProps> = ({ record
     if (record.faculty) addText(`Fakultas: ${record.faculty}`, 11);
     if (record.major) addText(`Program Studi: ${record.major}`, 11);
     if (record.semester) addText(`Semester: ${record.semester}`, 11);
-    if (record.email) addText(`Email: ${record.email}`, 11);
-    if (record.phone) addText(`Telepon: ${record.phone}`, 11);
     yPosition += 5;
 
     addText('DATA KONSULTASI', 14, true);
@@ -229,18 +227,6 @@ export const MedicalRecordDetail: React.FC<MedicalRecordDetailProps> = ({ record
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600 mb-1">Semester</p>
                   <p className="font-semibold text-gray-900">{record.semester}</p>
-                </div>
-              )}
-              {record.email && (
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-sm text-gray-600 mb-1">Email</p>
-                  <p className="font-semibold text-gray-900">{record.email}</p>
-                </div>
-              )}
-              {record.phone && (
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-sm text-gray-600 mb-1">No. Telepon</p>
-                  <p className="font-semibold text-gray-900">{record.phone}</p>
                 </div>
               )}
             </div>

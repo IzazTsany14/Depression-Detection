@@ -12,10 +12,13 @@ import { AdminDashboard } from "./pages/AdminDashboard";
 import { AdminUserManagement } from "./pages/AdminUserManagement";
 import { AdminReports } from "./pages/AdminReports";
 import { AdminStatistics } from "./pages/AdminStatistics";
+import { AdminProfile } from "./pages/AdminProfile";
 import { BKDashboard } from "./pages/BKDashboard";
 import { BKStudentCases } from "./pages/BKStudentCases";
 import { BKCounselingSchedule } from "./pages/BKCounselingSchedule";
 import { BKMedicalRecords } from "./pages/BKMedicalRecords";
+import { BKProfile } from "./pages/BKProfile";
+import { StudentProfile } from "./pages/StudentProfile";
 
 export const router = createBrowserRouter([
   {
@@ -71,6 +74,10 @@ export const router = createBrowserRouter([
     Component: AdminStatistics,
   },
   {
+    path: "/admin/profile",
+    Component: AdminProfile,
+  },
+  {
     path: "/bk",
     Component: BKDashboard,
   },
@@ -85,5 +92,13 @@ export const router = createBrowserRouter([
   {
     path: "/bk/medical-records",
     Component: BKMedicalRecords,
+  },
+  {
+    path: "/bk/profile",
+    Component: BKProfile,
+  },
+  {
+    path: "/student/profile",
+    Component: StudentProfile,
   },
 ]);

@@ -2,12 +2,12 @@ import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
 import { useAuth } from '../context/AuthContext';
 import { 
-  LayoutDashboard, 
+  Home, 
   Users, 
   FileText, 
   Heart,
   ClipboardList,
-  Settings,
+  User,
   LogOut,
   Activity,
   FolderOpen
@@ -30,8 +30,8 @@ export const DashboardSidebar: React.FC<SidebarProps> = ({ role }) => {
 
   const adminMenuItems = [
     { 
-      icon: LayoutDashboard, 
-      label: 'Dashboard', 
+      icon: Home, 
+      label: 'Beranda', 
       path: '/admin',
       active: location.pathname === '/admin'
     },
@@ -57,8 +57,8 @@ export const DashboardSidebar: React.FC<SidebarProps> = ({ role }) => {
 
   const bkMenuItems = [
     { 
-      icon: LayoutDashboard, 
-      label: 'Dashboard', 
+      icon: Home, 
+      label: 'Beranda', 
       path: '/bk',
       active: location.pathname === '/bk'
     },
@@ -122,10 +122,10 @@ export const DashboardSidebar: React.FC<SidebarProps> = ({ role }) => {
         <Button
           variant="outline"
           className="w-full justify-start"
-          onClick={() => navigate('/')}
+          onClick={() => navigate(role === 'admin' ? '/admin/profile' : '/bk/profile')}
         >
-          <Settings className="w-4 h-4 mr-2" />
-          Pengaturan
+          <User className="w-4 h-4 mr-2" />
+          Profil
         </Button>
         <Button
           variant="destructive"

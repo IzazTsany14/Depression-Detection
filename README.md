@@ -40,10 +40,10 @@ Sistem ini mengintegrasikan instrumen psikometrik **DASS-21** (Depression Anxiet
 | Komponen | Teknologi |
 |-----------|------------|
 | **Frontend** | React, Next.js, TypeScript, Tailwind CSS, Shadcn/UI |
-| **Logic Engine** | [cite_start]JavaScript (Fuzzy Logic Implementation) [cite: 309] |
-| **Backend** | [cite_start]Python (Django Framework) [cite: 821] |
-| **Database** | [cite_start]MySQL (Main DB) & Redis (Caching) [cite: 225, 231] |
-| **UI/UX** | [cite_start]Figma (Design System) [cite: 138] |
+| **Logic Engine** |JavaScript (Fuzzy Logic Implementation) |
+| **Backend** | Python (Django Framework)  |
+| **Database** | MySQL (Main DB) & Redis (Caching) |
+| **UI/UX** | Figma (Design System)  |
 
 ---
 

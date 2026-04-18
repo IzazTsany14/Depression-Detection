@@ -59,16 +59,25 @@ export const Header: React.FC = () => {
           <div className="hidden md:flex items-center gap-3">
             {user && !isGuest ? (
               <div className="flex items-center gap-3">
-                <Link
-                  to={user.role === 'admin' ? '/admin' : user.role === 'bk' ? '/bk' : '/dashboard'}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  <User className="w-5 h-5 text-blue-600" />
-                  <div className="text-left">
-                    <span className="text-sm font-medium text-gray-700 block">{user.name}</span>
-                    <span className="text-xs text-gray-500 capitalize">{user.role === 'bk' ? 'Konselor BK' : user.role}</span>
-                  </div>
-                </Link>
+                <div className="flex items-center gap-2">
+                  <Link
+                    to={user.role === 'admin' ? '/admin' : user.role === 'bk' ? '/bk' : '/dashboard'}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+                  >
+                    <User className="w-5 h-5 text-blue-600" />
+                    <div className="text-left">
+                      <span className="text-sm font-medium text-gray-700 block">{user.name}</span>
+                      <span className="text-xs text-gray-500 capitalize">{user.role === 'bk' ? 'Konselor BK' : user.role}</span>
+                    </div>
+                  </Link>
+                  {user.role === 'student' && (
+                    <Link to="/student/profile">
+                      <Button variant="outline" size="sm">
+                        Profil
+                      </Button>
+                    </Link>
+                  )}
+                </div>
                 <Button
                   variant="ghost"
                   size="sm"

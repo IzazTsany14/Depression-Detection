@@ -73,8 +73,6 @@ export const MedicalRecordList: React.FC<MedicalRecordListProps> = ({ records, o
     if (record.faculty) addText(`Fakultas: ${record.faculty}`, 11);
     if (record.major) addText(`Program Studi: ${record.major}`, 11);
     if (record.semester) addText(`Semester: ${record.semester}`, 11);
-    if (record.email) addText(`Email: ${record.email}`, 11);
-    if (record.phone) addText(`Telepon: ${record.phone}`, 11);
     yPosition += 5;
 
     // Data Konsultasi Section

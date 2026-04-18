@@ -5,9 +5,11 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { FileText, Save, Download } from 'lucide-react';
+import { FileText, Save, Download, AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription } from './ui/alert';
 import jsPDF from 'jspdf';
 import { toast } from 'sonner';
+import { dummyUsers } from '../data/dummyData';
 
 interface MedicalRecordFormProps {
   onSave: (record: MedicalRecord) => void;
@@ -22,8 +24,6 @@ export interface MedicalRecord {
   faculty: string;
   major: string;
   semester: string;
-  email: string;
-  phone: string;
   consultationDate: string;
   consultationType: string;
   symptoms: string;
@@ -43,9 +43,55 @@ export const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ onSave, on
     consultationType: 'Individual',
     depressionLevel: 'Normal',
   });
+  const [notFound, setNotFound] = useState(false);
 
   const handleChange = (field: keyof MedicalRecord, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleNikChange = (nik: string) => {
+    handleChange('nik', nik);
+    
+    if (nik.trim() === '') {
+      setFormData(prev => ({
+        ...prev,
+        studentName: '',
+        nim: '',
+        faculty: '',
+        major: '',
+        semester: ''
+      }));
+      setNotFound(false);
+      return;
+    }
+
+    // Cari mahasiswa berdasarkan NIK
+    const student = dummyUsers.find(u => u.role === 'student' && u.nik === nik);
+    
+    if (student) {
+      setFormData(prev => ({
+        ...prev,
+        nik: nik,
+        studentName: student.name,
+        nim: student.nim,
+        faculty: student.faculty || '',
+        major: student.major || '',
+        semester: student.semester ? student.semester.toString() : ''
+      }));
+      setNotFound(false);
+      toast.success('Data mahasiswa ditemukan');
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        nik: nik,
+        studentName: '',
+        nim: '',
+        faculty: '',
+        major: '',
+        semester: ''
+      }));
+      setNotFound(true);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -65,8 +111,6 @@ export const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ onSave, on
       faculty: formData.faculty || '',
       major: formData.major || '',
       semester: formData.semester || '',
-      email: formData.email || '',
-      phone: formData.phone || '',
       consultationDate: formData.consultationDate || '',
       consultationType: formData.consultationType || 'Individual',
       symptoms: formData.symptoms || '',
@@ -99,6 +143,28 @@ export const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ onSave, on
         <div className="space-y-4">
           <h4 className="font-semibold text-lg text-gray-900 border-b pb-2">Data Mahasiswa</h4>
           
+          {/* NIK Search Field - First */}
+          <div>
+            <Label htmlFor="nik">NIK (Nomor Induk Kependudukan) *</Label>
+            <Input
+              id="nik"
+              value={formData.nik || ''}
+              onChange={(e) => handleNikChange(e.target.value)}
+              placeholder="Masukkan NIK untuk mencari data mahasiswa"
+              required
+            />
+            <p className="text-xs text-gray-500 mt-1">Data lainnya akan terisi otomatis setelah NIK dimasukkan</p>
+          </div>
+
+          {notFound && formData.nik && (
+            <Alert className="bg-red-50 border-red-300">
+              <AlertCircle className="h-5 w-5 text-red-600" />
+              <AlertDescription className="text-red-900">
+                NIK tidak ditemukan dalam sistem. Mohon periksa kembali nomor NIK.
+              </AlertDescription>
+            </Alert>
+          )}
+          
           <div className="grid md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="studentName">Nama Lengkap *</Label>
@@ -106,8 +172,9 @@ export const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ onSave, on
                 id="studentName"
                 value={formData.studentName || ''}
                 onChange={(e) => handleChange('studentName', e.target.value)}
-                placeholder="Masukkan nama mahasiswa"
-                required
+                placeholder="Nama akan otomatis terisi"
+                readOnly
+                className="bg-gray-100 cursor-not-allowed"
               />
             </div>
             
@@ -117,19 +184,9 @@ export const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ onSave, on
                 id="nim"
                 value={formData.nim || ''}
                 onChange={(e) => handleChange('nim', e.target.value)}
-                placeholder="Contoh: 2024001"
-                required
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="nik">NIK *</Label>
-              <Input
-                id="nik"
-                value={formData.nik || ''}
-                onChange={(e) => handleChange('nik', e.target.value)}
-                placeholder="Contoh: 3201051998123001"
-                required
+                placeholder="NIM akan otomatis terisi"
+                readOnly
+                className="bg-gray-100 cursor-not-allowed"
               />
             </div>
 
@@ -139,7 +196,9 @@ export const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ onSave, on
                 id="faculty"
                 value={formData.faculty || ''}
                 onChange={(e) => handleChange('faculty', e.target.value)}
-                placeholder="Contoh: Teknik"
+                placeholder="Fakultas akan otomatis terisi"
+                readOnly
+                className="bg-gray-100 cursor-not-allowed"
               />
             </div>
 
@@ -149,7 +208,9 @@ export const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ onSave, on
                 id="major"
                 value={formData.major || ''}
                 onChange={(e) => handleChange('major', e.target.value)}
-                placeholder="Contoh: Informatika"
+                placeholder="Program studi akan otomatis terisi"
+                readOnly
+                className="bg-gray-100 cursor-not-allowed"
               />
             </div>
 
@@ -159,28 +220,9 @@ export const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ onSave, on
                 id="semester"
                 value={formData.semester || ''}
                 onChange={(e) => handleChange('semester', e.target.value)}
-                placeholder="Contoh: 5"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email || ''}
-                onChange={(e) => handleChange('email', e.target.value)}
-                placeholder="email@example.com"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="phone">No. Telepon</Label>
-              <Input
-                id="phone"
-                value={formData.phone || ''}
-                onChange={(e) => handleChange('phone', e.target.value)}
-                placeholder="08xxxxxxxxxx"
+                placeholder="Semester akan otomatis terisi"
+                readOnly
+                className="bg-gray-100 cursor-not-allowed"
               />
             </div>
           </div>
