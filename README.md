@@ -1,196 +1,85 @@
-# Sistem Deteksi Dini Tingkat Depresi Mahasiswa
+<div align='center'>
+  <a href="https://git.io/typing-svg">
+    <img src="https://readme-typing-svg.herokuapp.com?font=Poppins&weight=600&size=38&pause=1000&color=0B84F3&center=true&vCenter=true&width=800&height=70&lines=MindCheck;Sistem+Deteksi+Dini+Tingkat+Depresi;Logika+Fuzzy+%2B+Instrumen+DASS-21" alt="Typing SVG" />
+  </a>
+</div>
 
-## 📋 Deskripsi Sistem
-
-Sistem ini adalah aplikasi web untuk mendeteksi tingkat depresi mahasiswa menggunakan metode **DASS-21 (Depression, Anxiety, and Stress Scale)** dan **Logika Fuzzy** untuk memberikan hasil yang lebih akurat dan personalisasi.
-
-## 🎯 Fitur Utama
-
-### 1. **Tiga Tingkat Akses Pengguna**
-
-#### a. Guest (Tamu)
-- Akses tanpa registrasi
-- Dapat mengikuti tes DASS-21
-- Melihat hasil tes (tidak tersimpan)
-- **Tidak ada** riwayat tes
-- **Tidak ada** akses panduan personalisasi
-
-#### b. Mahasiswa (Registered User)
-- Harus registrasi dan login
-- Akses tes DASS-21
-- **Riwayat tes tersimpan**
-- **Dashboard pribadi** dengan grafik perkembangan
-- **Panduan personalisasi** berdasarkan hasil tes
-- Akses dokumen referensi penelitian
-
-#### c. Konselor BK (Bimbingan Konseling)
-- Login dengan akun khusus BK
-- **Interface dengan Sidebar** untuk navigasi mudah
-- Melihat **daftar mahasiswa yang memerlukan perhatian**
-- Filter berdasarkan tingkat keparahan:
-  - Urgent (Sangat Berat)
-  - Prioritas Tinggi (Berat)
-  - Semua Kasus
-- **Detail mahasiswa** dengan:
-  - Info lengkap (NPM, Fakultas, Prodi, Semester)
-  - Grafik riwayat skor tes
-  - Trend perkembangan (improving/worsening/new)
-  - Rekomendasi tindakan
-- Aksi cepat untuk hubungi mahasiswa
-- **✨ FITUR BARU: Rekam Medis Konsultasi**
-  - Form lengkap untuk input data konsultasi mahasiswa
-  - Menyimpan riwayat konsultasi dengan detail:
-    - Data mahasiswa (nama, NPM, fakultas, prodi, semester, kontak)
-    - Data konsultasi (tanggal, jenis, gejala, diagnosis)
-    - Tingkat depresi hasil asesmen
-    - Intervensi yang diberikan
-    - Rekomendasi tindak lanjut
-    - Jadwal follow-up
-    - Catatan konselor
-  - **Download otomatis ke PDF** dengan format profesional
-  - Daftar rekam medis yang telah dibuat
-  - Detail view untuk setiap rekam medis
-  - Hapus rekam medis jika diperlukan
-  - Data tersimpan di localStorage
-
-#### d. Admin
-- Login dengan akun admin
-- **Interface dengan Sidebar** untuk navigasi mudah
-- **Dashboard statistik lengkap**:
-  - Total mahasiswa, tes, konselor BK
-  - Kasus kritis yang memerlukan perhatian
-  - Grafik distribusi tingkat depresi (bar chart & pie chart)
-  - Trend tes bulanan (line chart)
-  - Distribusi mahasiswa per fakultas
-  - Aktivitas terbaru (10 tes terakhir)
-
-## 🎨 Desain & Tema
-
-### Palet Warna
-- **Biru Tenang:** `#4A90E2`, `#E6F0FA` - untuk elemen utama
-- **Hijau Mint:** `#28A745`, `#D4EDDA` - untuk status normal/positif
-- **Lavender:** `#6F4E7C`, `#E6E6FA` - untuk aksen
-- **Orange:** `#FF9800` - untuk warning/perhatian
-- **Red:** `#F44336` - untuk kondisi berat
-- **Purple:** `#9C27B0` - untuk kondisi sangat berat
-
-### Prinsip Desain
-- **Bersih & Minimalis**
-- **Menenangkan** (tidak agresif)
-- **Profesional** namun approachable
-- **Responsive** (mobile-friendly)
-
-## 🔢 Metode Perhitungan
-
-### DASS-21 Scoring
-Sistem menggunakan 21 pertanyaan dengan skala 0-3:
-- 0: Tidak pernah
-- 1: Kadang-kadang
-- 2: Sering
-- 3: Sangat sering
-
-### Tingkat Depresi
-Berdasarkan total skor:
-- **Normal:** 0-9
-- **Ringan:** 10-20
-- **Sedang:** 21-27
-- **Berat:** 28-55
-- **Sangat Berat:** >55
-
-### Fuzzy Logic
-Sistem menggunakan fuzzy logic untuk:
-- Memberikan nilai kontinu (fuzzy score 0-1)
-- Menangani borderline cases dengan lebih baik
-- Memberikan interpretasi yang lebih nuansa
-
-## 📱 Halaman dalam Sistem
-
-1. **Beranda** (`/`) - Landing page dengan informasi sistem
-2. **Registrasi** (`/registration`) - Daftar akun mahasiswa
-3. **Login** (`/login`) - Masuk ke sistem (semua role)
-4. **Kuesioner DASS-21** (`/questionnaire`) - Tes depresi
-5. **Hasil Guest** (`/result/guest`) - Hasil untuk tamu
-6. **Hasil Registered** (`/result/registered`) - Hasil untuk mahasiswa
-7. **Dashboard Mahasiswa** (`/dashboard`) - Dashboard pribadi mahasiswa
-8. **Panduan** (`/guide`) - Panduan mengatasi depresi + PDF referensi
-9. **Dashboard Admin** (`/admin`) - Dashboard untuk admin
-10. **Dashboard BK** (`/bk`) - Dashboard untuk konselor BK
-11. **Tentang DASS-21** (`/about`) - Informasi tentang metode
-
-## 🚀 Cara Menggunakan Sistem
-
-### Sebagai Mahasiswa
-1. Klik "Daftar" atau "Login"
-2. Isi data registrasi (jika baru)
-3. Klik "Mulai Tes" di dashboard
-4. Jawab 21 pertanyaan DASS-21
-5. Lihat hasil dan rekomendasi
-6. Akses panduan personalisasi
-7. Lihat grafik perkembangan di dashboard
-
-### Sebagai Konselor BK
-1. Login dengan akun BK
-2. Dashboard menampilkan mahasiswa yang perlu perhatian
-3. Filter berdasarkan keparahan (Urgent/High/All)
-4. Klik "Lihat Detail" pada mahasiswa
-5. Lihat riwayat tes, trend, dan rekomendasi
-6. Gunakan tombol "Hubungi" atau "Email"
-7. **✨ Kelola Rekam Medis:**
-   - Klik tab "Rekam Medis" di navigasi atas
-   - Klik "Tambah Rekam Medis" untuk membuat rekam medis baru
-   - Isi form dengan lengkap:
-     - Data mahasiswa (nama, NPM, kontak)
-     - Data konsultasi (tanggal, jenis, gejala, diagnosis)
-     - Tingkat depresi hasil asesmen
-     - Intervensi dan rekomendasi
-     - Jadwal follow-up
-     - Catatan konselor
-   - Klik "Simpan Rekam Medis" untuk menyimpan
-   - Data otomatis tersimpan dan dapat diunduh sebagai PDF
-   - Gunakan "Unduh PDF" untuk mendapatkan file rekam medis
-   - Gunakan "Lihat Detail" untuk melihat rekam medis lengkap
-   - Gunakan tombol hapus untuk menghapus rekam medis (dengan konfirmasi)
-
-### Sebagai Admin
-1. Login dengan akun admin
-2. Lihat statistik keseluruhan sistem
-3. Monitor distribusi tingkat depresi
-4. Analisis trend bulanan
-5. Lihat aktivitas terbaru
-
-## 📚 Teknologi yang Digunakan
-
-- **Frontend:** React + TypeScript
-- **Styling:** Tailwind CSS v4
-- **Routing:** React Router v7
-- **Charts:** Recharts
-- **PDF Viewer:** react-pdf
-- **PDF Generator:** jsPDF (untuk rekam medis)
-- **UI Components:** Radix UI (shadcn/ui)
-- **Icons:** Lucide React
-- **Notifications:** Sonner (toast notifications)
-- **Data Storage:** LocalStorage (untuk demo)
-
-## 📖 Referensi Penelitian
-
-Dokumen PDF penelitian dapat diakses melalui:
-- **Halaman Panduan** → Tab "Referensi"
-- File: `2024K_Kelompok_8.pdf`
-
-## 🎓 Catatan Penting
-
-1. **Data Dummy:** Sistem saat ini menggunakan data dummy di localStorage untuk demonstrasi. Dalam implementasi real, gunakan backend dan database yang proper.
-
-2. **Keamanan:** Password tersimpan plain text untuk demo. Implementasi real harus menggunakan hashing (bcrypt, dll).
-
-3. **Privasi:** Dalam implementasi real, pastikan data mahasiswa terenkripsi dan mematuhi regulasi privasi (GDPR, UU PDP, dll).
-
-4. **Validitas Klinis:** Sistem ini adalah alat skrining, **BUKAN diagnosis klinis**. Selalu rujuk ke profesional kesehatan mental untuk assessment lengkap.
-
-5. **Hotline Krisis:** Sistem menyediakan informasi hotline krisis 24/7 untuk kondisi darurat.
-
-## 👥 Tim Pengembang
-
-**Kelompok 8 - 2024K**
+<p align="center">
+  <img src="https://img.shields.io/badge/Frontend-React%2FNext.js-61DAFB?style=for-the-badge&logo=react" alt="React Badge">
+  <img src="https://img.shields.io/badge/Language-TypeScript-3178C6?style=for-the-badge&logo=typescript" alt="TypeScript Badge">
+  <img src="https://img.shields.io/badge/Styling-TailwindCSS-06B6D4?style=for-the-badge&logo=tailwind-css" alt="Tailwind Badge">
+  <img src="https://img.shields.io/badge/Backend-Django-092E20?style=for-the-badge&logo=django" alt="Django Badge">
+  <img src="https://img.shields.io/badge/Database-MySQL-4479A1?style=for-the-badge&logo=mysql" alt="MySQL Badge">
+</p>
 
 ---
+
+## 🌐 Tentang Proyek
+
+[cite_start]**MindCheck** adalah platform berbasis web yang dikembangkan untuk mendeteksi tingkat depresi secara dini pada mahasiswa, khususnya di lingkungan **Universitas Negeri Surabaya (UNESA)**[cite: 26, 66]. 
+
+[cite_start]Sistem ini mengintegrasikan instrumen psikometrik **DASS-21** (Depression Anxiety Stress Scale-21) dengan **Logika Fuzzy** sebagai inti penalaran untuk menangani subjektivitas dan ketidakpastian jawaban pengguna[cite: 66, 69, 95]. 
+
+[cite_start]**Disclaimer**: Proyek ini merupakan instrumen skrining awal dan tidak menggantikan diagnosis klinis dari tenaga profesional (psikolog/psikiater)[cite: 37, 118].
+
+---
+
+## ⚙️ Fitur Utama
+
+[cite_start]✅ **Asesmen DASS-21**: 21 pertanyaan tervalidasi dengan skala Likert 0-3[cite: 116, 276].
+[cite_start]🧠 **Fuzzy Inference Engine**: Komputasi sisi klien menggunakan metode *Mamdani* (Fuzzifikasi, 125 Aturan, Defuzzifikasi CoA)[cite: 292, 309].
+[cite_start]📊 **Dashboard Personalisasi**: Statistik riwayat tes, tren kondisi mental, dan ringkasan aktivitas[cite: 340, 354].
+[cite_start]📑 **Laporan PDF**: Unduhan hasil skrining resmi untuk keperluan dokumentasi atau rujukan[cite: 368].
+[cite_start]🚨 **Protokol Darurat**: Notifikasi otomatis dengan kontak bantuan (119 ext 8 & BK UNESA) untuk kategori hasil "Parah" dan "Sangat Parah"[cite: 318, 424].
+[cite_start]🛡️ **Keamanan & Privasi**: Pengolahan data jawaban di sisi klien (*client-side*) dan enkripsi password[cite: 309, 427].
+
+---
+
+## 🧩 Teknologi yang Digunakan
+
+| Komponen | Teknologi |
+|-----------|------------|
+| **Frontend** | React, Next.js, TypeScript, Tailwind CSS, Shadcn/UI |
+| **Logic Engine** | [cite_start]JavaScript (Fuzzy Logic Implementation) [cite: 309] |
+| **Backend** | [cite_start]Python (Django Framework) [cite: 821] |
+| **Database** | [cite_start]MySQL (Main DB) & Redis (Caching) [cite: 225, 231] |
+| **UI/UX** | [cite_start]Figma (Design System) [cite: 138] |
+
+---
+
+## 🧑‍💻 Tim Kontributor (Kelompok 8 - 2024K)
+
+[cite_start]Berdasarkan dokumen SRS **Sistem Deteksi Dini Tingkat Depresi Mahasiswa**[cite: 7]:
+
+| Nama | NIM | Peran |
+| ------- | -------- | ------- |
+| **[Izaz Tsany Rismawan](https://github.com/IzazTsany14)** | 25051204355 | Fullstack Developer / Lead |
+| **Lufita Setiati** | 25051204304 | System Analyst / Documentation |
+| **Fearda Agnessiya Putri Dardiri** | 25051204332 | UI/UX Designer / Researcher |
+
+[cite_start]**Dosen Pengampu**: Saifudin Yahya, S.Kom., M.T.I. [cite: 4]
+
+---
+
+## 🚀 Status Proyek
+
+[cite_start]🟢 **Phase: Implementation & Testing** Sistem saat ini sedang dalam tahap integrasi modul logika fuzzy dan validasi konten klinis oleh Unit BK UNESA[cite: 835, 840].
+
+---
+
+## 🛠️ Setup Project (Frontend)
+
+Pastikan Anda memiliki Node.js terinstal di perangkat Anda.
+
+```bash
+# Clone repositori
+git clone [https://github.com/username/mindcheck](https://github.com/username/mindcheck)
+
+# Masuk ke direktori proyek
+cd mindcheck
+
+# Install dependensi (menggunakan npm atau yarn)
+npm install
+
+# Jalankan server pengembangan
+npm run dev
