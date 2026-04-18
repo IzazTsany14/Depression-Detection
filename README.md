@@ -16,22 +16,22 @@
 
 ## 🌐 Tentang Proyek
 
-[cite_start]**MindCheck** adalah platform berbasis web yang dikembangkan untuk mendeteksi tingkat depresi secara dini pada mahasiswa, khususnya di lingkungan **Universitas Negeri Surabaya (UNESA)**[cite: 26, 66]. 
+**MindCheck** adalah platform berbasis web yang dikembangkan untuk mendeteksi tingkat depresi secara dini pada mahasiswa, khususnya di lingkungan **Universitas Negeri Surabaya (UNESA)**. 
 
-[cite_start]Sistem ini mengintegrasikan instrumen psikometrik **DASS-21** (Depression Anxiety Stress Scale-21) dengan **Logika Fuzzy** sebagai inti penalaran untuk menangani subjektivitas dan ketidakpastian jawaban pengguna[cite: 66, 69, 95]. 
+Sistem ini mengintegrasikan instrumen psikometrik **DASS-21** (Depression Anxiety Stress Scale-21) dengan **Logika Fuzzy** sebagai inti penalaran untuk menangani subjektivitas dan ketidakpastian jawaban pengguna. 
 
-[cite_start]**Disclaimer**: Proyek ini merupakan instrumen skrining awal dan tidak menggantikan diagnosis klinis dari tenaga profesional (psikolog/psikiater)[cite: 37, 118].
+**Disclaimer**: Proyek ini merupakan instrumen skrining awal dan tidak menggantikan diagnosis klinis dari tenaga profesional (psikolog/psikiater).
 
 ---
 
 ## ⚙️ Fitur Utama
 
-[cite_start]✅ **Asesmen DASS-21**: 21 pertanyaan tervalidasi dengan skala Likert 0-3[cite: 116, 276].
-[cite_start]🧠 **Fuzzy Inference Engine**: Komputasi sisi klien menggunakan metode *Mamdani* (Fuzzifikasi, 125 Aturan, Defuzzifikasi CoA)[cite: 292, 309].
-[cite_start]📊 **Dashboard Personalisasi**: Statistik riwayat tes, tren kondisi mental, dan ringkasan aktivitas[cite: 340, 354].
-[cite_start]📑 **Laporan PDF**: Unduhan hasil skrining resmi untuk keperluan dokumentasi atau rujukan[cite: 368].
-[cite_start]🚨 **Protokol Darurat**: Notifikasi otomatis dengan kontak bantuan (119 ext 8 & BK UNESA) untuk kategori hasil "Parah" dan "Sangat Parah"[cite: 318, 424].
-[cite_start]🛡️ **Keamanan & Privasi**: Pengolahan data jawaban di sisi klien (*client-side*) dan enkripsi password[cite: 309, 427].
+✅ **Asesmen DASS-21**: 21 pertanyaan tervalidasi dengan skala Likert 0-3.
+🧠 **Fuzzy Inference Engine**: Komputasi sisi klien menggunakan metode *Mamdani* (Fuzzifikasi, 125 Aturan, Defuzzifikasi CoA).
+📊 **Dashboard Personalisasi**: Statistik riwayat tes, tren kondisi mental, dan ringkasan aktivitas.
+📑 **Laporan PDF**: Unduhan hasil skrining resmi untuk keperluan dokumentasi atau rujukan.
+🚨 **Protokol Darurat**: Notifikasi otomatis dengan kontak bantuan (119 ext 8 & BK UNESA) untuk kategori hasil "Parah" dan "Sangat Parah".
+🛡️ **Keamanan & Privasi**: Pengolahan data jawaban di sisi klien (*client-side*) dan enkripsi password.
 
 ---
 
@@ -49,7 +49,7 @@
 
 ## 🧑‍💻 Tim Kontributor (Kelompok 8 - 2024K)
 
-[cite_start]Berdasarkan dokumen SRS **Sistem Deteksi Dini Tingkat Depresi Mahasiswa**[cite: 7]:
+Berdasarkan dokumen SRS **Sistem Deteksi Dini Tingkat Depresi Mahasiswa**:
 
 | Nama | NIM | Peran |
 | ------- | -------- | ------- |
