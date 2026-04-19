@@ -6,12 +6,11 @@ import { Button } from '../components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { useAuth } from '../context/AuthContext';
 import { Users, Search, Plus, Edit2, Trash2, Filter, CheckCircle2, XCircle, User } from 'lucide-react';
-import { dummyUsers } from '../data/dummyData';
 
 export const AdminUserManagement: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [users, setUsers] = useState(dummyUsers);
+  const [users, setUsers] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState<'all' | 'student' | 'admin' | 'bk'>('all');
   const [showAddUserDialog, setShowAddUserDialog] = useState(false);
@@ -32,11 +31,23 @@ export const AdminUserManagement: React.FC = () => {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Load users from localStorage on component mount
   useEffect(() => {
     if (!user || user.role !== 'admin') {
       navigate('/login');
+    } else {
+      // Load users from localStorage
+      const storedUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+      setUsers(storedUsers);
     }
   }, [user, navigate]);
+
+  // Sync users to localStorage whenever they change
+  useEffect(() => {
+    if (users.length > 0) {
+      localStorage.setItem('registeredUsers', JSON.stringify(users));
+    }
+  }, [users]);
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -97,7 +108,10 @@ export const AdminUserManagement: React.FC = () => {
       }),
     };
 
-    setUsers([...users, newUser]);
+    const updatedUsers = [...users, newUser];
+    setUsers(updatedUsers);
+    localStorage.setItem('registeredUsers', JSON.stringify(updatedUsers));
+    
     resetForm();
     setShowAddUserDialog(false);
     alert('User berhasil ditambahkan!');
@@ -169,6 +183,7 @@ export const AdminUserManagement: React.FC = () => {
           : u
       );
       setUsers(updatedUsers);
+      localStorage.setItem('registeredUsers', JSON.stringify(updatedUsers));
       alert('User berhasil diperbarui!');
     } else {
       // Add new user
@@ -181,9 +196,25 @@ export const AdminUserManagement: React.FC = () => {
   };
 
   const handleDeleteUser = (userToDelete: any) => {
-    if (window.confirm(`Apakah Anda yakin ingin menghapus user ${userToDelete.name}?`)) {
-      setUsers(users.filter(u => u.id !== userToDelete.id));
-      alert('User berhasil dihapus!');
+    if (window.confirm(`Apakah Anda yakin ingin menghapus user ${userToDelete.name}? Semua data user akan terhapus dan tidak bisa login lagi.`)) {
+      // Remove user from users list
+      const updatedUsers = users.filter(u => u.id !== userToDelete.id);
+      setUsers(updatedUsers);
+      
+      // Save updated users to localStorage
+      localStorage.setItem('registeredUsers', JSON.stringify(updatedUsers));
+      
+      // Delete all associated data for this user
+      localStorage.removeItem(`history_${userToDelete.id}`); // Delete test history
+      localStorage.removeItem(`completionNotes_${userToDelete.id}`); // Delete completion notes
+      
+      // If user was logged in, logout them
+      const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+      if (currentUser.id === userToDelete.id) {
+        localStorage.removeItem('user');
+      }
+      
+      alert('User dan semua data terkait berhasil dihapus!');
     }
   };
 

@@ -309,5 +309,7 @@ export const getStudentDetailBySearch = (query: string) => {
 
 // Login helper
 export const authenticateUser = (email: string, password: string) => {
-  return dummyUsers.find(u => u.email === email && u.password === password);
+  // Check from localStorage first (realtime data)
+  const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+  return registeredUsers.find((u: any) => u.email === email && u.password === password);
 };
