@@ -4,7 +4,7 @@ import { DashboardSidebar } from '../components/DashboardSidebar';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { useAuth } from '../context/AuthContext';
-import { getStatistics, dummyUsers, dummyTestResults } from '../data/dummyData';
+import { getStatistics, dummyUsers } from '../data/dummyData';
 import {
   Users,
   FileText,
@@ -18,9 +18,10 @@ import {
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 
 export const AdminDashboard: React.FC = () => {
-  const { user } = useAuth();
+  const { user, getAllTestResults } = useAuth();
   const navigate = useNavigate();
   const [stats, setStats] = useState<any>(null);
+  const [allTestResults, setAllTestResults] = useState<any[]>([]);
 
   useEffect(() => {
     // Only admin can access this page
@@ -29,10 +30,14 @@ export const AdminDashboard: React.FC = () => {
       return;
     }
 
+    // Load all test results
+    const results = getAllTestResults();
+    setAllTestResults(results);
+
     // Load statistics
     const statistics = getStatistics();
     setStats(statistics);
-  }, [user, navigate]);
+  }, [user, navigate, getAllTestResults]);
 
   if (!stats) {
     return (
@@ -58,7 +63,7 @@ export const AdminDashboard: React.FC = () => {
   };
 
   // Get monthly test trend
-  const monthlyData = dummyTestResults.reduce((acc, test) => {
+  const monthlyData = allTestResults.reduce((acc, test) => {
     const month = new Date(test.date).toLocaleDateString('id-ID', { month: 'short', year: 'numeric' });
     if (!acc[month]) {
       acc[month] = 0;
@@ -265,12 +270,11 @@ export const AdminDashboard: React.FC = () => {
                 Aktivitas Terbaru
               </h3>
               <div className="space-y-4">
-                {dummyTestResults
+                {allTestResults
                   .slice()
                   .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
                   .slice(0, 10)
                   .map((test, index) => {
-                    const student = dummyUsers.find(u => u.id === test.userId);
                     return (
                       <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                         <div className="flex items-center gap-4">
@@ -279,10 +283,10 @@ export const AdminDashboard: React.FC = () => {
                           </div>
                           <div>
                             <p className="font-medium text-gray-900">
-                              {student?.name || 'Unknown Student'}
+                              {test.userName || 'Unknown Student'}
                             </p>
                             <p className="text-sm text-gray-600">
-                              NIM: {student?.nim} | NIK: {student?.nik} - {student?.major}
+                              {test.userEmail}
                             </p>
                           </div>
                         </div>

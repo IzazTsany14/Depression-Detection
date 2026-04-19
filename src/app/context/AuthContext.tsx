@@ -30,6 +30,7 @@ interface AuthContextType {
   startAsGuest: () => void;
   saveTestResult: (result: TestResult) => void;
   getTestHistory: () => TestResult[];
+  getAllTestResults: () => any[];
   currentTestAnswers: number[];
   setCurrentTestAnswers: (answers: number[]) => void;
 }
@@ -162,6 +163,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return testHistory;
   };
 
+  const getAllTestResults = () => {
+    // Get all test results from localStorage across all users
+    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+    const allResults: any[] = [];
+
+    registeredUsers.forEach((u: any) => {
+      const userHistory = JSON.parse(localStorage.getItem(`history_${u.id}`) || '[]');
+      userHistory.forEach((test: any) => {
+        allResults.push({
+          ...test,
+          userId: u.id,
+          userName: u.name,
+          userEmail: u.email,
+          userRole: u.role
+        });
+      });
+    });
+
+    return allResults;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -173,6 +195,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         startAsGuest,
         saveTestResult,
         getTestHistory,
+        getAllTestResults,
         currentTestAnswers,
         setCurrentTestAnswers,
       }}

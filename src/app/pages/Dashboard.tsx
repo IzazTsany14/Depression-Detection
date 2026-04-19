@@ -16,9 +16,11 @@ import {
   Shield,
   Settings,
   LogOut,
-  Book
+  Book,
+  Download
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { generateTestResultPDF, downloadPDF } from '../utils/pdfGenerator';
 
 export const Dashboard: React.FC = () => {
   const { user, getTestHistory, logout } = useAuth();
@@ -67,6 +69,21 @@ export const Dashboard: React.FC = () => {
     date: new Date(test.date).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' }),
     skor: test.score,
   }));
+
+  const handleDownloadTestPDF = (test: any) => {
+    const testStyle = getColorForLevel(test.level);
+    const pdf = generateTestResultPDF({
+      level: test.level,
+      score: test.score,
+      date: test.date,
+      name: user?.name,
+      color: testStyle.color,
+      emoji: testStyle.emoji,
+    });
+    
+    const filename = `hasil-tes-dass21-${new Date(test.date).getTime()}.pdf`;
+    downloadPDF(pdf, filename);
+  };
 
   if (!user) {
     return null;
@@ -217,7 +234,7 @@ export const Dashboard: React.FC = () => {
                             borderColor: testStyle.color
                           }}
                         >
-                          <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-4 flex-1">
                             <span className="text-3xl">{testStyle.emoji}</span>
                             <div>
                               <p className="font-semibold text-gray-900">
@@ -235,13 +252,23 @@ export const Dashboard: React.FC = () => {
                               </p>
                             </div>
                           </div>
-                          <div className="text-right">
-                            <p className="font-bold text-lg" style={{ color: testStyle.color }}>
-                              {test.level}
-                            </p>
-                            <p className="text-sm text-gray-600">
-                              Skor: {test.score}
-                            </p>
+                          <div className="flex items-center gap-4">
+                            <div className="text-right">
+                              <p className="font-bold text-lg" style={{ color: testStyle.color }}>
+                                {test.level}
+                              </p>
+                              <p className="text-sm text-gray-600">
+                                Skor: {test.score}
+                              </p>
+                            </div>
+                            <Button
+                              onClick={() => handleDownloadTestPDF(test)}
+                              size="sm"
+                              className="bg-blue-600 hover:bg-blue-700"
+                              title="Unduh hasil test sebagai PDF"
+                            >
+                              <Download className="w-4 h-4" />
+                            </Button>
                           </div>
                         </div>
                       );

@@ -5,20 +5,23 @@ import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { useAuth } from '../context/AuthContext';
 import { FileText, Calendar, Filter, TrendingUp, Users, AlertTriangle } from 'lucide-react';
-import { dummyTestResults } from '../data/dummyData';
 
 export const AdminReports: React.FC = () => {
-  const { user } = useAuth();
+  const { user, getAllTestResults } = useAuth();
   const navigate = useNavigate();
   const [selectedPeriod, setSelectedPeriod] = useState('month');
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [dummyTestResults, setDummyTestResults] = useState<any[]>([]);
 
   useEffect(() => {
     if (!user || user.role !== 'admin') {
       navigate('/login');
+    } else {
+      const results = getAllTestResults();
+      setDummyTestResults(results);
     }
-  }, [user, navigate]);
+  }, [user, navigate, getAllTestResults]);
 
   const months = [
     'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',

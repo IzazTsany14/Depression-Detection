@@ -15,6 +15,9 @@ export const BKProfile: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    nip: '',
+    nidn: '',
+    nuptk: '',
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
@@ -31,7 +34,10 @@ export const BKProfile: React.FC = () => {
     setFormData(prev => ({
       ...prev,
       name: user.name || '',
-      email: user.email || ''
+      email: user.email || '',
+      nip: user.nip || '',
+      nidn: user.nidn || '',
+      nuptk: user.nuptk || '',
     }));
   }, [user, navigate]);
 
@@ -128,6 +134,36 @@ export const BKProfile: React.FC = () => {
                       value={formData.email}
                       onChange={(e) => handleChange('email', e.target.value)}
                       placeholder="Masukkan email"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="nip">NIP</Label>
+                    <Input
+                      id="nip"
+                      value={formData.nip}
+                      onChange={(e) => handleChange('nip', e.target.value)}
+                      placeholder="Nomor Induk Pegawai"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="nidn">NIDN</Label>
+                    <Input
+                      id="nidn"
+                      value={formData.nidn}
+                      onChange={(e) => handleChange('nidn', e.target.value)}
+                      placeholder="Nomor Induk Dosen Nasional"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="nuptk">NUPTK</Label>
+                    <Input
+                      id="nuptk"
+                      value={formData.nuptk}
+                      onChange={(e) => handleChange('nuptk', e.target.value)}
+                      placeholder="Nomor Unik Pendidik dan Tenaga Kependidikan"
                     />
                   </div>
                 </div>

@@ -1,24 +1,28 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { DashboardSidebar } from '../components/DashboardSidebar';
 import { Card } from '../components/ui/card';
 import { useAuth } from '../context/AuthContext';
 import { Activity, TrendingUp, Users, Calendar, BarChart3 } from 'lucide-react';
-import { dummyTestResults, dummyUsers } from '../data/dummyData';
+import { dummyUsers } from '../data/dummyData';
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area
 } from 'recharts';
 
 export const AdminStatistics: React.FC = () => {
-  const { user } = useAuth();
+  const { user, getAllTestResults } = useAuth();
   const navigate = useNavigate();
+  const [dummyTestResults, setDummyTestResults] = useState<any[]>([]);
 
   useEffect(() => {
     if (!user || user.role !== 'admin') {
       navigate('/login');
+    } else {
+      const results = getAllTestResults();
+      setDummyTestResults(results);
     }
-  }, [user, navigate]);
+  }, [user, navigate, getAllTestResults]);
 
   // Monthly trend
   const monthlyData = dummyTestResults.reduce((acc, test) => {

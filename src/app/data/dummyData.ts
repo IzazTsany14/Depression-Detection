@@ -8,6 +8,9 @@ export interface User {
   role: 'student' | 'admin' | 'bk';
   nik?: string; // Nomor Induk Kependudukan
   nim?: string; // Nomor Induk Mahasiswa
+  nip?: string; // Nomor Induk Pegawai
+  nidn?: string; // Nomor Induk Dosen Nasional
+  nuptk?: string; // Nomor Unik Pendidik dan Tenaga Kependidikan
   faculty?: string;
   major?: string;
   semester?: number;

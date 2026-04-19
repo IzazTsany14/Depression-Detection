@@ -16,12 +16,16 @@ export const AdminUserManagement: React.FC = () => {
   const [filterRole, setFilterRole] = useState<'all' | 'student' | 'admin' | 'bk'>('all');
   const [showAddUserDialog, setShowAddUserDialog] = useState(false);
   const [selectedUserType, setSelectedUserType] = useState<'student' | 'admin' | 'bk' | null>(null);
+  const [editingUser, setEditingUser] = useState<any>(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     nim: '',
     nik: '',
+    nip: '',
+    nidn: '',
+    nuptk: '',
     faculty: '',
     major: '',
     semester: '1',
@@ -86,6 +90,11 @@ export const AdminUserManagement: React.FC = () => {
         major: formData.major,
         semester: parseInt(formData.semester),
       }),
+      ...(selectedUserType === 'bk' && {
+        nip: formData.nip,
+        nidn: formData.nidn,
+        nuptk: formData.nuptk,
+      }),
     };
 
     setUsers([...users, newUser]);
@@ -101,12 +110,81 @@ export const AdminUserManagement: React.FC = () => {
       password: '',
       nim: '',
       nik: '',
+      nip: '',
+      nidn: '',
+      nuptk: '',
       faculty: '',
       major: '',
       semester: '1',
     });
     setSelectedUserType(null);
+    setEditingUser(null);
     setErrors({});
+  };
+
+  const handleEditUser = (userToEdit: any) => {
+    setEditingUser(userToEdit);
+    setSelectedUserType(userToEdit.role);
+    setFormData({
+      name: userToEdit.name,
+      email: userToEdit.email,
+      password: userToEdit.password,
+      nim: userToEdit.nim || '',
+      nik: userToEdit.nik || '',
+      nip: userToEdit.nip || '',
+      nidn: userToEdit.nidn || '',
+      nuptk: userToEdit.nuptk || '',
+      faculty: userToEdit.faculty || '',
+      major: userToEdit.major || '',
+      semester: String(userToEdit.semester || '1'),
+    });
+    setShowAddUserDialog(true);
+  };
+
+  const handleSaveUser = () => {
+    if (!validateForm()) return;
+
+    if (editingUser) {
+      // Update existing user
+      const updatedUsers = users.map(u => 
+        u.id === editingUser.id 
+          ? {
+              ...u,
+              name: formData.name,
+              email: formData.email,
+              password: formData.password,
+              ...(u.role === 'student' && {
+                nim: formData.nim,
+                nik: formData.nik,
+                faculty: formData.faculty,
+                major: formData.major,
+                semester: parseInt(formData.semester),
+              }),
+              ...(u.role === 'bk' && {
+                nip: formData.nip,
+                nidn: formData.nidn,
+                nuptk: formData.nuptk,
+              }),
+            }
+          : u
+      );
+      setUsers(updatedUsers);
+      alert('User berhasil diperbarui!');
+    } else {
+      // Add new user
+      handleAddUser();
+      return;
+    }
+
+    resetForm();
+    setShowAddUserDialog(false);
+  };
+
+  const handleDeleteUser = (userToDelete: any) => {
+    if (window.confirm(`Apakah Anda yakin ingin menghapus user ${userToDelete.name}?`)) {
+      setUsers(users.filter(u => u.id !== userToDelete.id));
+      alert('User berhasil dihapus!');
+    }
   };
 
   const filteredUsers = users.filter(u => {
@@ -317,10 +395,21 @@ export const AdminUserManagement: React.FC = () => {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-center gap-2">
-                          <Button variant="outline" size="sm">
+                          <Button 
+                            onClick={() => handleEditUser(u)}
+                            variant="outline" 
+                            size="sm"
+                            title="Edit user"
+                          >
                             <Edit2 className="w-4 h-4" />
                           </Button>
-                          <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50">
+                          <Button 
+                            onClick={() => handleDeleteUser(u)}
+                            variant="outline" 
+                            size="sm" 
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            title="Hapus user"
+                          >
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
@@ -340,12 +429,15 @@ export const AdminUserManagement: React.FC = () => {
           </Card>
 
           {/* Add User Dialog */}
-          <Dialog open={showAddUserDialog} onOpenChange={setShowAddUserDialog}>
+          <Dialog open={showAddUserDialog} onOpenChange={(open) => {
+            if (!open) resetForm();
+            setShowAddUserDialog(open);
+          }}>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
-                <DialogTitle>Tambah User Baru</DialogTitle>
+                <DialogTitle>{editingUser ? 'Edit User' : 'Tambah User Baru'}</DialogTitle>
                 <DialogDescription>
-                  Pilih tipe user dan isi informasi sesuai dengan tipenya
+                  {editingUser ? 'Perbarui informasi user' : 'Pilih tipe user dan isi informasi sesuai dengan tipenya'}
                 </DialogDescription>
               </DialogHeader>
 
@@ -516,6 +608,50 @@ export const AdminUserManagement: React.FC = () => {
                     </>
                   )}
 
+                  {/* BK-Specific Fields */}
+                  {selectedUserType === 'bk' && (
+                    <>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            NIP
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.nip}
+                            onChange={(e) => setFormData({ ...formData, nip: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Nomor Induk Pegawai"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            NIDN
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.nidn}
+                            onChange={(e) => setFormData({ ...formData, nidn: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Nomor Induk Dosen Nasional"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            NUPTK
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.nuptk}
+                            onChange={(e) => setFormData({ ...formData, nuptk: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Nomor Unik Pendidik dan Tenaga Kependidikan"
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
+
                   {/* Action Buttons */}
                   <div className="flex gap-2 pt-4">
                     <Button
@@ -529,10 +665,10 @@ export const AdminUserManagement: React.FC = () => {
                       Batal
                     </Button>
                     <Button
-                      onClick={handleAddUser}
+                      onClick={handleSaveUser}
                       className="flex-1 bg-green-600 hover:bg-green-700"
                     >
-                      Simpan User
+                      {editingUser ? 'Simpan Perubahan' : 'Simpan User'}
                     </Button>
                   </div>
                 </div>

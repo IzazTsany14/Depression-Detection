@@ -14,6 +14,11 @@ export const StudentProfile: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    nim: '',
+    nik: '',
+    faculty: '',
+    major: '',
+    semester: '',
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
@@ -30,7 +35,12 @@ export const StudentProfile: React.FC = () => {
     setFormData(prev => ({
       ...prev,
       name: user.name || '',
-      email: user.email || ''
+      email: user.email || '',
+      nim: user.nim || '',
+      nik: user.nik || '',
+      faculty: user.faculty || '',
+      major: user.major || '',
+      semester: String(user.semester || ''),
     }));
   }, [user, navigate]);
 
@@ -145,6 +155,63 @@ export const StudentProfile: React.FC = () => {
                       placeholder="Masukkan email"
                     />
                   </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="nim">NIM</Label>
+                    <Input
+                      id="nim"
+                      value={formData.nim}
+                      onChange={(e) => handleChange('nim', e.target.value)}
+                      placeholder="Nomor Induk Mahasiswa"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="nik">NIK</Label>
+                    <Input
+                      id="nik"
+                      value={formData.nik}
+                      onChange={(e) => handleChange('nik', e.target.value)}
+                      placeholder="Nomor Induk Kependudukan"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="faculty">Fakultas</Label>
+                    <Input
+                      id="faculty"
+                      value={formData.faculty}
+                      onChange={(e) => handleChange('faculty', e.target.value)}
+                      placeholder="Contoh: Fakultas Ilmu Komputer"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="major">Program Studi</Label>
+                    <Input
+                      id="major"
+                      value={formData.major}
+                      onChange={(e) => handleChange('major', e.target.value)}
+                      placeholder="Contoh: Teknik Informatika"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="semester">Semester</Label>
+                  <select
+                    id="semester"
+                    value={formData.semester}
+                    onChange={(e) => handleChange('semester', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  >
+                    <option value="">Pilih Semester</option>
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map(sem => (
+                      <option key={sem} value={sem}>Semester {sem}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="flex gap-2 pt-4">
