@@ -130,7 +130,7 @@ export const generateTestResultPDF = (data: TestResultPDF) => {
   pdf.setFontSize(12);
   pdf.setFont(undefined, 'bold');
   pdf.setTextColor(30, 58, 138);
-  pdf.text('📊 HASIL TES', margin + 8, yPosition + 8);
+  pdf.text('HASIL TES', margin + 8, yPosition + 8);
 
   // Depression level - Large and prominent
   pdf.setFontSize(18);
