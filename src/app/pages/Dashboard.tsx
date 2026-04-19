@@ -17,7 +17,10 @@ import {
   Settings,
   LogOut,
   Book,
-  Download
+  Download,
+  Clock,
+  CheckCircle2,
+  XCircle
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { generateTestResultPDF, downloadPDF } from '../utils/pdfGenerator';
@@ -26,6 +29,7 @@ export const Dashboard: React.FC = () => {
   const { user, getTestHistory, logout } = useAuth();
   const navigate = useNavigate();
   const [history, setHistory] = useState<any[]>([]);
+  const [counselingSessions, setCounselingSessions] = useState<any[]>([]);
 
   useEffect(() => {
     // Only registered users can access dashboard
@@ -37,6 +41,17 @@ export const Dashboard: React.FC = () => {
     // Load test history
     const testHistory = getTestHistory();
     setHistory(testHistory);
+
+    // Load counseling schedules
+    const storedSessions = localStorage.getItem('counselingSessions');
+    if (storedSessions) {
+      const sessions = JSON.parse(storedSessions);
+      // Filter for schedules relevant to this student (by name or nim)
+      const userSessions = sessions.filter((s: any) => 
+        s.studentName === user.name || s.studentNim === user.nim
+      );
+      setCounselingSessions(userSessions);
+    }
   }, [user, navigate, getTestHistory]);
 
   const getColorForLevel = (level: string) => {
@@ -209,6 +224,117 @@ export const Dashboard: React.FC = () => {
                   </p>
                 </Card>
               )}
+
+              {/* Counseling Schedule */}
+              <Card className="p-6 bg-gradient-to-br from-purple-50 to-blue-50 border-2 border-purple-200">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                    <Calendar className="w-6 h-6 text-purple-600" />
+                    Jadwal Konseling Anda
+                  </h2>
+                </div>
+
+                {counselingSessions.length > 0 ? (
+                  <div className="space-y-3">
+                    {counselingSessions
+                      .filter(s => s.status === 'scheduled')
+                      .sort((a: any, b: any) => {
+                        const dateCompare = new Date(a.date).getTime() - new Date(b.date).getTime();
+                        if (dateCompare !== 0) return dateCompare;
+                        return a.time.localeCompare(b.time);
+                      })
+                      .length > 0 ? (
+                      counselingSessions
+                        .filter(s => s.status === 'scheduled')
+                        .sort((a: any, b: any) => {
+                          const dateCompare = new Date(a.date).getTime() - new Date(b.date).getTime();
+                          if (dateCompare !== 0) return dateCompare;
+                          return a.time.localeCompare(b.time);
+                        })
+                        .slice(0, 3)
+                        .map((session: any) => (
+                          <div 
+                            key={session.id}
+                            className="p-4 rounded-lg bg-white border-l-4 border-purple-500 hover:shadow-md transition-shadow"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <div className="flex items-center gap-2 mb-1">
+                                  <Clock className="w-4 h-4 text-purple-600" />
+                                  <p className="font-semibold text-gray-900">
+                                    {new Date(session.date).toLocaleDateString('id-ID', { 
+                                      weekday: 'short',
+                                      day: 'numeric', 
+                                      month: 'short'
+                                    })} • {session.time}
+                                  </p>
+                                </div>
+                                <p className="text-sm text-gray-600 ml-6">
+                                  Durasi: {session.duration} menit
+                                </p>
+                                {session.notes && (
+                                  <p className="text-xs text-gray-600 mt-1 ml-6 italic">"{session.notes}"</p>
+                                )}
+                              </div>
+                              <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                                session.priority === 'high' 
+                                  ? 'bg-red-100 text-red-800'
+                                  : session.priority === 'medium'
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-green-100 text-green-800'
+                              }`}>
+                                {session.priority === 'high' ? 'Prioritas Tinggi' : 'Prioritas ' + (session.priority === 'medium' ? 'Sedang' : 'Rendah')}
+                              </span>
+                            </div>
+                          </div>
+                        ))
+                    ) : (
+                      <div className="text-center py-6">
+                        <Clock className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+                        <p className="text-gray-600">Tidak ada jadwal terjadwal</p>
+                      </div>
+                    )}
+                    
+                    {/* Completed Sessions History */}
+                    {counselingSessions.filter(s => s.status === 'completed').length > 0 && (
+                      <div className="mt-6 pt-6 border-t">
+                        <p className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-green-600" />
+                          Sesi Selesai ({counselingSessions.filter(s => s.status === 'completed').length})
+                        </p>
+                        <div className="space-y-2">
+                          {counselingSessions
+                            .filter(s => s.status === 'completed')
+                            .sort((a: any, b: any) => new Date(b.completedAt || '').getTime() - new Date(a.completedAt || '').getTime())
+                            .slice(0, 2)
+                            .map((session: any) => (
+                              <div key={session.id} className="text-xs text-gray-600 bg-green-50 p-2 rounded">
+                                <p className="font-medium text-green-900">{new Date(session.completedAt || '').toLocaleDateString('id-ID')}</p>
+                                {session.completionNotes && <p className="mt-1">{session.completionNotes}</p>}
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Cancelled Sessions */}
+                    {counselingSessions.filter(s => s.status === 'cancelled').length > 0 && (
+                      <div className="mt-4 pt-4 border-t">
+                        <p className="text-xs font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                          <XCircle className="w-3 h-3 text-red-600" />
+                          Sesi Dibatalkan ({counselingSessions.filter(s => s.status === 'cancelled').length})
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-3" />
+                    <p className="text-gray-600">Belum ada jadwal konseling</p>
+                    <p className="text-sm text-gray-500 mt-2">Hubungi bagian BK untuk membuat jadwal konseling</p>
+                  </div>
+                )}
+              </Card>
 
               {/* Test History */}
               <Card className="p-6">

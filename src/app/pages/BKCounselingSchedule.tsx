@@ -17,6 +17,9 @@ interface CounselingSession {
   type: 'individual' | 'group';
   notes?: string;
   priority: 'high' | 'medium' | 'low';
+  completionNotes?: string;
+  completedAt?: string;
+  cancelledAt?: string;
 }
 
 export const BKCounselingSchedule: React.FC = () => {
@@ -26,6 +29,19 @@ export const BKCounselingSchedule: React.FC = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [editingSession, setEditingSession] = useState<CounselingSession | null>(null);
+  const [formData, setFormData] = useState({
+    studentName: '',
+    studentNim: '',
+    date: new Date().toISOString().split('T')[0],
+    time: '09:00',
+    duration: '60',
+    type: 'individual' as 'individual' | 'group',
+    priority: 'medium' as 'high' | 'medium' | 'low',
+    notes: '',
+  });
+  const [showCompletionForm, setShowCompletionForm] = useState<string | null>(null);
+  const [completionNotes, setCompletionNotes] = useState('');
 
   useEffect(() => {
     if (!user || user.role !== 'bk') {
@@ -36,79 +52,85 @@ export const BKCounselingSchedule: React.FC = () => {
   }, [user, navigate]);
 
   const loadDummySessions = () => {
-    const dummySessions: CounselingSession[] = [
-      {
-        id: '1',
-        studentName: 'Dewi Lestari',
-        studentNim: '2021001',
-        date: '2026-04-18',
-        time: '09:00',
-        duration: 60,
-        status: 'scheduled',
-        type: 'individual',
-        priority: 'high',
-        notes: 'First session - Tingkat depresi sangat berat'
-      },
-      {
-        id: '2',
-        studentName: 'Ahmad Rizki',
-        studentNim: '2021002',
-        date: '2026-04-18',
-        time: '10:30',
-        duration: 60,
-        status: 'scheduled',
-        type: 'individual',
-        priority: 'high'
-      },
-      {
-        id: '3',
-        studentName: 'Siti Nurhaliza',
-        studentNim: '2021003',
-        date: '2026-04-18',
-        time: '13:00',
-        duration: 45,
-        status: 'scheduled',
-        type: 'individual',
-        priority: 'medium'
-      },
-      {
-        id: '4',
-        studentName: 'Budi Santoso',
-        studentNim: '2021004',
-        date: '2026-04-17',
-        time: '09:00',
-        duration: 60,
-        status: 'completed',
-        type: 'individual',
-        priority: 'medium',
-        notes: 'Progress baik, lanjutkan terapi'
-      },
-      {
-        id: '5',
-        studentName: 'Rina Wijaya',
-        studentNim: '2021005',
-        date: '2026-04-17',
-        time: '11:00',
-        duration: 60,
-        status: 'completed',
-        type: 'individual',
-        priority: 'low'
-      },
-      {
-        id: '6',
-        studentName: 'Group Session A',
-        studentNim: 'GROUP-A',
-        date: '2026-04-19',
-        time: '14:00',
-        duration: 90,
-        status: 'scheduled',
-        type: 'group',
-        priority: 'medium',
-        notes: '5 peserta - Mindfulness & Stress Management'
-      },
-    ];
-
-    setSessions(dummySessions);
+    const storedSessions = localStorage.getItem('counselingSessions');
+    if (storedSessions) {
+      setSessions(JSON.parse(storedSessions));
+    } else {
+      const dummySessions: CounselingSession[] = [
+        {
+          id: '1',
+          studentName: 'Dewi Lestari',
+          studentNim: '2021001',
+          date: '2026-04-18',
+          time: '09:00',
+          duration: 60,
+          status: 'scheduled',
+          type: 'individual',
+          priority: 'high',
+          notes: 'First session - Tingkat depresi sangat berat'
+        },
+        {
+          id: '2',
+          studentName: 'Ahmad Rizki',
+          studentNim: '2021002',
+          date: '2026-04-18',
+          time: '10:30',
+          duration: 60,
+          status: 'scheduled',
+          type: 'individual',
+          priority: 'high'
+        },
+        {
+          id: '3',
+          studentName: 'Siti Nurhaliza',
+          studentNim: '2021003',
+          date: '2026-04-18',
+          time: '13:00',
+          duration: 45,
+          status: 'scheduled',
+          type: 'individual',
+          priority: 'medium'
+        },
+        {
+          id: '4',
+          studentName: 'Budi Santoso',
+          studentNim: '2021004',
+          date: '2026-04-17',
+          time: '09:00',
+          duration: 60,
+          status: 'completed',
+          type: 'individual',
+          priority: 'medium',
+          notes: 'Progress baik, lanjutkan terapi',
+          completionNotes: 'Sesi berjalan lancar, mahasiswa responsif'
+        },
+        {
+          id: '5',
+          studentName: 'Rina Wijaya',
+          studentNim: '2021005',
+          date: '2026-04-17',
+          time: '11:00',
+          duration: 60,
+          status: 'completed',
+          type: 'individual',
+          priority: 'low'
+        },
+        {
+          id: '6',
+          studentName: 'Group Session A',
+          studentNim: 'GROUP-A',
+          date: '2026-04-19',
+          time: '14:00',
+          duration: 90,
+          status: 'scheduled',
+          type: 'group',
+          priority: 'medium',
+          notes: '5 peserta - Mindfulness & Stress Management'
+        },
+      ];
+      setSessions(dummySessions);
+      localStorage.setItem('counselingSessions', JSON.stringify(dummySessions));
+    }
   };
 
   const filteredSessions = sessions.filter(session => {
@@ -158,6 +180,91 @@ export const BKCounselingSchedule: React.FC = () => {
       default:
         return '';
     }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      studentName: '',
+      studentNim: '',
+      date: new Date().toISOString().split('T')[0],
+      time: '09:00',
+      duration: '60',
+      type: 'individual',
+      priority: 'medium',
+      notes: '',
+    });
+    setEditingSession(null);
+    setShowAddForm(false);
+  };
+
+  const handleSaveSession = () => {
+    if (!formData.studentName || !formData.studentNim || !formData.date || !formData.time) {
+      alert('Mohon isi semua field yang wajib diisi!');
+      return;
+    }
+
+    if (editingSession) {
+      const updated = sessions.map(s => 
+        s.id === editingSession.id 
+          ? { ...s, ...formData, duration: parseInt(formData.duration) }
+          : s
+      );
+      setSessions(updated);
+      localStorage.setItem('counselingSessions', JSON.stringify(updated));
+    } else {
+      const newSession: CounselingSession = {
+        id: Date.now().toString(),
+        ...formData,
+        duration: parseInt(formData.duration),
+        status: 'scheduled'
+      };
+      const updated = [...sessions, newSession];
+      setSessions(updated);
+      localStorage.setItem('counselingSessions', JSON.stringify(updated));
+    }
+    resetForm();
+    alert('Jadwal berhasil disimpan!');
+  };
+
+  const handleCompleteSession = (sessionId: string) => {
+    const updated = sessions.map(s =>
+      s.id === sessionId
+        ? { ...s, status: 'completed' as const, completionNotes, completedAt: new Date().toISOString() }
+        : s
+    );
+    setSessions(updated);
+    localStorage.setItem('counselingSessions', JSON.stringify(updated));
+    setShowCompletionForm(null);
+    setCompletionNotes('');
+    alert('Jadwal berhasil ditandai sebagai selesai!');
+  };
+
+  const handleCancelSession = (sessionId: string) => {
+    if (window.confirm('Apakah Anda yakin ingin membatalkan jadwal ini?')) {
+      const updated = sessions.map(s =>
+        s.id === sessionId
+          ? { ...s, status: 'cancelled' as const, cancelledAt: new Date().toISOString() }
+          : s
+      );
+      setSessions(updated);
+      localStorage.setItem('counselingSessions', JSON.stringify(updated));
+      alert('Jadwal berhasil dibatalkan!');
+    }
+  };
+
+  const handleEditSession = (session: CounselingSession) => {
+    setEditingSession(session);
+    setFormData({
+      studentName: session.studentName,
+      studentNim: session.studentNim,
+      date: session.date,
+      time: session.time,
+      duration: session.duration.toString(),
+      type: session.type,
+      priority: session.priority,
+      notes: session.notes || '',
+    });
+    setShowAddForm(true);
   };
 
   const todaySessions = sessions.filter(s => s.date === new Date().toISOString().split('T')[0]);
@@ -275,7 +382,10 @@ export const BKCounselingSchedule: React.FC = () => {
                   Selesai
                 </Button>
               </div>
-              <Button className="bg-green-600 hover:bg-green-700" onClick={() => setShowAddForm(true)}>
+              <Button className="bg-green-600 hover:bg-green-700" onClick={() => {
+                resetForm();
+                setShowAddForm(true);
+              }}>
                 <Plus className="w-4 h-4 mr-2" />
                 Tambah Jadwal
               </Button>
@@ -349,35 +459,46 @@ export const BKCounselingSchedule: React.FC = () => {
                             </p>
                           )}
 
-                          <div className="flex gap-2 mt-4">
+                          <div className="flex gap-2 mt-4 flex-wrap">
                             {session.status === 'scheduled' && (
                               <>
-                                <Button size="sm" variant="outline" className="text-green-600 hover:bg-green-50">
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  className="text-green-600 hover:bg-green-50"
+                                  onClick={() => setShowCompletionForm(session.id)}
+                                >
                                   <CheckCircle2 className="w-4 h-4 mr-2" />
                                   Tandai Selesai
                                 </Button>
-                                <Button size="sm" variant="outline" className="text-red-600 hover:bg-red-50">
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  className="text-red-600 hover:bg-red-50"
+                                  onClick={() => handleCancelSession(session.id)}
+                                >
                                   <XCircle className="w-4 h-4 mr-2" />
                                   Batalkan
                                 </Button>
-                                {session.type === 'individual' && (
-                                  <>
-                                    <Button size="sm" variant="outline">
-                                      <Phone className="w-4 h-4 mr-2" />
-                                      Hubungi
-                                    </Button>
-                                    <Button size="sm" variant="outline">
-                                      <Mail className="w-4 h-4 mr-2" />
-                                      Email
-                                    </Button>
-                                  </>
-                                )}
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  onClick={() => handleEditSession(session)}
+                                >
+                                  Edit
+                                </Button>
                               </>
                             )}
                             {session.status === 'completed' && (
-                              <Button size="sm" variant="outline">
-                                Lihat Catatan
-                              </Button>
+                              <>
+                                <span className="text-xs text-gray-600 py-2">Diselesaikan: {new Date(session.completedAt || '').toLocaleDateString('id-ID')}</span>
+                                {session.completionNotes && (
+                                  <p className="text-sm text-gray-600 bg-green-50 p-2 rounded flex-1">Catatan: {session.completionNotes}</p>
+                                )}
+                              </>
+                            )}
+                            {session.status === 'cancelled' && (
+                              <span className="text-xs text-gray-600 py-2">Dibatalkan: {new Date(session.cancelledAt || '').toLocaleDateString('id-ID')}</span>
                             )}
                           </div>
                         </div>
@@ -387,6 +508,151 @@ export const BKCounselingSchedule: React.FC = () => {
                 ))
             )}
           </div>
+
+          {/* Completion Form Modal */}
+          {showCompletionForm && (
+            <Card className="p-6 mb-6 bg-green-50 border-2 border-green-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Tandai Sesi Selesai</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Catatan Penyelesaian (Opsional)
+                  </label>
+                  <textarea
+                    value={completionNotes}
+                    onChange={(e) => setCompletionNotes(e.target.value)}
+                    placeholder="Masukkan catatan tentang hasil sesi..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    rows={3}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    className="bg-green-600 hover:bg-green-700"
+                    onClick={() => handleCompleteSession(showCompletionForm)}
+                  >
+                    Selesaikan Sesi
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={() => {
+                      setShowCompletionForm(null);
+                      setCompletionNotes('');
+                    }}
+                  >
+                    Batal
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          )}
+
+          {/* Add/Edit Schedule Form Modal */}
+          {showAddForm && (
+            <Card className="p-6 mb-6 bg-blue-50 border-2 border-blue-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                {editingSession ? 'Edit Jadwal' : 'Tambah Jadwal Konseling Baru'}
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nama Mahasiswa *</label>
+                  <input
+                    type="text"
+                    value={formData.studentName}
+                    onChange={(e) => setFormData({ ...formData, studentName: e.target.value })}
+                    placeholder="Masukkan nama mahasiswa"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">NIM *</label>
+                  <input
+                    type="text"
+                    value={formData.studentNim}
+                    onChange={(e) => setFormData({ ...formData, studentNim: e.target.value })}
+                    placeholder="Masukkan NIM"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal *</label>
+                  <input
+                    type="date"
+                    value={formData.date}
+                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Jam *</label>
+                  <input
+                    type="time"
+                    value={formData.time}
+                    onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Durasi (menit) *</label>
+                  <input
+                    type="number"
+                    value={formData.duration}
+                    onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                    placeholder="60"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tipe Konseling</label>
+                  <select
+                    value={formData.type}
+                    onChange={(e) => setFormData({ ...formData, type: e.target.value as 'individual' | 'group' })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="individual">Individual</option>
+                    <option value="group">Grup</option>
+                  </select>
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Prioritas</label>
+                  <select
+                    value={formData.priority}
+                    onChange={(e) => setFormData({ ...formData, priority: e.target.value as 'high' | 'medium' | 'low' })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="low">Rendah</option>
+                    <option value="medium">Sedang</option>
+                    <option value="high">Tinggi</option>
+                  </select>
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Catatan</label>
+                  <textarea
+                    value={formData.notes}
+                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    placeholder="Masukkan catatan..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    rows={2}
+                  />
+                </div>
+              </div>
+              <div className="flex gap-2 pt-4 mt-4 border-t">
+                <Button
+                  onClick={handleSaveSession}
+                  className="bg-blue-600 hover:bg-blue-700 flex-1"
+                >
+                  Simpan Jadwal
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={resetForm}
+                  className="flex-1"
+                >
+                  Batal
+                </Button>
+              </div>
+            </Card>
+          )}
 
           {/* Quick Schedule Overview */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">

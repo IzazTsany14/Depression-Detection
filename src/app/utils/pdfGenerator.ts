@@ -33,13 +33,13 @@ export const generateTestResultPDF = (data: TestResultPDF) => {
 
   // Title
   pdf.setFontSize(26);
-  pdf.setFont(undefined, 'bold');
+  pdf.setFont('Helvetica', 'bold');
   pdf.setTextColor(255, 255, 255);
   pdf.text('HASIL TES DASS-21', pageWidth / 2, 18, { align: 'center' });
 
   // Subtitle
   pdf.setFontSize(10);
-  pdf.setFont(undefined, 'normal');
+  pdf.setFont('Helvetica', 'normal');
   pdf.setTextColor(200, 220, 255);
   pdf.text('Sistem Deteksi Depresi Berbasis Fuzzy Logic', pageWidth / 2, 28, { align: 'center' });
 
@@ -52,7 +52,7 @@ export const generateTestResultPDF = (data: TestResultPDF) => {
 
   // ===== USER INFO SECTION =====
   pdf.setFontSize(10);
-  pdf.setFont(undefined, 'normal');
+  pdf.setFont('Helvetica', 'normal');
   pdf.setTextColor(51, 65, 85);
 
   // Info box background
@@ -63,9 +63,9 @@ export const generateTestResultPDF = (data: TestResultPDF) => {
   pdf.rect(margin, yPosition - 5, contentWidth, 25);
 
   if (data.name) {
-    pdf.setFont(undefined, 'bold');
+    pdf.setFont('Helvetica', 'bold');
     pdf.text('Nama:', margin + 5, yPosition);
-    pdf.setFont(undefined, 'normal');
+    pdf.setFont('Helvetica', 'normal');
     pdf.text(data.name, margin + 35, yPosition);
   }
 
@@ -76,9 +76,9 @@ export const generateTestResultPDF = (data: TestResultPDF) => {
     day: 'numeric',
   });
   
-  pdf.setFont(undefined, 'bold');
+  pdf.setFont('Helvetica', 'bold');
   pdf.text('Tanggal:', margin + 5, yPosition + 8);
-  pdf.setFont(undefined, 'normal');
+  pdf.setFont('Helvetica', 'normal');
   pdf.text(formattedDate, margin + 35, yPosition + 8);
 
   const formattedTime = new Date(data.date).toLocaleTimeString('id-ID', {
@@ -86,9 +86,9 @@ export const generateTestResultPDF = (data: TestResultPDF) => {
     minute: '2-digit',
   });
   
-  pdf.setFont(undefined, 'bold');
+  pdf.setFont('Helvetica', 'bold');
   pdf.text('Jam:', margin + 5, yPosition + 16);
-  pdf.setFont(undefined, 'normal');
+  pdf.setFont('Helvetica', 'normal');
   pdf.text(formattedTime, margin + 35, yPosition + 16);
 
   yPosition += 35;
@@ -118,43 +118,43 @@ export const generateTestResultPDF = (data: TestResultPDF) => {
   }
 
   // Result box background
-  pdf.setFillColor(...levelBgColor);
+  pdf.setFillColor(levelBgColor[0], levelBgColor[1], levelBgColor[2]);
   pdf.rect(margin, yPosition, contentWidth, 50, 'F');
   
   // Result box border
-  pdf.setDrawColor(...levelColor);
+  pdf.setDrawColor(levelColor[0], levelColor[1], levelColor[2]);
   pdf.setLineWidth(2);
   pdf.rect(margin, yPosition, contentWidth, 50);
 
   // Section title
   pdf.setFontSize(12);
-  pdf.setFont(undefined, 'bold');
+  pdf.setFont('Helvetica', 'bold');
   pdf.setTextColor(30, 58, 138);
   pdf.text('HASIL TES', margin + 8, yPosition + 8);
 
   // Depression level - Large and prominent
   pdf.setFontSize(18);
-  pdf.setFont(undefined, 'bold');
-  pdf.setTextColor(...levelColor);
+  pdf.setFont('Helvetica', 'bold');
+  pdf.setTextColor(levelColor[0], levelColor[1], levelColor[2]);
   pdf.text(`Tingkat Depresi: ${data.level}`, margin + 8, yPosition + 20);
 
   // Score
   pdf.setFontSize(11);
-  pdf.setFont(undefined, 'normal');
+  pdf.setFont('Helvetica', 'normal');
   pdf.setTextColor(51, 65, 85);
   pdf.text(`Skor: ${data.score} / 126`, margin + 8, yPosition + 30);
 
   // Status
   pdf.setFontSize(10);
-  pdf.setFont(undefined, 'bold');
-  pdf.setTextColor(...levelColor);
+  pdf.setFont('Helvetica', 'bold');
+  pdf.setTextColor(levelColor[0], levelColor[1], levelColor[2]);
   pdf.text(statusText, margin + 8, yPosition + 39);
 
   yPosition += 60;
 
   // ===== INTERPRETATION SECTION =====
   pdf.setFontSize(11);
-  pdf.setFont(undefined, 'bold');
+  pdf.setFont('Helvetica', 'bold');
   pdf.setTextColor(30, 58, 138);
   pdf.text('INTERPRETASI HASIL:', margin, yPosition);
   yPosition += 8;
@@ -170,7 +170,7 @@ export const generateTestResultPDF = (data: TestResultPDF) => {
   const interpretation = interpretations[data.level] || 'Konsultasikan hasil tes ini dengan profesional kesehatan mental untuk evaluasi lebih lanjut.';
 
   pdf.setFontSize(10);
-  pdf.setFont(undefined, 'normal');
+  pdf.setFont('Helvetica', 'normal');
   pdf.setTextColor(51, 65, 85);
   const splitText = pdf.splitTextToSize(interpretation, contentWidth - 4);
   pdf.text(splitText, margin + 2, yPosition, { maxWidth: contentWidth - 4, align: 'justify' });
@@ -184,11 +184,11 @@ export const generateTestResultPDF = (data: TestResultPDF) => {
   pdf.rect(margin, yPosition, contentWidth, 28, 'FD');
 
   pdf.setFontSize(9);
-  pdf.setFont(undefined, 'bold');
+  pdf.setFont('Helvetica', 'bold');
   pdf.setTextColor(180, 140, 0);
   pdf.text('PENTING - PERHATIAN:', margin + 5, yPosition + 6);
 
-  pdf.setFont(undefined, 'normal');
+  pdf.setFont('Helvetica', 'normal');
   pdf.setTextColor(140, 110, 0);
   pdf.setFontSize(8);
   const warningText = pdf.splitTextToSize(
@@ -199,7 +199,7 @@ export const generateTestResultPDF = (data: TestResultPDF) => {
 
   // ===== FOOTER =====
   pdf.setFontSize(8);
-  pdf.setFont(undefined, 'normal');
+  pdf.setFont('Helvetica', 'normal');
   pdf.setTextColor(130, 140, 155);
   
   // Horizontal line before footer

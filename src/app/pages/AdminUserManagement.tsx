@@ -433,7 +433,7 @@ export const AdminUserManagement: React.FC = () => {
             if (!open) resetForm();
             setShowAddUserDialog(open);
           }}>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
               <DialogHeader>
                 <DialogTitle>{editingUser ? 'Edit User' : 'Tambah User Baru'}</DialogTitle>
                 <DialogDescription>
@@ -441,7 +441,8 @@ export const AdminUserManagement: React.FC = () => {
                 </DialogDescription>
               </DialogHeader>
 
-              {!selectedUserType ? (
+              <div className="overflow-y-auto flex-1 px-4">
+              {!selectedUserType && !editingUser ? (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4">
                   {/* Mahasiswa Card */}
                   <button
@@ -475,17 +476,19 @@ export const AdminUserManagement: React.FC = () => {
                 </div>
               ) : (
                 <div className="space-y-4 py-4">
-                  {/* Back Button */}
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setSelectedUserType(null);
-                      setErrors({});
-                    }}
-                    className="w-full"
-                  >
-                    ← Kembali Pilih Tipe User
-                  </Button>
+                  {/* Back Button - Only show when adding new user, not when editing */}
+                  {!editingUser && (
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setSelectedUserType(null);
+                        setErrors({});
+                      }}
+                      className="w-full"
+                    >
+                      ← Kembali Pilih Tipe User
+                    </Button>
+                  )}
 
                   {/* Common Fields */}
                   <div>
@@ -652,27 +655,29 @@ export const AdminUserManagement: React.FC = () => {
                     </>
                   )}
 
-                  {/* Action Buttons */}
-                  <div className="flex gap-2 pt-4">
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        resetForm();
-                        setShowAddUserDialog(false);
-                      }}
-                      className="flex-1"
-                    >
-                      Batal
-                    </Button>
-                    <Button
-                      onClick={handleSaveUser}
-                      className="flex-1 bg-green-600 hover:bg-green-700"
-                    >
-                      {editingUser ? 'Simpan Perubahan' : 'Simpan User'}
-                    </Button>
-                  </div>
                 </div>
               )}
+              </div>
+
+              {/* Action Buttons - Fixed at bottom */}
+              <div className="flex gap-2 pt-4 border-t mt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    resetForm();
+                    setShowAddUserDialog(false);
+                  }}
+                  className="flex-1"
+                >
+                  Batal
+                </Button>
+                <Button
+                  onClick={handleSaveUser}
+                  className="flex-1 bg-green-600 hover:bg-green-700"
+                >
+                  {editingUser ? 'Simpan Perubahan' : 'Simpan User'}
+                </Button>
+              </div>
             </DialogContent>
           </Dialog>
         </main>
