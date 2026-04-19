@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router';
 import { DashboardSidebar } from '../components/DashboardSidebar';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { useAuth } from '../context/AuthContext';
-import { Users, Search, Plus, Edit2, Trash2, Filter, CheckCircle2, XCircle } from 'lucide-react';
+import { Users, Search, Plus, Edit2, Trash2, Filter, CheckCircle2, XCircle, User } from 'lucide-react';
 import { dummyUsers } from '../data/dummyData';
 
 export const AdminUserManagement: React.FC = () => {
@@ -13,12 +14,100 @@ export const AdminUserManagement: React.FC = () => {
   const [users, setUsers] = useState(dummyUsers);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState<'all' | 'student' | 'admin' | 'bk'>('all');
+  const [showAddUserDialog, setShowAddUserDialog] = useState(false);
+  const [selectedUserType, setSelectedUserType] = useState<'student' | 'admin' | 'bk' | null>(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    nim: '',
+    nik: '',
+    faculty: '',
+    major: '',
+    semester: '1',
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!user || user.role !== 'admin') {
       navigate('/login');
     }
   }, [user, navigate]);
+
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = 'Nama wajib diisi';
+    }
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email wajib diisi';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Email tidak valid';
+    }
+    if (!formData.password.trim()) {
+      newErrors.password = 'Password wajib diisi';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password minimal 6 karakter';
+    }
+
+    if (selectedUserType === 'student') {
+      if (!formData.nim.trim()) {
+        newErrors.nim = 'NIM wajib diisi';
+      }
+      if (!formData.nik.trim()) {
+        newErrors.nik = 'NIK wajib diisi';
+      }
+      if (!formData.faculty.trim()) {
+        newErrors.faculty = 'Fakultas wajib diisi';
+      }
+      if (!formData.major.trim()) {
+        newErrors.major = 'Jurusan wajib diisi';
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleAddUser = () => {
+    if (!validateForm()) return;
+
+    const newUser = {
+      id: `${selectedUserType}-${Date.now()}`,
+      email: formData.email,
+      password: formData.password,
+      name: formData.name,
+      role: selectedUserType as 'student' | 'admin' | 'bk',
+      ...(selectedUserType === 'student' && {
+        nim: formData.nim,
+        nik: formData.nik,
+        faculty: formData.faculty,
+        major: formData.major,
+        semester: parseInt(formData.semester),
+      }),
+    };
+
+    setUsers([...users, newUser]);
+    resetForm();
+    setShowAddUserDialog(false);
+    alert('User berhasil ditambahkan!');
+  };
+
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      email: '',
+      password: '',
+      nim: '',
+      nik: '',
+      faculty: '',
+      major: '',
+      semester: '1',
+    });
+    setSelectedUserType(null);
+    setErrors({});
+  };
 
   const filteredUsers = users.filter(u => {
     const matchesSearch = 
@@ -175,7 +264,10 @@ export const AdminUserManagement: React.FC = () => {
                   Admin
                 </Button>
               </div>
-              <Button className="bg-green-600 hover:bg-green-700">
+              <Button 
+                onClick={() => setShowAddUserDialog(true)}
+                className="bg-green-600 hover:bg-green-700"
+              >
                 <Plus className="w-4 h-4 mr-2" />
                 Tambah User
               </Button>
@@ -246,6 +338,207 @@ export const AdminUserManagement: React.FC = () => {
               </div>
             )}
           </Card>
+
+          {/* Add User Dialog */}
+          <Dialog open={showAddUserDialog} onOpenChange={setShowAddUserDialog}>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Tambah User Baru</DialogTitle>
+                <DialogDescription>
+                  Pilih tipe user dan isi informasi sesuai dengan tipenya
+                </DialogDescription>
+              </DialogHeader>
+
+              {!selectedUserType ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4">
+                  {/* Mahasiswa Card */}
+                  <button
+                    onClick={() => setSelectedUserType('student')}
+                    className="p-6 border-2 border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-all"
+                  >
+                    <div className="text-4xl mb-3">👨‍🎓</div>
+                    <h3 className="font-semibold text-gray-900 mb-2">Mahasiswa</h3>
+                    <p className="text-sm text-gray-600">Tambahkan data mahasiswa dengan NIM, fakultas, dll</p>
+                  </button>
+
+                  {/* BK Card */}
+                  <button
+                    onClick={() => setSelectedUserType('bk')}
+                    className="p-6 border-2 border-gray-200 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-all"
+                  >
+                    <div className="text-4xl mb-3">👨‍⚕️</div>
+                    <h3 className="font-semibold text-gray-900 mb-2">BK</h3>
+                    <p className="text-sm text-gray-600">Tambahkan staf Bimbingan Konseling</p>
+                  </button>
+
+                  {/* Admin Card */}
+                  <button
+                    onClick={() => setSelectedUserType('admin')}
+                    className="p-6 border-2 border-gray-200 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-all"
+                  >
+                    <div className="text-4xl mb-3">⚙️</div>
+                    <h3 className="font-semibold text-gray-900 mb-2">Admin</h3>
+                    <p className="text-sm text-gray-600">Tambahkan admin sistem</p>
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-4 py-4">
+                  {/* Back Button */}
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setSelectedUserType(null);
+                      setErrors({});
+                    }}
+                    className="w-full"
+                  >
+                    ← Kembali Pilih Tipe User
+                  </Button>
+
+                  {/* Common Fields */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Nama Lengkap *
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Masukkan nama lengkap"
+                    />
+                    {errors.name && <p className="text-xs text-red-600 mt-1">{errors.name}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Email *
+                    </label>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Masukkan email"
+                    />
+                    {errors.email && <p className="text-xs text-red-600 mt-1">{errors.email}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Password *
+                    </label>
+                    <input
+                      type="password"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Masukkan password (minimal 6 karakter)"
+                    />
+                    {errors.password && <p className="text-xs text-red-600 mt-1">{errors.password}</p>}
+                  </div>
+
+                  {/* Student-Specific Fields */}
+                  {selectedUserType === 'student' && (
+                    <>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            NIM *
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.nim}
+                            onChange={(e) => setFormData({ ...formData, nim: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Nomor Induk Mahasiswa"
+                          />
+                          {errors.nim && <p className="text-xs text-red-600 mt-1">{errors.nim}</p>}
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            NIK *
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.nik}
+                            onChange={(e) => setFormData({ ...formData, nik: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Nomor Induk Kependudukan"
+                          />
+                          {errors.nik && <p className="text-xs text-red-600 mt-1">{errors.nik}</p>}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Fakultas *
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.faculty}
+                          onChange={(e) => setFormData({ ...formData, faculty: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="Contoh: Fakultas Ilmu Komputer"
+                        />
+                        {errors.faculty && <p className="text-xs text-red-600 mt-1">{errors.faculty}</p>}
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Jurusan *
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.major}
+                            onChange={(e) => setFormData({ ...formData, major: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Contoh: Teknik Informatika"
+                          />
+                          {errors.major && <p className="text-xs text-red-600 mt-1">{errors.major}</p>}
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Semester
+                          </label>
+                          <select
+                            value={formData.semester}
+                            onChange={(e) => setFormData({ ...formData, semester: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          >
+                            {[1, 2, 3, 4, 5, 6, 7, 8].map(sem => (
+                              <option key={sem} value={sem}>Semester {sem}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-2 pt-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        resetForm();
+                        setShowAddUserDialog(false);
+                      }}
+                      className="flex-1"
+                    >
+                      Batal
+                    </Button>
+                    <Button
+                      onClick={handleAddUser}
+                      className="flex-1 bg-green-600 hover:bg-green-700"
+                    >
+                      Simpan User
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
         </main>
       </div>
     </div>

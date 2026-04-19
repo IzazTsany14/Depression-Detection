@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from '../components/ui/alert';
 import { useAuth } from '../context/AuthContext';
 import { AlertTriangle, RefreshCw, BookOpen, Download, TrendingUp, Calendar, BarChart3 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { generateTestResultPDF, downloadPDF } from '../utils/pdfGenerator';
 
 export const RegisteredResult: React.FC = () => {
   const { user, getTestHistory } = useAuth();
@@ -63,11 +64,17 @@ export const RegisteredResult: React.FC = () => {
   }));
 
   const handleDownloadPDF = () => {
-    // Mock PDF download - in real app, this would generate an actual PDF
-    alert('Fitur download PDF akan segera tersedia. Hasil tes Anda:\n\n' +
-          `Tanggal: ${new Date(latestResult.date).toLocaleDateString('id-ID')}\n` +
-          `Tingkat Depresi: ${latestResult.level}\n` +
-          `Skor: ${latestResult.score}`);
+    const pdf = generateTestResultPDF({
+      level: latestResult.level,
+      score: latestResult.score,
+      date: latestResult.date,
+      name: user?.name,
+      color: resultStyle.color,
+      emoji: resultStyle.emoji,
+    });
+    
+    const filename = `hasil-tes-dass21-${new Date().getTime()}.pdf`;
+    downloadPDF(pdf, filename);
   };
 
   return (

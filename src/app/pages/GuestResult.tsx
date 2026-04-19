@@ -7,7 +7,8 @@ import { Card } from '../components/ui/card';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { useAuth } from '../context/AuthContext';
 import { calculateDepressionScore, getDepressionLevel } from '../utils/fuzzyLogic';
-import { AlertTriangle, RefreshCw, UserPlus, Home, TrendingUp } from 'lucide-react';
+import { AlertTriangle, RefreshCw, UserPlus, Home, TrendingUp, Download } from 'lucide-react';
+import { generateTestResultPDF, downloadPDF } from '../utils/pdfGenerator';
 
 export const GuestResult: React.FC = () => {
   const { currentTestAnswers, isGuest } = useAuth();
@@ -30,6 +31,20 @@ export const GuestResult: React.FC = () => {
   if (!result) {
     return null;
   }
+
+  const handleDownloadPDF = () => {
+    const pdf = generateTestResultPDF({
+      level: result.level,
+      score: result.score,
+      date: new Date().toISOString(),
+      color: result.color,
+      emoji: result.emoji,
+      description: result.description,
+    });
+    
+    const filename = `hasil-tes-dass21-guest-${new Date().getTime()}.pdf`;
+    downloadPDF(pdf, filename);
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white">
@@ -124,6 +139,14 @@ export const GuestResult: React.FC = () => {
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button 
+              onClick={handleDownloadPDF}
+              size="lg"
+              className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700"
+            >
+              <Download className="w-5 h-5 mr-2" />
+              Unduh Hasil PDF
+            </Button>
             <Link to="/questionnaire">
               <Button 
                 variant="outline" 

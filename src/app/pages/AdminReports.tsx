@@ -4,7 +4,7 @@ import { DashboardSidebar } from '../components/DashboardSidebar';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { useAuth } from '../context/AuthContext';
-import { FileText, Download, Calendar, Filter, TrendingUp, Users, AlertTriangle } from 'lucide-react';
+import { FileText, Calendar, Filter, TrendingUp, Users, AlertTriangle } from 'lucide-react';
 import { dummyTestResults } from '../data/dummyData';
 
 export const AdminReports: React.FC = () => {
@@ -46,10 +46,6 @@ export const AdminReports: React.FC = () => {
     acc[test.level] = (acc[test.level] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
-
-  const handleDownloadReport = (format: 'pdf' | 'excel') => {
-    alert(`Mengunduh laporan dalam format ${format.toUpperCase()}...`);
-  };
 
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-blue-50 to-white">
@@ -115,16 +111,6 @@ export const AdminReports: React.FC = () => {
                     <option key={year} value={year}>{year}</option>
                   ))}
                 </select>
-              </div>
-              <div className="flex items-end gap-2">
-                <Button onClick={() => handleDownloadReport('pdf')} className="flex-1 bg-red-600 hover:bg-red-700">
-                  <Download className="w-4 h-4 mr-2" />
-                  PDF
-                </Button>
-                <Button onClick={() => handleDownloadReport('excel')} className="flex-1 bg-green-600 hover:bg-green-700">
-                  <Download className="w-4 h-4 mr-2" />
-                  Excel
-                </Button>
               </div>
             </div>
           </Card>
