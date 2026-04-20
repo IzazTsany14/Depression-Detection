@@ -283,19 +283,19 @@ export const dummyUsers: User[] = [
     nik: '3402081996456789',
     nim: '2021110130',
     faculty: 'Fakultas PSDKU',
-    major: 'Manajemen Pariwisata',
+    major: 'Manajemen',
     semester: 6
   },
   {
     id: 'student-020',
     email: 'mahasiswa20@student.ac.id',
     password: 'student123',
-    name: 'Ulfah Karina',
+    name: 'Camek Mulyono',
     role: 'student',
     nik: '3503151998567890',
     nim: '2022110140',
     faculty: 'Fakultas PSDKU',
-    major: 'Manajemen Pariwisata',
+    major: 'Pendidikan Tata Rias',
     semester: 4
   }
 ];
