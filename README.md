@@ -73,7 +73,7 @@ Pastikan Anda memiliki Node.js terinstal di perangkat Anda.
 
 ```bash
 # Clone repositori
-git clone [https://github.com/username/mindcheck](https://github.com/username/mindcheck)
+git clone https://github.com/IzazTsany14/Depression-Detection.git
 
 
 # Install dependensi (menggunakan npm atau yarn)
