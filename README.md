@@ -57,13 +57,13 @@ Berdasarkan dokumen SRS **Sistem Deteksi Dini Tingkat Depresi Mahasiswa**:
 | **Lufita Setiati** | 25051204304 | System Analyst / Documentation |
 | **Fearda Agnessiya Putri Dardiri** | 25051204332 | UI/UX Designer / Researcher |
 
-[cite_start]**Dosen Pengampu**: Saifudin Yahya, S.Kom., M.T.I. [cite: 4]
+**Dosen Pengampu**: Saifudin Yahya, S.Kom., M.T.I.
 
 ---
 
 ## 🚀 Status Proyek
 
-[cite_start]🟢 **Phase: Implementation & Testing** Sistem saat ini sedang dalam tahap integrasi modul logika fuzzy dan validasi konten klinis oleh Unit BK UNESA[cite: 835, 840].
+🟢 **Phase: Implementation & Testing** Sistem saat ini sedang dalam tahap integrasi modul logika fuzzy dan validasi konten klinis oleh Unit BK UNESA.
 
 ---
 
@@ -75,8 +75,6 @@ Pastikan Anda memiliki Node.js terinstal di perangkat Anda.
 # Clone repositori
 git clone [https://github.com/username/mindcheck](https://github.com/username/mindcheck)
 
-# Masuk ke direktori proyek
-cd mindcheck
 
 # Install dependensi (menggunakan npm atau yarn)
 npm install
