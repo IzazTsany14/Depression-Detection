@@ -17,6 +17,8 @@ export const BKStudentCases: React.FC = () => {
   const [students, setStudents] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterLevel, setFilterLevel] = useState<string>('all');
+  const [filterFaculty, setFilterFaculty] = useState<string>('all');
+  const [filterMajor, setFilterMajor] = useState<string>('all');
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
 
   useEffect(() => {
@@ -28,6 +30,16 @@ export const BKStudentCases: React.FC = () => {
     }
   }, [user, navigate]);
 
+  // Get unique faculties and majors for filtering
+  const faculties = Array.from(new Set(students.map(s => s.faculty))).sort();
+  const majors = filterFaculty === 'all' 
+    ? Array.from(new Set(students.map(s => s.major))).sort()
+    : Array.from(new Set(
+        students
+          .filter(s => s.faculty === filterFaculty)
+          .map(s => s.major)
+      )).sort();
+
   const filteredStudents = students.filter(s => {
     const matchesSearch = 
       s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -36,8 +48,10 @@ export const BKStudentCases: React.FC = () => {
       s.faculty.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesLevel = filterLevel === 'all' || s.latestTest.level === filterLevel;
+    const matchesFaculty = filterFaculty === 'all' || s.faculty === filterFaculty;
+    const matchesMajor = filterMajor === 'all' || s.major === filterMajor;
     
-    return matchesSearch && matchesLevel;
+    return matchesSearch && matchesLevel && matchesFaculty && matchesMajor;
   });
 
   const getTrendIcon = (trend: string) => {
@@ -290,29 +304,36 @@ export const BKStudentCases: React.FC = () => {
 
           {/* Search and Filter */}
           <Card className="p-6 mb-6">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Cari nama, NIM, NIK, atau fakultas..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                />
+            <div className="space-y-4">
+              {/* Search Bar */}
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Cari nama, NIM, NIK, atau fakultas..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  />
+                </div>
               </div>
-              <div className="flex gap-2">
+
+              {/* Level Filter */}
+              <div className="flex gap-2 flex-wrap">
+                <span className="text-sm font-medium text-gray-700 flex items-center">Filter Tingkat:</span>
                 <Button
                   variant={filterLevel === 'all' ? 'default' : 'outline'}
                   onClick={() => setFilterLevel('all')}
+                  size="sm"
                   className={filterLevel === 'all' ? 'bg-purple-600 hover:bg-purple-700' : ''}
                 >
-                  <Filter className="w-4 h-4 mr-2" />
                   Semua
                 </Button>
                 <Button
                   variant={filterLevel === 'Sangat Berat' ? 'default' : 'outline'}
                   onClick={() => setFilterLevel('Sangat Berat')}
+                  size="sm"
                   className={filterLevel === 'Sangat Berat' ? 'bg-purple-600 hover:bg-purple-700' : ''}
                 >
                   Sangat Berat
@@ -320,6 +341,7 @@ export const BKStudentCases: React.FC = () => {
                 <Button
                   variant={filterLevel === 'Berat' ? 'default' : 'outline'}
                   onClick={() => setFilterLevel('Berat')}
+                  size="sm"
                   className={filterLevel === 'Berat' ? 'bg-purple-600 hover:bg-purple-700' : ''}
                 >
                   Berat
@@ -327,10 +349,48 @@ export const BKStudentCases: React.FC = () => {
                 <Button
                   variant={filterLevel === 'Sedang' ? 'default' : 'outline'}
                   onClick={() => setFilterLevel('Sedang')}
+                  size="sm"
                   className={filterLevel === 'Sedang' ? 'bg-purple-600 hover:bg-purple-700' : ''}
                 >
                   Sedang
                 </Button>
+              </div>
+
+              {/* Faculty and Major Filter */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Filter Fakultas</label>
+                  <select
+                    value={filterFaculty}
+                    onChange={(e) => {
+                      setFilterFaculty(e.target.value);
+                      setFilterMajor('all');
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  >
+                    <option value="all">Semua Fakultas</option>
+                    {faculties.map((faculty) => (
+                      <option key={faculty} value={faculty}>
+                        {faculty}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Filter Program Studi</label>
+                  <select
+                    value={filterMajor}
+                    onChange={(e) => setFilterMajor(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  >
+                    <option value="all">Semua Program Studi</option>
+                    {majors.map((major) => (
+                      <option key={major} value={major}>
+                        {major}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
           </Card>

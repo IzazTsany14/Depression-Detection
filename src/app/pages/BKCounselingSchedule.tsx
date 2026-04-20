@@ -28,7 +28,12 @@ export const BKCounselingSchedule: React.FC = () => {
   const [sessions, setSessions] = useState<CounselingSession[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [filterStatus, setFilterStatus] = useState<string>('scheduled');
+  const [dateFilterType, setDateFilterType] = useState<'day' | 'range' | 'month' | 'year'>('day');
+  const [dateRangeStart, setDateRangeStart] = useState(new Date().toISOString().split('T')[0]);
+  const [dateRangeEnd, setDateRangeEnd] = useState(new Date().toISOString().split('T')[0]);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().split('T')[0].slice(0, 7));
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
   const [editingSession, setEditingSession] = useState<CounselingSession | null>(null);
   const [formData, setFormData] = useState({
     studentName: '',
@@ -134,7 +139,18 @@ export const BKCounselingSchedule: React.FC = () => {
   };
 
   const filteredSessions = sessions.filter(session => {
-    const matchesDate = session.date === selectedDate;
+    let matchesDate = false;
+    
+    if (dateFilterType === 'day') {
+      matchesDate = session.date === selectedDate;
+    } else if (dateFilterType === 'range') {
+      matchesDate = session.date >= dateRangeStart && session.date <= dateRangeEnd;
+    } else if (dateFilterType === 'month') {
+      matchesDate = session.date.slice(0, 7) === selectedMonth;
+    } else if (dateFilterType === 'year') {
+      matchesDate = session.date.slice(0, 4) === selectedYear;
+    }
+    
     const matchesStatus = filterStatus === 'all' || session.status === filterStatus;
     return matchesDate && matchesStatus;
   });
@@ -347,26 +363,129 @@ export const BKCounselingSchedule: React.FC = () => {
 
           {/* Date Selector and Filters */}
           <Card className="p-6 mb-6">
-            <div className="flex flex-col md:flex-row gap-4 items-center">
-              <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Pilih Tanggal
-                </label>
-                <input
-                  type="date"
-                  value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                />
+            <div className="space-y-4">
+              {/* Filter Type Selector */}
+              <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Filter Tanggal
+                  </label>
+                  <div className="flex gap-2 flex-wrap">
+                    <Button
+                      variant={dateFilterType === 'day' ? 'default' : 'outline'}
+                      onClick={() => setDateFilterType('day')}
+                      size="sm"
+                      className={dateFilterType === 'day' ? 'bg-purple-600 hover:bg-purple-700' : ''}
+                    >
+                      Hari
+                    </Button>
+                    <Button
+                      variant={dateFilterType === 'range' ? 'default' : 'outline'}
+                      onClick={() => setDateFilterType('range')}
+                      size="sm"
+                      className={dateFilterType === 'range' ? 'bg-purple-600 hover:bg-purple-700' : ''}
+                    >
+                      Range Hari
+                    </Button>
+                    <Button
+                      variant={dateFilterType === 'month' ? 'default' : 'outline'}
+                      onClick={() => setDateFilterType('month')}
+                      size="sm"
+                      className={dateFilterType === 'month' ? 'bg-purple-600 hover:bg-purple-700' : ''}
+                    >
+                      Bulan
+                    </Button>
+                    <Button
+                      variant={dateFilterType === 'year' ? 'default' : 'outline'}
+                      onClick={() => setDateFilterType('year')}
+                      size="sm"
+                      className={dateFilterType === 'year' ? 'bg-purple-600 hover:bg-purple-700' : ''}
+                    >
+                      Tahun
+                    </Button>
+                  </div>
+                </div>
               </div>
-              <div className="flex gap-2 items-end">
-                <Button
-                  variant={filterStatus === 'all' ? 'default' : 'outline'}
-                  onClick={() => setFilterStatus('all')}
-                  className={filterStatus === 'all' ? 'bg-purple-600 hover:bg-purple-700' : ''}
-                >
-                  Semua
-                </Button>
+
+              {/* Date Input Based on Filter Type */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {dateFilterType === 'day' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Pilih Hari
+                    </label>
+                    <input
+                      type="date"
+                      value={selectedDate}
+                      onChange={(e) => setSelectedDate(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    />
+                  </div>
+                )}
+
+                {dateFilterType === 'range' && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Tanggal Mulai
+                      </label>
+                      <input
+                        type="date"
+                        value={dateRangeStart}
+                        onChange={(e) => setDateRangeStart(e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Tanggal Akhir
+                      </label>
+                      <input
+                        type="date"
+                        value={dateRangeEnd}
+                        onChange={(e) => setDateRangeEnd(e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                      />
+                    </div>
+                  </>
+                )}
+
+                {dateFilterType === 'month' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Pilih Bulan
+                    </label>
+                    <input
+                      type="month"
+                      value={selectedMonth}
+                      onChange={(e) => setSelectedMonth(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    />
+                  </div>
+                )}
+
+                {dateFilterType === 'year' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Pilih Tahun
+                    </label>
+                    <select
+                      value={selectedYear}
+                      onChange={(e) => setSelectedYear(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    >
+                      <option value="2024">2024</option>
+                      <option value="2025">2025</option>
+                      <option value="2026">2026</option>
+                      <option value="2027">2027</option>
+                      <option value="2028">2028</option>
+                    </select>
+                  </div>
+                )}
+              </div>
+
+              {/* Status Filter */}
+              <div className="flex gap-2 flex-wrap">
                 <Button
                   variant={filterStatus === 'scheduled' ? 'default' : 'outline'}
                   onClick={() => setFilterStatus('scheduled')}
@@ -381,37 +500,55 @@ export const BKCounselingSchedule: React.FC = () => {
                 >
                   Selesai
                 </Button>
+                <Button
+                  variant={filterStatus === 'cancelled' ? 'default' : 'outline'}
+                  onClick={() => setFilterStatus('cancelled')}
+                  className={filterStatus === 'cancelled' ? 'bg-purple-600 hover:bg-purple-700' : ''}
+                >
+                  Dibatalkan
+                </Button>
+                <Button
+                  variant={filterStatus === 'all' ? 'default' : 'outline'}
+                  onClick={() => setFilterStatus('all')}
+                  className={filterStatus === 'all' ? 'bg-purple-600 hover:bg-purple-700' : ''}
+                >
+                  Semua
+                </Button>
               </div>
-              <Button className="bg-green-600 hover:bg-green-700" onClick={() => {
-                resetForm();
-                setShowAddForm(true);
-              }}>
-                <Plus className="w-4 h-4 mr-2" />
-                Tambah Jadwal
-              </Button>
             </div>
           </Card>
 
-          {/* Sessions List */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold text-gray-900">
-              Jadwal untuk {new Date(selectedDate).toLocaleDateString('id-ID', { 
-                weekday: 'long', 
-                day: 'numeric', 
-                month: 'long', 
-                year: 'numeric' 
-              })}
-            </h3>
+          {/* Sessions List - Scheduled */}
+          <div className="space-y-4 mb-8">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-semibold text-gray-900">
+                {dateFilterType === 'day' && `Jadwal ${new Date(selectedDate).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}`}
+                {dateFilterType === 'range' && `Jadwal ${new Date(dateRangeStart).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })} - ${new Date(dateRangeEnd).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`}
+                {dateFilterType === 'month' && `Jadwal ${new Date(selectedMonth + '-01').toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}`}
+                {dateFilterType === 'year' && `Jadwal Tahun ${selectedYear}`}
+              </h3>
+              {filterStatus === 'scheduled' && (
+                <Button className="bg-green-600 hover:bg-green-700" onClick={() => {
+                  resetForm();
+                  setShowAddForm(true);
+                }}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Tambah Jadwal
+                </Button>
+              )}
+            </div>
 
             {filteredSessions.length === 0 ? (
               <Card className="p-12">
                 <div className="text-center">
                   <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600">Tidak ada jadwal konseling untuk tanggal ini</p>
-                  <Button className="mt-4 bg-purple-600 hover:bg-purple-700" onClick={() => setShowAddForm(true)}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Tambah Jadwal Baru
-                  </Button>
+                  <p className="text-gray-600">Tidak ada jadwal konseling untuk periode ini</p>
+                  {filterStatus === 'scheduled' && (
+                    <Button className="mt-4 bg-purple-600 hover:bg-purple-700" onClick={() => setShowAddForm(true)}>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Tambah Jadwal Baru
+                    </Button>
+                  )}
                 </div>
               </Card>
             ) : (
@@ -509,7 +646,7 @@ export const BKCounselingSchedule: React.FC = () => {
             )}
           </div>
 
-          {/* Completion Form Modal */}
+          {/* Completion Form - Inline */}
           {showCompletionForm && (
             <Card className="p-6 mb-6 bg-green-50 border-2 border-green-200">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Tandai Sesi Selesai</h3>
@@ -547,11 +684,11 @@ export const BKCounselingSchedule: React.FC = () => {
             </Card>
           )}
 
-          {/* Add/Edit Schedule Form Modal */}
+          {/* Add/Edit Schedule Form - Inline */}
           {showAddForm && (
             <Card className="p-6 mb-6 bg-blue-50 border-2 border-blue-200">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                {editingSession ? 'Edit Jadwal' : 'Tambah Jadwal Konseling Baru'}
+                {editingSession ? 'Edit Jadwal Konseling' : 'Tambah Jadwal Konseling Baru'}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -653,6 +790,113 @@ export const BKCounselingSchedule: React.FC = () => {
               </div>
             </Card>
           )}
+
+          {/* Completed Sessions */}
+          <div className="space-y-4 mb-8 mt-8">
+            <h3 className="text-xl font-semibold text-gray-900">Riwayat Konseling - Selesai</h3>
+
+            {sessions.filter(s => s.status === 'completed').length === 0 ? (
+              <Card className="p-12">
+                <div className="text-center">
+                  <CheckCircle2 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600">Belum ada konseling yang selesai</p>
+                </div>
+              </Card>
+            ) : (
+              sessions
+                .filter(s => s.status === 'completed')
+                .sort((a, b) => new Date(b.completedAt || '').getTime() - new Date(a.completedAt || '').getTime())
+                .map((session) => (
+                  <Card key={session.id} className="p-6 border-l-4 border-green-500 hover:shadow-lg transition-shadow">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-4 mb-3">
+                          <div className="bg-green-100 p-3 rounded-lg">
+                            <CheckCircle2 className="w-6 h-6 text-green-600" />
+                          </div>
+                          <div>
+                            <h4 className="text-lg font-bold text-gray-900">{session.studentName}</h4>
+                            <p className="text-sm text-gray-600">{session.studentNim} • {session.date} {session.time}</p>
+                          </div>
+                          <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                            {getStatusLabel(session.status)}
+                          </span>
+                        </div>
+
+                        <div className="ml-16">
+                          {session.completionNotes && (
+                            <p className="text-sm text-gray-600 bg-green-50 p-3 rounded mb-2">
+                              <strong>Catatan Penyelesaian:</strong> {session.completionNotes}
+                            </p>
+                          )}
+                          <div className="text-xs text-gray-500">
+                            Diselesaikan: {new Date(session.completedAt || '').toLocaleDateString('id-ID', { 
+                              weekday: 'long', 
+                              day: 'numeric', 
+                              month: 'long', 
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                ))
+            )}
+          </div>
+
+          {/* Cancelled Sessions */}
+          <div className="space-y-4 mb-8">
+            <h3 className="text-xl font-semibold text-gray-900">Riwayat Konseling - Dibatalkan</h3>
+
+            {sessions.filter(s => s.status === 'cancelled').length === 0 ? (
+              <Card className="p-12">
+                <div className="text-center">
+                  <XCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600">Tidak ada konseling yang dibatalkan</p>
+                </div>
+              </Card>
+            ) : (
+              sessions
+                .filter(s => s.status === 'cancelled')
+                .sort((a, b) => new Date(b.cancelledAt || '').getTime() - new Date(a.cancelledAt || '').getTime())
+                .map((session) => (
+                  <Card key={session.id} className="p-6 border-l-4 border-red-500 hover:shadow-lg transition-shadow">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-4 mb-3">
+                          <div className="bg-red-100 p-3 rounded-lg">
+                            <XCircle className="w-6 h-6 text-red-600" />
+                          </div>
+                          <div>
+                            <h4 className="text-lg font-bold text-gray-900">{session.studentName}</h4>
+                            <p className="text-sm text-gray-600">{session.studentNim} • {session.date} {session.time}</p>
+                          </div>
+                          <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
+                            {getStatusLabel(session.status)}
+                          </span>
+                        </div>
+
+                        <div className="ml-16">
+                          <div className="text-xs text-gray-500">
+                            Dibatalkan: {new Date(session.cancelledAt || '').toLocaleDateString('id-ID', { 
+                              weekday: 'long', 
+                              day: 'numeric', 
+                              month: 'long', 
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                ))
+            )}
+          </div>
 
           {/* Quick Schedule Overview */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">

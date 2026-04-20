@@ -13,6 +13,8 @@ export const AdminUserManagement: React.FC = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState<'all' | 'student' | 'admin' | 'bk'>('all');
+  const [filterFaculty, setFilterFaculty] = useState<string>('all');
+  const [filterMajor, setFilterMajor] = useState<string>('all');
   const [showAddUserDialog, setShowAddUserDialog] = useState(false);
   const [selectedUserType, setSelectedUserType] = useState<'student' | 'admin' | 'bk' | null>(null);
   const [editingUser, setEditingUser] = useState<any>(null);
@@ -226,9 +228,23 @@ export const AdminUserManagement: React.FC = () => {
       (u.nim && u.nim.includes(searchTerm));
     
     const matchesRole = filterRole === 'all' || u.role === filterRole;
+    const matchesFaculty = filterFaculty === 'all' || u.faculty === filterFaculty;
+    const matchesMajor = filterMajor === 'all' || u.major === filterMajor;
     
-    return matchesSearch && matchesRole;
+    return matchesSearch && matchesRole && matchesFaculty && matchesMajor;
   });
+
+  // Get unique faculties and majors for filtering
+  const studentUsers = users.filter(u => u.role === 'student');
+  const faculties = Array.from(new Set(studentUsers.map(u => u.faculty).filter(Boolean))).sort();
+  const majors = filterFaculty === 'all' 
+    ? Array.from(new Set(studentUsers.map(u => u.major).filter(Boolean))).sort()
+    : Array.from(new Set(
+        studentUsers
+          .filter(u => u.faculty === filterFaculty)
+          .map(u => u.major)
+          .filter(Boolean)
+      )).sort();
 
   const getRoleBadge = (role: string) => {
     switch (role) {
@@ -331,29 +347,43 @@ export const AdminUserManagement: React.FC = () => {
 
           {/* Search and Filter */}
           <Card className="p-6 mb-6">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Cari nama, email, NIM, atau NIK..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
+            <div className="space-y-4">
+              {/* Search Bar */}
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Cari nama, email, NIM, atau NIK..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <Button 
+                  onClick={() => setShowAddUserDialog(true)}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Tambah User
+                </Button>
               </div>
-              <div className="flex gap-2">
+
+              {/* Role Filter */}
+              <div className="flex gap-2 flex-wrap">
+                <span className="text-sm font-medium text-gray-700 flex items-center">Filter Role:</span>
                 <Button
                   variant={filterRole === 'all' ? 'default' : 'outline'}
                   onClick={() => setFilterRole('all')}
+                  size="sm"
                   className={filterRole === 'all' ? 'bg-blue-600 hover:bg-blue-700' : ''}
                 >
-                  <Filter className="w-4 h-4 mr-2" />
                   Semua
                 </Button>
                 <Button
                   variant={filterRole === 'student' ? 'default' : 'outline'}
                   onClick={() => setFilterRole('student')}
+                  size="sm"
                   className={filterRole === 'student' ? 'bg-blue-600 hover:bg-blue-700' : ''}
                 >
                   Mahasiswa
@@ -361,6 +391,7 @@ export const AdminUserManagement: React.FC = () => {
                 <Button
                   variant={filterRole === 'bk' ? 'default' : 'outline'}
                   onClick={() => setFilterRole('bk')}
+                  size="sm"
                   className={filterRole === 'bk' ? 'bg-blue-600 hover:bg-blue-700' : ''}
                 >
                   BK
@@ -368,18 +399,51 @@ export const AdminUserManagement: React.FC = () => {
                 <Button
                   variant={filterRole === 'admin' ? 'default' : 'outline'}
                   onClick={() => setFilterRole('admin')}
+                  size="sm"
                   className={filterRole === 'admin' ? 'bg-blue-600 hover:bg-blue-700' : ''}
                 >
                   Admin
                 </Button>
               </div>
-              <Button 
-                onClick={() => setShowAddUserDialog(true)}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Tambah User
-              </Button>
+
+              {/* Faculty and Major Filter - Only show when filtering students */}
+              {filterRole === 'all' || filterRole === 'student' ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Filter Fakultas</label>
+                    <select
+                      value={filterFaculty}
+                      onChange={(e) => {
+                        setFilterFaculty(e.target.value);
+                        setFilterMajor('all');
+                      }}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="all">Semua Fakultas</option>
+                      {faculties.map((faculty) => (
+                        <option key={faculty} value={faculty}>
+                          {faculty}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Filter Program Studi</label>
+                    <select
+                      value={filterMajor}
+                      onChange={(e) => setFilterMajor(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="all">Semua Program Studi</option>
+                      {majors.map((major) => (
+                        <option key={major} value={major}>
+                          {major}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              ) : null}
             </div>
           </Card>
 

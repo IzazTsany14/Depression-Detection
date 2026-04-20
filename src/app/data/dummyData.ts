@@ -51,7 +51,7 @@ export const dummyUsers: User[] = [
     name: 'Dr. Siti Nurhaliza, M.Psi',
     role: 'bk'
   },
-  // Students
+  // Students - Fisipol (Fakultas Ilmu Sosial dan Ilmu Politik)
   {
     id: 'student-001',
     email: 'mahasiswa1@student.ac.id',
@@ -60,8 +60,8 @@ export const dummyUsers: User[] = [
     role: 'student',
     nik: '3201051998123001',
     nim: '2021110001',
-    faculty: 'Fakultas Ilmu Komputer',
-    major: 'Teknik Informatika',
+    faculty: 'Fakultas Ilmu Sosial dan Ilmu Politik (Fisipol)',
+    major: 'Ilmu Administrasi',
     semester: 6
   },
   {
@@ -72,8 +72,8 @@ export const dummyUsers: User[] = [
     role: 'student',
     nik: '3206021999234002',
     nim: '2021110002',
-    faculty: 'Fakultas Ilmu Komputer',
-    major: 'Sistem Informasi',
+    faculty: 'Fakultas Ilmu Sosial dan Ilmu Politik (Fisipol)',
+    major: 'Ilmu Komunikasi',
     semester: 6
   },
   {
@@ -84,10 +84,11 @@ export const dummyUsers: User[] = [
     role: 'student',
     nik: '3571021996345003',
     nim: '2020110015',
-    faculty: 'Fakultas Teknik',
-    major: 'Teknik Elektro',
+    faculty: 'Fakultas Ilmu Sosial dan Ilmu Politik (Fisipol)',
+    major: 'Ilmu Politik',
     semester: 8
   },
+  // FEB (Fakultas Ekonomi dan Bisnis)
   {
     id: 'student-004',
     email: 'mahasiswa4@student.ac.id',
@@ -96,8 +97,8 @@ export const dummyUsers: User[] = [
     role: 'student',
     nik: '3502031997456004',
     nim: '2022110030',
-    faculty: 'Fakultas Psikologi',
-    major: 'Psikologi',
+    faculty: 'Fakultas Ekonomi dan Bisnis (FEB)',
+    major: 'Akuntansi',
     semester: 4
   },
   {
@@ -108,9 +109,194 @@ export const dummyUsers: User[] = [
     role: 'student',
     nik: '3514121995567005',
     nim: '2021110045',
-    faculty: 'Fakultas Ekonomi',
+    faculty: 'Fakultas Ekonomi dan Bisnis (FEB)',
     major: 'Manajemen',
     semester: 6
+  },
+  {
+    id: 'student-006',
+    email: 'mahasiswa6@student.ac.id',
+    password: 'student123',
+    name: 'Ratna Wijaya',
+    role: 'student',
+    nik: '3301011997123456',
+    nim: '2021110046',
+    faculty: 'Fakultas Ekonomi dan Bisnis (FEB)',
+    major: 'Ekonomi Pembangunan',
+    semester: 5
+  },
+  // FT (Fakultas Teknik)
+  {
+    id: 'student-007',
+    email: 'mahasiswa7@student.ac.id',
+    password: 'student123',
+    name: 'Hendra Gunawan',
+    role: 'student',
+    nik: '3406021996234567',
+    nim: '2021110050',
+    faculty: 'Fakultas Teknik (FT)',
+    major: 'Teknik Informatika',
+    semester: 6
+  },
+  {
+    id: 'student-008',
+    email: 'mahasiswa8@student.ac.id',
+    password: 'student123',
+    name: 'Indah Sulistyo',
+    role: 'student',
+    nik: '3502121997345678',
+    nim: '2021110051',
+    faculty: 'Fakultas Teknik (FT)',
+    major: 'Teknik Elektro',
+    semester: 6
+  },
+  {
+    id: 'student-009',
+    email: 'mahasiswa9@student.ac.id',
+    password: 'student123',
+    name: 'Joko Pambudi',
+    role: 'student',
+    nik: '3211231996456789',
+    nim: '2020110060',
+    faculty: 'Fakultas Teknik (FT)',
+    major: 'Teknik Sipil',
+    semester: 8
+  },
+  {
+    id: 'student-010',
+    email: 'mahasiswa10@student.ac.id',
+    password: 'student123',
+    name: 'Kimberly Tan',
+    role: 'student',
+    nik: '3601121997567890',
+    nim: '2022110070',
+    faculty: 'Fakultas Teknik (FT)',
+    major: 'Teknik Mesin',
+    semester: 4
+  },
+  // FV (Fakultas Vokasi)
+  {
+    id: 'student-011',
+    email: 'mahasiswa11@student.ac.id',
+    password: 'student123',
+    name: 'Lina Marlina',
+    role: 'student',
+    nik: '3701051998678901',
+    nim: '2021110080',
+    faculty: 'Fakultas Vokasi (FV)',
+    major: 'D3 Perhotelan',
+    semester: 5
+  },
+  {
+    id: 'student-012',
+    email: 'mahasiswa12@student.ac.id',
+    password: 'student123',
+    name: 'Maulana Rizki',
+    role: 'student',
+    nik: '3302061998789012',
+    nim: '2021110081',
+    faculty: 'Fakultas Vokasi (FV)',
+    major: 'D3 Pariwisata',
+    semester: 5
+  },
+  // FH (Fakultas Hukum)
+  {
+    id: 'student-013',
+    email: 'mahasiswa13@student.ac.id',
+    password: 'student123',
+    name: 'Nanda Pratama',
+    role: 'student',
+    nik: '3401121997890123',
+    nim: '2021110090',
+    faculty: 'Fakultas Hukum (FH)',
+    major: 'Ilmu Hukum',
+    semester: 6
+  },
+  {
+    id: 'student-014',
+    email: 'mahasiswa14@student.ac.id',
+    password: 'student123',
+    name: 'Okta Permana',
+    role: 'student',
+    nik: '3502181996901234',
+    nim: '2020110100',
+    faculty: 'Fakultas Hukum (FH)',
+    major: 'Ilmu Hukum',
+    semester: 8
+  },
+  // FMIPA (Fakultas Matematika dan Ilmu Pengetahuan Alam)
+  {
+    id: 'student-015',
+    email: 'mahasiswa15@student.ac.id',
+    password: 'student123',
+    name: 'Priya Santoso',
+    role: 'student',
+    nik: '3301051998012345',
+    nim: '2021110110',
+    faculty: 'Fakultas Matematika dan Ilmu Pengetahuan Alam (FMIPA)',
+    major: 'Matematika',
+    semester: 6
+  },
+  {
+    id: 'student-016',
+    email: 'mahasiswa16@student.ac.id',
+    password: 'student123',
+    name: 'Quentin Ridho',
+    role: 'student',
+    nik: '3401101997123456',
+    nim: '2021110111',
+    faculty: 'Fakultas Matematika dan Ilmu Pengetahuan Alam (FMIPA)',
+    major: 'Fisika',
+    semester: 6
+  },
+  {
+    id: 'student-017',
+    email: 'mahasiswa17@student.ac.id',
+    password: 'student123',
+    name: 'Rina Dwi',
+    role: 'student',
+    nik: '3502111996234567',
+    nim: '2021110112',
+    faculty: 'Fakultas Matematika dan Ilmu Pengetahuan Alam (FMIPA)',
+    major: 'Kimia',
+    semester: 6
+  },
+  {
+    id: 'student-018',
+    email: 'mahasiswa18@student.ac.id',
+    password: 'student123',
+    name: 'Sinta Nurma',
+    role: 'student',
+    nik: '3601201997345678',
+    nim: '2022110120',
+    faculty: 'Fakultas Matematika dan Ilmu Pengetahuan Alam (FMIPA)',
+    major: 'Biologi',
+    semester: 4
+  },
+  // Fakultas PSDKU
+  {
+    id: 'student-019',
+    email: 'mahasiswa19@student.ac.id',
+    password: 'student123',
+    name: 'Toni Suryanto',
+    role: 'student',
+    nik: '3402081996456789',
+    nim: '2021110130',
+    faculty: 'Fakultas PSDKU',
+    major: 'Manajemen Pariwisata',
+    semester: 6
+  },
+  {
+    id: 'student-020',
+    email: 'mahasiswa20@student.ac.id',
+    password: 'student123',
+    name: 'Ulfah Karina',
+    role: 'student',
+    nik: '3503151998567890',
+    nim: '2022110140',
+    faculty: 'Fakultas PSDKU',
+    major: 'Manajemen Pariwisata',
+    semester: 4
   }
 ];
 
@@ -205,6 +391,171 @@ export const dummyTestResults: TestResult[] = [
     score: 63,
     level: 'Sangat Berat',
     fuzzyScore: 0.95
+  },
+
+  // Ratna Wijaya - student-006 (Berat - perlu perhatian)
+  {
+    userId: 'student-006',
+    testId: 'test-006-1',
+    date: '2026-04-02T14:00:00',
+    answers: [3, 2, 3, 2, 2, 3, 2, 3, 3, 2, 3, 2, 2, 3, 2, 3, 2, 3, 2, 3, 2],
+    score: 52,
+    level: 'Berat',
+    fuzzyScore: 0.80
+  },
+
+  // Hendra Gunawan - student-007 (Sedang - monitoring)
+  {
+    userId: 'student-007',
+    testId: 'test-007-1',
+    date: '2026-03-28T11:30:00',
+    answers: [2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
+    score: 31,
+    level: 'Sedang',
+    fuzzyScore: 0.52
+  },
+
+  // Indah Sulistyo - student-008 (Normal)
+  {
+    userId: 'student-008',
+    testId: 'test-008-1',
+    date: '2026-04-03T10:15:00',
+    answers: [0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0],
+    score: 9,
+    level: 'Normal',
+    fuzzyScore: 0.12
+  },
+
+  // Joko Pambudi - student-009 (Ringan)
+  {
+    userId: 'student-009',
+    testId: 'test-009-1',
+    date: '2026-03-30T13:45:00',
+    answers: [1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1],
+    score: 19,
+    level: 'Ringan',
+    fuzzyScore: 0.32
+  },
+
+  // Kimberly Tan - student-010 (Normal)
+  {
+    userId: 'student-010',
+    testId: 'test-010-1',
+    date: '2026-04-06T09:00:00',
+    answers: [0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0],
+    score: 8,
+    level: 'Normal',
+    fuzzyScore: 0.10
+  },
+
+  // Lina Marlina - student-011 (Sedang)
+  {
+    userId: 'student-011',
+    testId: 'test-011-1',
+    date: '2026-04-01T15:20:00',
+    answers: [2, 2, 1, 2, 1, 2, 2, 1, 2, 1, 2, 1, 2, 2, 1, 2, 1, 2, 1, 2, 1],
+    score: 33,
+    level: 'Sedang',
+    fuzzyScore: 0.58
+  },
+
+  // Maulana Rizki - student-012 (Ringan)
+  {
+    userId: 'student-012',
+    testId: 'test-012-1',
+    date: '2026-03-31T12:00:00',
+    answers: [1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0],
+    score: 17,
+    level: 'Ringan',
+    fuzzyScore: 0.28
+  },
+
+  // Nanda Pratama - student-013 (Berat)
+  {
+    userId: 'student-013',
+    testId: 'test-013-1',
+    date: '2026-04-04T11:15:00',
+    answers: [3, 3, 2, 3, 3, 2, 3, 2, 3, 3, 2, 3, 2, 3, 3, 2, 3, 2, 3, 2, 3],
+    score: 56,
+    level: 'Berat',
+    fuzzyScore: 0.83
+  },
+
+  // Okta Permana - student-014 (Normal)
+  {
+    userId: 'student-014',
+    testId: 'test-014-1',
+    date: '2026-03-22T14:30:00',
+    answers: [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+    score: 10,
+    level: 'Normal',
+    fuzzyScore: 0.14
+  },
+
+  // Priya Santoso - student-015 (Ringan)
+  {
+    userId: 'student-015',
+    testId: 'test-015-1',
+    date: '2026-04-07T10:45:00',
+    answers: [1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0],
+    score: 20,
+    level: 'Ringan',
+    fuzzyScore: 0.33
+  },
+
+  // Quentin Ridho - student-016 (Normal)
+  {
+    userId: 'student-016',
+    testId: 'test-016-1',
+    date: '2026-03-26T13:00:00',
+    answers: [0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1],
+    score: 9,
+    level: 'Normal',
+    fuzzyScore: 0.13
+  },
+
+  // Rina Dwi - student-017 (Sedang - monitoring)
+  {
+    userId: 'student-017',
+    testId: 'test-017-1',
+    date: '2026-04-09T11:45:00',
+    answers: [2, 1, 2, 2, 1, 2, 1, 2, 2, 1, 2, 2, 1, 2, 1, 2, 2, 1, 2, 1, 2],
+    score: 35,
+    level: 'Sedang',
+    fuzzyScore: 0.60
+  },
+
+  // Sinta Nurma - student-018 (Normal)
+  {
+    userId: 'student-018',
+    testId: 'test-018-1',
+    date: '2026-04-11T09:30:00',
+    answers: [0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0],
+    score: 8,
+    level: 'Normal',
+    fuzzyScore: 0.11
+  },
+
+  // Toni Suryanto - student-019 (Ringan)
+  {
+    userId: 'student-019',
+    testId: 'test-019-1',
+    date: '2026-03-29T14:15:00',
+    answers: [1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1],
+    score: 18,
+    level: 'Ringan',
+    fuzzyScore: 0.30
+  },
+
+  // Ulfah Karina - student-020 (Normal)
+  {
+    userId: 'student-020',
+    testId: 'test-020-1',
+    date: '2026-04-13T15:45:00',
+    answers: [0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1],
+    score: 10,
+    level: 'Normal',
+    fuzzyScore: 0.15
   }
 ];
 
