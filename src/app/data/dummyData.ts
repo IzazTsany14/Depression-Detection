@@ -658,9 +658,92 @@ export const getStudentDetailBySearch = (query: string) => {
   });
 };
 
-// Login helper
+// Login helper - cek dari semua sumber: registered, dummy, dan admin-added users
 export const authenticateUser = (email: string, password: string) => {
-  // Check from localStorage first (realtime data)
+  // 1. Check dari localStorage (registered users, admin-added, dan new registrations)
   const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-  return registeredUsers.find((u: any) => u.email === email && u.password === password);
+  const foundUser = registeredUsers.find((u: any) => u.email === email && u.password === password);
+  
+  if (foundUser) {
+    return foundUser;
+  }
+
+  // 2. Check dari dummyUsers sebagai fallback jika belum di-initialize ke localStorage
+  const dummyUser = dummyUsers.find(u => u.email === email && u.password === password);
+  if (dummyUser) {
+    return dummyUser;
+  }
+
+  return null;
+};
+
+// Get all users dari semua sumber (real-time)
+export const getAllUsers = (): User[] => {
+  const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+  const adminUsers = JSON.parse(localStorage.getItem('adminAddedUsers') || '[]');
+  
+  // Gabungkan semua user dan remove duplicates berdasarkan ID
+  const allUsers = [...registeredUsers, ...adminUsers];
+  const userMap = new Map<string, User>();
+  
+  allUsers.forEach(user => {
+    if (!userMap.has(user.id)) {
+      userMap.set(user.id, user);
+    }
+  });
+  
+  // Jika localStorage kosong, gunakan dummyUsers
+  if (userMap.size === 0) {
+    dummyUsers.forEach(user => userMap.set(user.id, user));
+  }
+  
+  return Array.from(userMap.values());
+};
+
+// Add user dari admin (real-time)
+export const addUserFromAdmin = (newUser: User): boolean => {
+  const adminUsers = JSON.parse(localStorage.getItem('adminAddedUsers') || '[]');
+  
+  // Check apakah email sudah ada di registered atau admin users
+  const allUsers = getAllUsers();
+  if (allUsers.some(u => u.email === newUser.email)) {
+    return false;
+  }
+  
+  adminUsers.push({
+    ...newUser,
+    password: newUser.password || 'defaultPassword123' // fallback password
+  });
+  
+  localStorage.setItem('adminAddedUsers', JSON.stringify(adminUsers));
+  return true;
+};
+
+// Get user by ID (search dari semua sumber)
+export const getUserById = (userId: string): User | undefined => {
+  return getAllUsers().find(u => u.id === userId);
+};
+
+// Update user (untuk edit profile)
+export const updateUser = (userId: string, updatedData: Partial<User>): boolean => {
+  const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+  const adminUsers = JSON.parse(localStorage.getItem('adminAddedUsers') || '[]');
+  
+  // Cari dan update di registered users
+  const registeredIndex = registeredUsers.findIndex((u: any) => u.id === userId);
+  if (registeredIndex !== -1) {
+    registeredUsers[registeredIndex] = { ...registeredUsers[registeredIndex], ...updatedData };
+    localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+    return true;
+  }
+  
+  // Cari dan update di admin users
+  const adminIndex = adminUsers.findIndex((u: any) => u.id === userId);
+  if (adminIndex !== -1) {
+    adminUsers[adminIndex] = { ...adminUsers[adminIndex], ...updatedData };
+    localStorage.setItem('adminAddedUsers', JSON.stringify(adminUsers));
+    return true;
+  }
+  
+  return false;
 };
