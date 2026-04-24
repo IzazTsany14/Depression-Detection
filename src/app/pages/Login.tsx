@@ -6,8 +6,9 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Card } from '../components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { useAuth } from '../context/AuthContext';
-import { Eye, EyeOff, LogIn, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, LogIn, AlertCircle, Mail, CheckCircle2 } from 'lucide-react';
 import { Alert, AlertDescription } from '../components/ui/alert';
 
 export const Login: React.FC = () => {
@@ -22,6 +23,9 @@ export const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
+  const [forgotPasswordMessage, setForgotPasswordMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -64,6 +68,29 @@ export const Login: React.FC = () => {
   const handleGuestAccess = () => {
     startAsGuest();
     navigate('/questionnaire');
+  };
+
+  const handleForgotPassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!forgotPasswordEmail) {
+      setForgotPasswordMessage({ type: 'error', text: 'Masukkan email terlebih dahulu' });
+      return;
+    }
+
+    // Simulate sending password reset email
+    // In a real app, this would call a backend API to send a reset email
+    setForgotPasswordMessage({ 
+      type: 'success', 
+      text: `Link reset password telah dikirim ke ${forgotPasswordEmail}. Silakan cek email Anda dan ikuti instruksi.` 
+    });
+
+    // Reset form after 3 seconds and close dialog
+    setTimeout(() => {
+      setForgotPasswordEmail('');
+      setForgotPasswordMessage(null);
+      setShowForgotPassword(false);
+    }, 3000);
   };
 
   return (
@@ -113,6 +140,7 @@ export const Login: React.FC = () => {
                   <Label htmlFor="password">Password</Label>
                   <button
                     type="button"
+                    onClick={() => setShowForgotPassword(true)}
                     className="text-sm text-blue-600 hover:underline"
                   >
                     Lupa Password?
@@ -211,6 +239,72 @@ export const Login: React.FC = () => {
       </main>
 
       <Footer />
+
+      {/* Forgot Password Dialog */}
+      <Dialog open={showForgotPassword} onOpenChange={setShowForgotPassword}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Mail className="w-5 h-5 text-blue-600" />
+              Reset Password
+            </DialogTitle>
+            <DialogDescription>
+              Masukkan email Anda untuk menerima link reset password
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleForgotPassword} className="space-y-4 py-4">
+            {forgotPasswordMessage && (
+              <Alert className={`${forgotPasswordMessage.type === 'success' ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}`}>
+                {forgotPasswordMessage.type === 'success' ? (
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                ) : (
+                  <AlertCircle className="h-4 w-4 text-red-600" />
+                )}
+                <AlertDescription className={forgotPasswordMessage.type === 'success' ? 'text-green-900' : 'text-red-900'}>
+                  {forgotPasswordMessage.text}
+                </AlertDescription>
+              </Alert>
+            )}
+
+            <div>
+              <Label htmlFor="reset-email">Email</Label>
+              <Input
+                id="reset-email"
+                type="email"
+                value={forgotPasswordEmail}
+                onChange={(e) => {
+                  setForgotPasswordEmail(e.target.value);
+                  setForgotPasswordMessage(null);
+                }}
+                placeholder="nama@email.com"
+                className="mt-1"
+              />
+            </div>
+
+            <div className="flex gap-3 pt-4">
+              <Button
+                type="submit"
+                className="flex-1 bg-blue-600 hover:bg-blue-700"
+              >
+                Kirim Link Reset
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setShowForgotPassword(false);
+                  setForgotPasswordEmail('');
+                  setForgotPasswordMessage(null);
+                }}
+                className="flex-1"
+              >
+                Batal
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
