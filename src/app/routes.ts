@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router";
 import { Home } from "./pages/Home";
 import { Registration } from "./pages/Registration";
 import { Login } from "./pages/Login";
+import { ResetPassword } from "./pages/ResetPassword";
 import { Questionnaire } from "./pages/Questionnaire";
 import { GuestResult } from "./pages/GuestResult";
 import { RegisteredResult } from "./pages/RegisteredResult";
@@ -32,6 +33,10 @@ export const router = createBrowserRouter([
   {
     path: "/login",
     Component: Login,
+  },
+  {
+    path: "/reset-password",
+    Component: ResetPassword,
   },
   {
     path: "/questionnaire",

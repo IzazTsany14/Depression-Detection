@@ -8,8 +8,9 @@ import { Label } from '../components/ui/label';
 import { Card } from '../components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { useAuth } from '../context/AuthContext';
-import { Eye, EyeOff, LogIn, AlertCircle, Mail, CheckCircle2 } from 'lucide-react';
+import { Eye, EyeOff, LogIn, AlertCircle, Mail, CheckCircle2, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '../components/ui/alert';
+import { checkEmailExists, sendResetEmail } from '../utils/emailService';
 
 export const Login: React.FC = () => {
   const { login, startAsGuest, user } = useAuth();
@@ -26,6 +27,7 @@ export const Login: React.FC = () => {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
   const [forgotPasswordMessage, setForgotPasswordMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -70,7 +72,7 @@ export const Login: React.FC = () => {
     navigate('/questionnaire');
   };
 
-  const handleForgotPassword = (e: React.FormEvent) => {
+  const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!forgotPasswordEmail) {
@@ -78,19 +80,62 @@ export const Login: React.FC = () => {
       return;
     }
 
-    // Simulate sending password reset email
-    // In a real app, this would call a backend API to send a reset email
-    setForgotPasswordMessage({ 
-      type: 'success', 
-      text: `Link reset password telah dikirim ke ${forgotPasswordEmail}. Silakan cek email Anda dan ikuti instruksi.` 
-    });
+    setForgotPasswordLoading(true);
 
-    // Reset form after 3 seconds and close dialog
-    setTimeout(() => {
-      setForgotPasswordEmail('');
-      setForgotPasswordMessage(null);
-      setShowForgotPassword(false);
-    }, 3000);
+    // Check if email exists in registered users
+    const emailExists = checkEmailExists(forgotPasswordEmail);
+
+    if (!emailExists) {
+      setForgotPasswordMessage({ 
+        type: 'error', 
+        text: `Email "${forgotPasswordEmail}" belum terdaftar di sistem. Silakan cek kembali atau buat akun baru.` 
+      });
+      setForgotPasswordLoading(false);
+      return;
+    }
+
+    // Get user data for email
+    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+    const adminUsers = JSON.parse(localStorage.getItem('adminAddedUsers') || '[]');
+    const allUsers = [...registeredUsers, ...adminUsers];
+    
+    const userData = allUsers.find((user: any) => user.email.toLowerCase() === forgotPasswordEmail.toLowerCase());
+    
+    if (!userData) {
+      setForgotPasswordMessage({ type: 'error', text: 'Terjadi kesalahan. Silakan coba lagi.' });
+      setForgotPasswordLoading(false);
+      return;
+    }
+
+    // Send reset email
+    try {
+      const response = await sendResetEmail({
+        email: forgotPasswordEmail,
+        name: userData.name,
+        resetLink: '' // Will be generated in the service
+      });
+
+      setForgotPasswordMessage({ 
+        type: response.success ? 'success' : 'error',
+        text: response.message
+      });
+
+      if (response.success) {
+        // Reset form after 3 seconds and close dialog
+        setTimeout(() => {
+          setForgotPasswordEmail('');
+          setForgotPasswordMessage(null);
+          setShowForgotPassword(false);
+        }, 3000);
+      }
+    } catch (error) {
+      setForgotPasswordMessage({ 
+        type: 'error', 
+        text: 'Gagal mengirim email. Silakan coba lagi nanti.' 
+      });
+    }
+
+    setForgotPasswordLoading(false);
   };
 
   return (
@@ -285,13 +330,22 @@ export const Login: React.FC = () => {
             <div className="flex gap-3 pt-4">
               <Button
                 type="submit"
+                disabled={forgotPasswordLoading}
                 className="flex-1 bg-blue-600 hover:bg-blue-700"
               >
-                Kirim Link Reset
+                {forgotPasswordLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Mengirim...
+                  </>
+                ) : (
+                  'Kirim Link Reset'
+                )}
               </Button>
               <Button
                 type="button"
                 variant="outline"
+                disabled={forgotPasswordLoading}
                 onClick={() => {
                   setShowForgotPassword(false);
                   setForgotPasswordEmail('');
