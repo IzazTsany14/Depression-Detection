@@ -54,7 +54,7 @@ Berdasarkan dokumen SRS **Sistem Deteksi Dini Tingkat Depresi Mahasiswa**:
 | Nama | NIM | Peran |
 | ------- | -------- | ------- |
 | **[Izaz Tsany Rismawan](https://github.com/IzazTsany14)** | 25051204355 | Fullstack Developer / Lead |
-| **Lufita Setiati** | 25051204304 | System Analyst / Documentation |
+| **[Lufita Setiati](https://github.com/lupitaaasetia)** | 25051204304 | System Analyst / Documentation |
 | **Fearda Agnessiya Putri Dardiri** | 25051204332 | UI/UX Designer / Researcher |
 
 **Dosen Pengampu**: Saifudin Yahya, S.Kom., M.T.I.
