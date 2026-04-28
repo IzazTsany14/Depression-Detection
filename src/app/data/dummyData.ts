@@ -31,7 +31,7 @@ export const dummyUsers: User[] = [
   // Admin
   {
     id: 'admin-001',
-    email: 'admin@university.ac.id',
+    email: 'adminsistem@universitas.ac.id',
     password: 'admin123',
     name: 'Dr. Admin Sistem',
     role: 'admin'
@@ -39,14 +39,14 @@ export const dummyUsers: User[] = [
   // BK (Bimbingan Konseling)
   {
     id: 'bk-001',
-    email: 'bk@university.ac.id',
+    email: 'budisantoso@universitas.ac.id',
     password: 'bk123',
     name: 'Psikolog Budi Santoso, M.Psi',
     role: 'bk'
   },
   {
     id: 'bk-002',
-    email: 'bk2@university.ac.id',
+    email: 'sitinurhaliza@universitas.ac.id',
     password: 'bk123',
     name: 'Dr. Siti Nurhaliza, M.Psi',
     role: 'bk'
@@ -54,7 +54,7 @@ export const dummyUsers: User[] = [
   // Students - Fisipol (Fakultas Ilmu Sosial dan Ilmu Politik)
   {
     id: 'student-001',
-    email: 'mahasiswa1@student.ac.id',
+    email: 'ahmadfauzi01@mhs.universitas.ac.id',
     password: 'student123',
     name: 'Ahmad Fauzi',
     role: 'student',
@@ -66,7 +66,7 @@ export const dummyUsers: User[] = [
   },
   {
     id: 'student-002',
-    email: 'mahasiswa2@student.ac.id',
+    email: 'sitirahmawati02@mhs.universitas.ac.id',
     password: 'student123',
     name: 'Siti Rahmawati',
     role: 'student',
@@ -78,7 +78,7 @@ export const dummyUsers: User[] = [
   },
   {
     id: 'student-003',
-    email: 'mahasiswa3@student.ac.id',
+    email: 'budihartono03@mhs.universitas.ac.id',
     password: 'student123',
     name: 'Budi Hartono',
     role: 'student',
@@ -91,7 +91,7 @@ export const dummyUsers: User[] = [
   // FEB (Fakultas Ekonomi dan Bisnis)
   {
     id: 'student-004',
-    email: 'mahasiswa4@student.ac.id',
+    email: 'dewikusuma04@mhs.universitas.ac.id',
     password: 'student123',
     name: 'Dewi Kusuma',
     role: 'student',
@@ -103,7 +103,7 @@ export const dummyUsers: User[] = [
   },
   {
     id: 'student-005',
-    email: 'mahasiswa5@student.ac.id',
+    email: 'ekoprasetyo05@mhs.universitas.ac.id',
     password: 'student123',
     name: 'Eko Prasetyo',
     role: 'student',
@@ -115,7 +115,7 @@ export const dummyUsers: User[] = [
   },
   {
     id: 'student-006',
-    email: 'mahasiswa6@student.ac.id',
+    email: 'ratnawijaya06@mhs.universitas.ac.id',
     password: 'student123',
     name: 'Ratna Wijaya',
     role: 'student',
@@ -128,7 +128,7 @@ export const dummyUsers: User[] = [
   // FT (Fakultas Teknik)
   {
     id: 'student-007',
-    email: 'mahasiswa7@student.ac.id',
+    email: 'hendragunawan07@mhs.universitas.ac.id',
     password: 'student123',
     name: 'Hendra Gunawan',
     role: 'student',
@@ -140,7 +140,7 @@ export const dummyUsers: User[] = [
   },
   {
     id: 'student-008',
-    email: 'mahasiswa8@student.ac.id',
+    email: 'indahsulistyo08@mhs.universitas.ac.id',
     password: 'student123',
     name: 'Indah Sulistyo',
     role: 'student',
@@ -152,7 +152,7 @@ export const dummyUsers: User[] = [
   },
   {
     id: 'student-009',
-    email: 'mahasiswa9@student.ac.id',
+    email: 'jokopambudi09@mhs.universitas.ac.id',
     password: 'student123',
     name: 'Joko Pambudi',
     role: 'student',
@@ -164,7 +164,7 @@ export const dummyUsers: User[] = [
   },
   {
     id: 'student-010',
-    email: 'mahasiswa10@student.ac.id',
+    email: 'kimberlytan10@mhs.universitas.ac.id',
     password: 'student123',
     name: 'Kimberly Tan',
     role: 'student',
@@ -177,7 +177,7 @@ export const dummyUsers: User[] = [
   // FV (Fakultas Vokasi)
   {
     id: 'student-011',
-    email: 'mahasiswa11@student.ac.id',
+    email: 'linamarlina11@mhs.universitas.ac.id',
     password: 'student123',
     name: 'Lina Marlina',
     role: 'student',
@@ -189,7 +189,7 @@ export const dummyUsers: User[] = [
   },
   {
     id: 'student-012',
-    email: 'mahasiswa12@student.ac.id',
+    email: 'maulanarizki12@mhs.universitas.ac.id',
     password: 'student123',
     name: 'Maulana Rizki',
     role: 'student',
@@ -202,7 +202,7 @@ export const dummyUsers: User[] = [
   // FH (Fakultas Hukum)
   {
     id: 'student-013',
-    email: 'mahasiswa13@student.ac.id',
+    email: 'nandapratama13@mhs.universitas.ac.id',
     password: 'student123',
     name: 'Nanda Pratama',
     role: 'student',
@@ -214,7 +214,7 @@ export const dummyUsers: User[] = [
   },
   {
     id: 'student-014',
-    email: 'mahasiswa14@student.ac.id',
+    email: 'oktapermana14@mhs.universitas.ac.id',
     password: 'student123',
     name: 'Okta Permana',
     role: 'student',
@@ -227,7 +227,7 @@ export const dummyUsers: User[] = [
   // FMIPA (Fakultas Matematika dan Ilmu Pengetahuan Alam)
   {
     id: 'student-015',
-    email: 'mahasiswa15@student.ac.id',
+    email: 'priyasantoso15@mhs.universitas.ac.id',
     password: 'student123',
     name: 'Priya Santoso',
     role: 'student',
@@ -239,7 +239,7 @@ export const dummyUsers: User[] = [
   },
   {
     id: 'student-016',
-    email: 'mahasiswa16@student.ac.id',
+    email: 'quentinridho16@mhs.universitas.ac.id',
     password: 'student123',
     name: 'Quentin Ridho',
     role: 'student',
@@ -251,7 +251,7 @@ export const dummyUsers: User[] = [
   },
   {
     id: 'student-017',
-    email: 'mahasiswa17@student.ac.id',
+    email: 'rinadwi17@mhs.universitas.ac.id',
     password: 'student123',
     name: 'Rina Dwi',
     role: 'student',
@@ -263,7 +263,7 @@ export const dummyUsers: User[] = [
   },
   {
     id: 'student-018',
-    email: 'mahasiswa18@student.ac.id',
+    email: 'sintanurma18@mhs.universitas.ac.id',
     password: 'student123',
     name: 'Sinta Nurma',
     role: 'student',
@@ -276,7 +276,7 @@ export const dummyUsers: User[] = [
   // Fakultas PSDKU
   {
     id: 'student-019',
-    email: 'mahasiswa19@student.ac.id',
+    email: 'tonisuryanto19@mhs.universitas.ac.id',
     password: 'student123',
     name: 'Toni Suryanto',
     role: 'student',
@@ -288,7 +288,7 @@ export const dummyUsers: User[] = [
   },
   {
     id: 'student-020',
-    email: 'mahasiswa20@student.ac.id',
+    email: 'camekmulyono34@mhs.universitas.ac.id',
     password: 'student123',
     name: 'Camek Mulyono',
     role: 'student',

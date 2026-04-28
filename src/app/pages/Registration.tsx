@@ -209,11 +209,28 @@ export const Registration: React.FC = () => {
                     </div>
                   </div>
 
+                  <div className="flex items-start space-x-3 pt-2">
+                    <Checkbox
+                      id="terms"
+                      checked={agreedToTerms}
+                      onCheckedChange={(checked) => setAgreedToTerms(checked as boolean)}
+                    />
+                    <div className="grid gap-1.5 leading-none">
+                      <label
+                        htmlFor="terms"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Saya setuju dengan{' '}
+                        <a href="#" className="font-bold text-blue-600 hover:underline">Syarat & Ketentuan</a>.
+                      </label>
+                    </div>
+                  </div>
+
                   <Button
                     type="submit"
                     size="lg"
                     className="w-full bg-blue-600 hover:bg-blue-700"
-                    disabled={loading}
+                    disabled={loading || !agreedToTerms}
                   >
                     {loading ? 'Mendaftar...' : 'Daftar Sekarang'}
                   </Button>

@@ -10,7 +10,8 @@ import {
   User,
   LogOut,
   Activity,
-  FolderOpen
+  FolderOpen,
+  Settings
 } from 'lucide-react';
 import { Button } from './ui/button';
 
@@ -53,6 +54,12 @@ export const DashboardSidebar: React.FC<SidebarProps> = ({ role }) => {
       path: '/admin/statistics',
       active: location.pathname === '/admin/statistics'
     },
+    { 
+      icon: Settings, 
+      label: 'Manajemen Pertanyaan', 
+      path: '/admin/questions',
+      active: location.pathname === '/admin/questions'
+    },
   ];
 
   const bkMenuItems = [
@@ -79,6 +86,12 @@ export const DashboardSidebar: React.FC<SidebarProps> = ({ role }) => {
       label: 'Jadwal Konseling', 
       path: '/bk/schedule',
       active: location.pathname === '/bk/schedule'
+    },
+    { 
+      icon: Settings, 
+      label: 'Manajemen Pertanyaan', 
+      path: '/bk/questions',
+      active: location.pathname === '/bk/questions'
     },
   ];
 

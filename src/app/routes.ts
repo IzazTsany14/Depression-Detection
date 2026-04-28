@@ -14,11 +14,13 @@ import { AdminUserManagement } from "./pages/AdminUserManagement";
 import { AdminReports } from "./pages/AdminReports";
 import { AdminStatistics } from "./pages/AdminStatistics";
 import { AdminProfile } from "./pages/AdminProfile";
+import { AdminQuestionManagement } from "./pages/AdminQuestionManagement";
 import { BKDashboard } from "./pages/BKDashboard";
 import { BKStudentCases } from "./pages/BKStudentCases";
 import { BKCounselingSchedule } from "./pages/BKCounselingSchedule";
 import { BKMedicalRecords } from "./pages/BKMedicalRecords";
 import { BKProfile } from "./pages/BKProfile";
+import { BKQuestionManagement } from "./pages/BKQuestionManagement";
 import { StudentProfile } from "./pages/StudentProfile";
 
 export const router = createBrowserRouter([
@@ -83,6 +85,10 @@ export const router = createBrowserRouter([
     Component: AdminProfile,
   },
   {
+    path: "/admin/questions",
+    Component: AdminQuestionManagement,
+  },
+  {
     path: "/bk",
     Component: BKDashboard,
   },
@@ -101,6 +107,10 @@ export const router = createBrowserRouter([
   {
     path: "/bk/profile",
     Component: BKProfile,
+  },
+  {
+    path: "/bk/questions",
+    Component: BKQuestionManagement,
   },
   {
     path: "/student/profile",
