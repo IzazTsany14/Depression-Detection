@@ -7,21 +7,21 @@ import { Questionnaire } from "./pages/Questionnaire";
 import { GuestResult } from "./pages/GuestResult";
 import { RegisteredResult } from "./pages/RegisteredResult";
 import { Guide } from "./pages/Guide";
-import { Dashboard } from "./pages/Dashboard";
 import { About } from "./pages/About";
-import { AdminDashboard } from "./pages/AdminDashboard";
-import { AdminUserManagement } from "./pages/AdminUserManagement";
-import { AdminReports } from "./pages/AdminReports";
-import { AdminStatistics } from "./pages/AdminStatistics";
-import { AdminProfile } from "./pages/AdminProfile";
-import { AdminQuestionManagement } from "./pages/AdminQuestionManagement";
-import { BKDashboard } from "./pages/BKDashboard";
-import { BKStudentCases } from "./pages/BKStudentCases";
-import { BKCounselingSchedule } from "./pages/BKCounselingSchedule";
-import { BKMedicalRecords } from "./pages/BKMedicalRecords";
-import { BKProfile } from "./pages/BKProfile";
-import { BKQuestionManagement } from "./pages/BKQuestionManagement";
-import { StudentProfile } from "./pages/StudentProfile";
+import { AdminDashboard } from "./pages/admin/AdminDashboard";
+import { AdminUserManagement } from "./pages/admin/AdminUserManagement";
+import { AdminReports } from "./pages/admin/AdminReports";
+import { AdminStatistics } from "./pages/admin/AdminStatistics";
+import { AdminProfile } from "./pages/admin/AdminProfile";
+import { AdminQuestionManagement } from "./pages/admin/AdminQuestionManagement";
+import { BKDashboard } from "./pages/bk/BKDashboard";
+import { BKStudentCases } from "./pages/bk/BKStudentCases";
+import { BKCounselingSchedule } from "./pages/bk/BKCounselingSchedule";
+import { BKMedicalRecords } from "./pages/bk/BKMedicalRecords";
+import { BKProfile } from "./pages/bk/BKProfile";
+import { BKQuestionManagement } from "./pages/bk/BKQuestionManagement";
+import { Dashboard } from "./pages/mahasiswa/Dashboard";
+import { StudentProfile } from "./pages/mahasiswa/StudentProfile";
 
 export const router = createBrowserRouter([
   {
