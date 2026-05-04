@@ -67,7 +67,7 @@ Berdasarkan dokumen SRS **Sistem Deteksi Dini Tingkat Depresi Mahasiswa**:
 
 ---
 
-## 🛠️ Setup Project (Frontend)
+## 🛠️ Setup Project 
 
 Pastikan Anda memiliki Node.js terinstal di perangkat Anda.
 
