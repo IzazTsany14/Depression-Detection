@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 02, 2026 at 12:14 PM
+-- Generation Time: May 06, 2026 at 04:25 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -32,6 +32,7 @@ CREATE TABLE `accounts` (
   `email` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
   `role` enum('student','admin','bk') NOT NULL,
+  `profile_picture` varchar(255) DEFAULT NULL,
   `is_active` tinyint(1) DEFAULT 1,
   `last_login` datetime DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
@@ -41,30 +42,30 @@ CREATE TABLE `accounts` (
 -- Dumping data for table `accounts`
 --
 
-INSERT INTO `accounts` (`account_id`, `email`, `password`, `role`, `is_active`, `last_login`, `created_at`) VALUES
-('admin-001', 'adminsistem@universitas.ac.id', 'admin123', 'admin', 1, NULL, '2026-05-02 10:14:19'),
-('bk-001', 'budisantoso@universitas.ac.id', 'bk123', 'bk', 1, NULL, '2026-05-02 10:14:19'),
-('bk-002', 'sitinurhaliza@universitas.ac.id', 'bk123', 'bk', 1, NULL, '2026-05-02 10:14:19'),
-('student-001', 'ahmadfauzi01@mhs.universitas.ac.id', 'student123', 'student', 1, NULL, '2026-05-02 10:14:19'),
-('student-002', 'sitirahmawati02@mhs.universitas.ac.id', 'student123', 'student', 1, NULL, '2026-05-02 10:14:19'),
-('student-003', 'budihartono03@mhs.universitas.ac.id', 'student123', 'student', 1, NULL, '2026-05-02 10:14:19'),
-('student-004', 'dewikusuma04@mhs.universitas.ac.id', 'student123', 'student', 1, NULL, '2026-05-02 10:14:19'),
-('student-005', 'ekoprasetyo05@mhs.universitas.ac.id', 'student123', 'student', 1, NULL, '2026-05-02 10:14:19'),
-('student-006', 'ratnawijaya06@mhs.universitas.ac.id', 'student123', 'student', 1, NULL, '2026-05-02 10:14:19'),
-('student-007', 'hendragunawan07@mhs.universitas.ac.id', 'student123', 'student', 1, NULL, '2026-05-02 10:14:19'),
-('student-008', 'indahsulistyo08@mhs.universitas.ac.id', 'student123', 'student', 1, NULL, '2026-05-02 10:14:19'),
-('student-009', 'jokopambudi09@mhs.universitas.ac.id', 'student123', 'student', 1, NULL, '2026-05-02 10:14:19'),
-('student-010', 'kimberlytan10@mhs.universitas.ac.id', 'student123', 'student', 1, NULL, '2026-05-02 10:14:19'),
-('student-011', 'linamarlina11@mhs.universitas.ac.id', 'student123', 'student', 1, NULL, '2026-05-02 10:14:19'),
-('student-012', 'maulanarizki12@mhs.universitas.ac.id', 'student123', 'student', 1, NULL, '2026-05-02 10:14:19'),
-('student-013', 'nandapratama13@mhs.universitas.ac.id', 'student123', 'student', 1, NULL, '2026-05-02 10:14:19'),
-('student-014', 'oktapermana14@mhs.universitas.ac.id', 'student123', 'student', 1, NULL, '2026-05-02 10:14:19'),
-('student-015', 'priyasantoso15@mhs.universitas.ac.id', 'student123', 'student', 1, NULL, '2026-05-02 10:14:19'),
-('student-016', 'quentinridho16@mhs.universitas.ac.id', 'student123', 'student', 1, NULL, '2026-05-02 10:14:19'),
-('student-017', 'rinadwi17@mhs.universitas.ac.id', 'student123', 'student', 1, NULL, '2026-05-02 10:14:19'),
-('student-018', 'sintanurma18@mhs.universitas.ac.id', 'student123', 'student', 1, NULL, '2026-05-02 10:14:19'),
-('student-019', 'tonisuryanto19@mhs.universitas.ac.id', 'student123', 'student', 1, NULL, '2026-05-02 10:14:19'),
-('student-020', 'camekmulyono34@mhs.universitas.ac.id', 'student123', 'student', 1, NULL, '2026-05-02 10:14:19');
+INSERT INTO `accounts` (`account_id`, `email`, `password`, `role`, `profile_picture`, `is_active`, `last_login`, `created_at`) VALUES
+('admin-001', 'adminsistem@universitas.ac.id', '$2b$12$a0qBsvOL.zACOew44euil.d9mYYADuNnALK2YJYWNlbgOhg2njA9.', 'admin', NULL, 1, NULL, '2026-05-06 02:24:22'),
+('bk-001', 'budisantoso@universitas.ac.id', '$2b$12$GMTJGdzRoK5gP5HcJN8Iv.Y0w4n9PGJpc7aIVKAl2XjLvZIqL16g6', 'bk', NULL, 1, NULL, '2026-05-06 02:24:22'),
+('bk-002', 'sitinurhaliza@universitas.ac.id', '$2b$12$GMTJGdzRoK5gP5HcJN8Iv.Y0w4n9PGJpc7aIVKAl2XjLvZIqL16g6', 'bk', NULL, 1, NULL, '2026-05-06 02:24:22'),
+('student-001', 'ahmadfauzi01@mhs.universitas.ac.id', '$2b$12$nS6PnA6rADW5uJVcKtOiUe6MEoOiTI9EG0qXmWZ3Ch7whbdOaipHy', 'student', NULL, 1, NULL, '2026-05-06 02:24:22'),
+('student-002', 'sitirahmawati02@mhs.universitas.ac.id', '$2b$12$nS6PnA6rADW5uJVcKtOiUe6MEoOiTI9EG0qXmWZ3Ch7whbdOaipHy', 'student', NULL, 1, NULL, '2026-05-06 02:24:22'),
+('student-003', 'budihartono03@mhs.universitas.ac.id', '$2b$12$nS6PnA6rADW5uJVcKtOiUe6MEoOiTI9EG0qXmWZ3Ch7whbdOaipHy', 'student', NULL, 1, NULL, '2026-05-06 02:24:22'),
+('student-004', 'dewikusuma04@mhs.universitas.ac.id', '$2b$12$nS6PnA6rADW5uJVcKtOiUe6MEoOiTI9EG0qXmWZ3Ch7whbdOaipHy', 'student', NULL, 1, NULL, '2026-05-06 02:24:22'),
+('student-005', 'ekoprasetyo05@mhs.universitas.ac.id', '$2b$12$nS6PnA6rADW5uJVcKtOiUe6MEoOiTI9EG0qXmWZ3Ch7whbdOaipHy', 'student', NULL, 1, NULL, '2026-05-06 02:24:22'),
+('student-006', 'ratnawijaya06@mhs.universitas.ac.id', '$2b$12$nS6PnA6rADW5uJVcKtOiUe6MEoOiTI9EG0qXmWZ3Ch7whbdOaipHy', 'student', NULL, 1, NULL, '2026-05-06 02:24:22'),
+('student-007', 'hendragunawan07@mhs.universitas.ac.id', '$2b$12$nS6PnA6rADW5uJVcKtOiUe6MEoOiTI9EG0qXmWZ3Ch7whbdOaipHy', 'student', NULL, 1, NULL, '2026-05-06 02:24:22'),
+('student-008', 'indahsulistyo08@mhs.universitas.ac.id', '$2b$12$nS6PnA6rADW5uJVcKtOiUe6MEoOiTI9EG0qXmWZ3Ch7whbdOaipHy', 'student', NULL, 1, NULL, '2026-05-06 02:24:22'),
+('student-009', 'jokopambudi09@mhs.universitas.ac.id', '$2b$12$nS6PnA6rADW5uJVcKtOiUe6MEoOiTI9EG0qXmWZ3Ch7whbdOaipHy', 'student', NULL, 1, NULL, '2026-05-06 02:24:22'),
+('student-010', 'kimberlytan10@mhs.universitas.ac.id', '$2b$12$nS6PnA6rADW5uJVcKtOiUe6MEoOiTI9EG0qXmWZ3Ch7whbdOaipHy', 'student', NULL, 1, NULL, '2026-05-06 02:24:22'),
+('student-011', 'linamarlina11@mhs.universitas.ac.id', '$2b$12$nS6PnA6rADW5uJVcKtOiUe6MEoOiTI9EG0qXmWZ3Ch7whbdOaipHy', 'student', NULL, 1, NULL, '2026-05-06 02:24:22'),
+('student-012', 'maulanarizki12@mhs.universitas.ac.id', '$2b$12$nS6PnA6rADW5uJVcKtOiUe6MEoOiTI9EG0qXmWZ3Ch7whbdOaipHy', 'student', NULL, 1, NULL, '2026-05-06 02:24:22'),
+('student-013', 'nandapratama13@mhs.universitas.ac.id', '$2b$12$nS6PnA6rADW5uJVcKtOiUe6MEoOiTI9EG0qXmWZ3Ch7whbdOaipHy', 'student', NULL, 1, NULL, '2026-05-06 02:24:22'),
+('student-014', 'oktapermana14@mhs.universitas.ac.id', '$2b$12$nS6PnA6rADW5uJVcKtOiUe6MEoOiTI9EG0qXmWZ3Ch7whbdOaipHy', 'student', NULL, 1, NULL, '2026-05-06 02:24:22'),
+('student-015', 'priyasantoso15@mhs.universitas.ac.id', '$2b$12$nS6PnA6rADW5uJVcKtOiUe6MEoOiTI9EG0qXmWZ3Ch7whbdOaipHy', 'student', NULL, 1, NULL, '2026-05-06 02:24:22'),
+('student-016', 'quentinridho16@mhs.universitas.ac.id', '$2b$12$nS6PnA6rADW5uJVcKtOiUe6MEoOiTI9EG0qXmWZ3Ch7whbdOaipHy', 'student', NULL, 1, NULL, '2026-05-06 02:24:22'),
+('student-017', 'rinadwi17@mhs.universitas.ac.id', '$2b$12$nS6PnA6rADW5uJVcKtOiUe6MEoOiTI9EG0qXmWZ3Ch7whbdOaipHy', 'student', NULL, 1, NULL, '2026-05-06 02:24:22'),
+('student-018', 'sintanurma18@mhs.universitas.ac.id', '$2b$12$nS6PnA6rADW5uJVcKtOiUe6MEoOiTI9EG0qXmWZ3Ch7whbdOaipHy', 'student', NULL, 1, NULL, '2026-05-06 02:24:22'),
+('student-019', 'tonisuryanto19@mhs.universitas.ac.id', '$2b$12$nS6PnA6rADW5uJVcKtOiUe6MEoOiTI9EG0qXmWZ3Ch7whbdOaipHy', 'student', NULL, 1, NULL, '2026-05-06 02:24:22'),
+('student-020', 'camekmulyono34@mhs.universitas.ac.id', '$2b$12$nS6PnA6rADW5uJVcKtOiUe6MEoOiTI9EG0qXmWZ3Ch7whbdOaipHy', 'student', NULL, 1, NULL, '2026-05-06 02:24:22');
 
 -- --------------------------------------------------------
 
@@ -168,7 +169,7 @@ INSERT INTO `students` (`student_id`, `account_id`, `nim`, `nik`, `name`, `facul
 ('student-016', 'student-016', '2021110111', '3401101997123456', 'Quentin Ridho', 'Fakultas Matematika dan Ilmu Pengetahuan Alam (FMIPA)', 'Fisika', 6, NULL),
 ('student-017', 'student-017', '2021110112', '3502111996234567', 'Rina Dwi', 'Fakultas Matematika dan Ilmu Pengetahuan Alam (FMIPA)', 'Kimia', 6, NULL),
 ('student-018', 'student-018', '2022110120', '3601201997345678', 'Sinta Nurma', 'Fakultas Matematika dan Ilmu Pengetahuan Alam (FMIPA)', 'Biologi', 4, NULL),
-('student-019', 'student-019', '2021110130', '3402081996456789', 'Toni Suryanto', 'Fakultas PSDKU', 'Manajemen', 6, NULL),
+('student-019', 'student-019', '2021110130', NULL, 'Toni Suryanto', 'Fakultas PSDKU', 'Manajemen', 6, NULL),
 ('student-020', 'student-020', '2022110140', '3503151998567890', 'Camek Mulyono', 'Fakultas PSDKU', 'Pendidikan Tata Rias', 4, NULL);
 
 -- --------------------------------------------------------

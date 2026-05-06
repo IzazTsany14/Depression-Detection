@@ -6,6 +6,8 @@ interface User {
   name: string;
   email: string;
   role: 'student' | 'admin' | 'bk';
+  profile_picture?: string | null;
+  profilePicture?: string | null;
   nik?: string;
   nim?: string;
   nip?: string;
@@ -55,6 +57,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     name: apiUser.name || apiUser.email,
     email: apiUser.email,
     role: apiUser.role,
+    profile_picture: apiUser.profile_picture ?? apiUser.profilePicture ?? null,
+    profilePicture: apiUser.profilePicture ?? apiUser.profile_picture ?? null,
     nik: apiUser.nik || undefined,
     nim: apiUser.nim || undefined,
     nip: apiUser.nip || undefined,

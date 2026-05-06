@@ -1,0 +1,20 @@
+
+> @figma/my-make-file@0.0.1 dev:backend
+> npm --prefix backend start
+
+
+> depression-detection-backend@1.0.0 start
+> node src/server.js
+
+
+==================================================
+🚀 Depression Detection API Server
+==================================================
+✓ Environment: development
+✓ Port: 5000
+✓ URL: http://localhost:5000
+==================================================
+
+Database connected successfully
+[11.38.04] POST /api/auth/login
+[11.38.04] GET /api/health

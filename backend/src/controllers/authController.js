@@ -5,6 +5,7 @@
  */
 import pool from '../config/db.js';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 import { v4 as uuidv4 } from 'uuid';
 import { fileURLToPath } from 'url';
@@ -36,12 +37,21 @@ const signToken = (account) => jwt.sign(
   { expiresIn: '24h' }
 );
 
+const verifyPassword = async (plainPassword, storedPassword) => {
+  if (typeof storedPassword === 'string' && storedPassword.startsWith('$2')) {
+    return bcrypt.compare(plainPassword, storedPassword);
+  }
+
+  return plainPassword === storedPassword;
+};
+
 const getUserWithProfile = async (accountId) => {
   const query = `
     SELECT
       a.account_id,
       a.email,
       a.role,
+      a.profile_picture,
       a.is_active,
       COALESCE(s.student_id, b.bk_id, ad.admin_id, a.account_id) AS id,
       COALESCE(s.name, b.name, ad.name, a.email) AS name,
@@ -73,6 +83,7 @@ const getUserWithProfile = async (accountId) => {
     accountId: user.account_id,
     email: user.email,
     role: user.role,
+    profile_picture: user.profile_picture,
     name: user.name,
     nim: user.nim,
     nik: user.nik,
@@ -128,8 +139,8 @@ export const login = async (req, res) => {
       });
     }
 
-    // Verifikasi password (TODO: gunakan bcrypt untuk hash password di production)
-    if (user.password !== password) {
+    const passwordMatches = await verifyPassword(password, user.password);
+    if (!passwordMatches) {
       return res.status(401).json({ 
         message: 'Password salah' 
       });
@@ -236,9 +247,10 @@ export const register = async (req, res) => {
       await connection.beginTransaction();
 
       accountId = `${role}-${uuidv4().substring(0, 8)}`;
+      const hashedPassword = await bcrypt.hash(password, 12);
       await connection.query(
         'INSERT INTO accounts (account_id, email, password, role) VALUES (?, ?, ?, ?)',
-        [accountId, email, password, role]
+        [accountId, email, hashedPassword, role]
       );
 
       if (role === 'student') {
