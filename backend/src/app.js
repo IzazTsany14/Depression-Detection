@@ -6,6 +6,8 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import pool from './config/db.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 // Import routes
 import authRoutes from './routes/authRoutes.js';
@@ -17,6 +19,7 @@ import { errorHandler } from './middleware/authMiddleware.js';
 dotenv.config();
 
 const app = express();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // ============ MIDDLEWARE ============
 
@@ -32,6 +35,7 @@ app.use(cors());
  */
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
 
 app.get('/api/students', async (req, res) => {
   try {
@@ -39,6 +43,7 @@ app.get('/api/students', async (req, res) => {
       SELECT
         s.*,
         a.email,
+        a.profile_picture,
         a.is_active,
         a.created_at
       FROM students s

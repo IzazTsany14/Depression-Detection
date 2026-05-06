@@ -7,7 +7,8 @@ import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Alert, AlertDescription } from '../../components/ui/alert';
 import { useAuth } from '../../context/AuthContext';
-import { User, Mail, Lock, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Mail, Lock, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { ProfileAvatar } from '../../components/ProfileAvatar';
 
 export const BKProfile: React.FC = () => {
   const { user } = useAuth();
@@ -105,9 +106,13 @@ export const BKProfile: React.FC = () => {
             {/* Profil Information */}
             <Card className="p-6 bg-white mb-6">
               <div className="flex items-center gap-6 mb-8">
-                <div className="w-24 h-24 bg-purple-600 rounded-full flex items-center justify-center">
-                  <User className="w-12 h-12 text-white" />
-                </div>
+                <ProfileAvatar
+                  profilePicture={user?.profile_picture}
+                  className="w-24 h-24"
+                  iconClassName="w-12 h-12 text-white"
+                  fallbackClassName="bg-purple-600"
+                  alt={`Foto profil ${user?.name || 'BK'}`}
+                />
                 <div>
                   <h3 className="text-2xl font-bold text-gray-900">{user?.name}</h3>
                   <p className="text-gray-600">Bimbingan Konseling (BK)</p>
