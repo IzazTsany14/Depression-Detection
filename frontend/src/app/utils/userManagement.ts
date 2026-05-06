@@ -1,5 +1,22 @@
 // Real-time User Management Utility
-import { User } from '../data/dummyData';
+
+export interface User {
+  id: string;
+  accountId?: string;
+  name: string;
+  email: string;
+  role: 'student' | 'admin' | 'bk';
+  profile_picture?: string | null;
+  profilePicture?: string | null;
+  nik?: string;
+  nim?: string;
+  nip?: string;
+  nidn?: string;
+  nuptk?: string;
+  faculty?: string;
+  major?: string;
+  semester?: number;
+}
 
 interface UserWithPassword extends User {
   password: string;

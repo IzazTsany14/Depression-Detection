@@ -1,8 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { Brain, User, LogOut, Menu, X } from 'lucide-react';
+import { Brain, LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/button';
+import { ProfileAvatar } from './ProfileAvatar';
 
 export const Header: React.FC = () => {
   const { user, isGuest, logout } = useAuth();
@@ -64,7 +65,13 @@ export const Header: React.FC = () => {
                     to={user.role === 'admin' ? '/admin' : user.role === 'bk' ? '/bk' : '/dashboard'}
                     className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
                   >
-                    <User className="w-5 h-5 text-blue-600" />
+                    <ProfileAvatar
+                      profilePicture={user.profile_picture}
+                      className="w-9 h-9"
+                      iconClassName="w-5 h-5 text-blue-700"
+                      fallbackClassName="bg-blue-100"
+                      alt={`Foto profil ${user.name}`}
+                    />
                     <div className="text-left">
                       <span className="text-sm font-medium text-gray-700 block">{user.name}</span>
                       <span className="text-xs text-gray-500 capitalize">{user.role === 'bk' ? 'Konselor BK' : user.role}</span>
