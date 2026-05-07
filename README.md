@@ -5,14 +5,16 @@
 </div>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Frontend-React%2FNext.js-61DAFB?style=for-the-badge&logo=react" alt="React Badge">
+  <img src="https://img.shields.io/badge/Frontend-React%2F-61DAFB?style=for-the-badge&logo=react" alt="React Badge">
   <img src="https://img.shields.io/badge/Language-TypeScript-3178C6?style=for-the-badge&logo=typescript" alt="TypeScript Badge">
   <img src="https://img.shields.io/badge/Styling-TailwindCSS-06B6D4?style=for-the-badge&logo=tailwind-css" alt="Tailwind Badge">
-  <img src="https://img.shields.io/badge/Backend-Django-092E20?style=for-the-badge&logo=django" alt="Node Js Badge">
+  <img src="https://img.shields.io/badge/Backend-Node.Js-092E20?style=for-the-badge&logo=django" alt="Node Js Badge">
   <img src="https://img.shields.io/badge/Database-MySQL-4479A1?style=for-the-badge&logo=mysql" alt="MySQL Badge">
 </p>
 
 ---
+## Link priview
+**https://depression-detection-kelompok8.netlify.app/**
 
 ## 🌐 Tentang Proyek
 
