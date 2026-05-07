@@ -48,7 +48,7 @@ export const AdminStatistics: React.FC = () => {
     .reduce((acc, student) => {
       const faculty = student.faculty || 'Lainnya';
       if (!acc[faculty]) {
-        acc[faculty] = { faculty, Normal: 0, Ringan: 0, Sedang: 0, Berat: 0, 'Sangat Berat': 0 };
+        acc[faculty] = { faculty, Normal: 0, Ringan: 0, Sedang: 0, Parah: 0, 'Sangat Parah': 0 };
       }
       
       // Get latest test for this student
@@ -87,7 +87,7 @@ export const AdminStatistics: React.FC = () => {
       id: `week-${i}`,
       minggu: `Minggu ${8 - i}`,
       tes: weekTests.length,
-      kritis: weekTests.filter(t => ['Berat', 'Sangat Berat'].includes(t.level)).length
+      kritis: weekTests.filter(t => ['Parah', 'Sangat Parah'].includes(t.level)).length
     });
   }
 
@@ -96,8 +96,8 @@ export const AdminStatistics: React.FC = () => {
     { range: '0-9', min: 0, max: 9, label: 'Normal' },
     { range: '10-20', min: 10, max: 20, label: 'Ringan' },
     { range: '21-35', min: 21, max: 35, label: 'Sedang' },
-    { range: '36-50', min: 36, max: 50, label: 'Berat' },
-    { range: '51+', min: 51, max: 100, label: 'Sangat Berat' }
+    { range: '36-50', min: 36, max: 50, label: 'Parah' },
+    { range: '51+', min: 51, max: 100, label: 'Sangat Parah' }
   ];
 
   const scoreDistribution = scoreRanges.map((range, index) => ({
@@ -111,8 +111,8 @@ export const AdminStatistics: React.FC = () => {
     'Normal': '#28A745',
     'Ringan': '#FFC107',
     'Sedang': '#FF9800',
-    'Berat': '#F44336',
-    'Sangat Berat': '#9C27B0'
+    'Parah': '#F44336',
+    'Sangat Parah': '#9C27B0'
   };
 
   return (
@@ -306,14 +306,14 @@ export const AdminStatistics: React.FC = () => {
                       <Cell key={`faculty-sedang-${entry.id}`} />
                     ))}
                   </Bar>
-                  <Bar dataKey="Berat" stackId="a" fill={COLORS['Berat']}>
+                  <Bar dataKey="Parah" stackId="a" fill={COLORS['Parah']}>
                     {facultyChartData.map((entry) => (
-                      <Cell key={`faculty-berat-${entry.id}`} />
+                      <Cell key={`faculty-parah-${entry.id}`} />
                     ))}
                   </Bar>
-                  <Bar dataKey="Sangat Berat" stackId="a" fill={COLORS['Sangat Berat']}>
+                  <Bar dataKey="Sangat Parah" stackId="a" fill={COLORS['Sangat Parah']}>
                     {facultyChartData.map((entry) => (
-                      <Cell key={`faculty-sangat-berat-${entry.id}`} />
+                      <Cell key={`faculty-sangat-parah-${entry.id}`} />
                     ))}
                   </Bar>
                 </BarChart>

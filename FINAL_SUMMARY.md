@@ -217,8 +217,8 @@ DASS-21 Depression Detection:
    ├── 0-9: Normal
    ├── 10-13: Ringan
    ├── 14-20: Sedang
-   ├── 21-27: Berat
-   └── 28+: Sangat Berat
+   ├── 21-27: Parah
+   └── 28+: Sangat Parah
 5. Hitung Membership Functions (Fuzzy Logic)
 6. Return score, level, fuzzy_score, description
 

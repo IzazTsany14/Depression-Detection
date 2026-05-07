@@ -207,7 +207,7 @@ export const getStudentStats = () => {
     totalTests: allTestResults.length,
     levelDistribution: levelCounts,
     criticalCases: allTestResults.filter(r =>
-      r.level === 'Berat' || r.level === 'Sangat Berat'
+      r.level === 'Parah' || r.level === 'Sangat Parah'
     ).length
   };
 };

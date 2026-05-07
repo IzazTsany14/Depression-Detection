@@ -67,8 +67,8 @@ export const Guide: React.FC = () => {
           description: 'Disarankan untuk berkonsultasi dengan profesional kesehatan mental.',
           focus: ['Professional Help', 'Self-Care']
         };
-      case 'Berat':
-      case 'Sangat Berat':
+      case 'Parah':
+      case 'Sangat Parah':
         return {
           title: 'Segera Cari Bantuan Profesional',
           description: 'Sangat penting untuk segera berkonsultasi dengan psikolog atau psikiater.',

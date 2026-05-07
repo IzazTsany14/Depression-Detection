@@ -107,11 +107,11 @@ export const generateTestResultPDF = (data: TestResultPDF) => {
     levelColor = [255, 152, 0]; // Orange
     levelBgColor = [255, 243, 224];
     statusText = 'Status: Perlu Konseling';
-  } else if (data.level === 'Berat') {
+  } else if (data.level === 'Parah') {
     levelColor = [244, 67, 54]; // Red
     levelBgColor = [255, 235, 238];
     statusText = 'Status: Konseling Segera';
-  } else if (data.level === 'Sangat Berat') {
+  } else if (data.level === 'Sangat Parah') {
     levelColor = [198, 40, 40]; // Dark Red
     levelBgColor = [253, 230, 230];
     statusText = 'Status: Konseling Segera (Prioritas)';
@@ -163,8 +163,8 @@ export const generateTestResultPDF = (data: TestResultPDF) => {
     'Normal': 'Berdasarkan hasil tes DASS-21, Anda tidak mengalami gejala depresi yang signifikan. Tetaplah menjaga kesehatan mental dengan menjalankan gaya hidup sehat, berolahraga secara teratur, dan mempertahankan hubungan sosial yang positif.',
     'Ringan': 'Hasil tes menunjukkan gejala depresi ringan. Disarankan untuk mulai memperhatikan kesehatan mental Anda dengan lebih serius. Tingkatkan aktivitas fisik, cukup istirahat, dan jika memungkinkan, berbicara dengan teman atau keluarga tentang perasaan Anda.',
     'Sedang': 'Hasil tes menunjukkan gejala depresi sedang. Sangat disarankan untuk berkonsultasi dengan profesional kesehatan mental seperti psikolog atau konselor. Mereka dapat memberikan dukungan dan strategi coping yang tepat.',
-    'Berat': 'Hasil tes menunjukkan gejala depresi berat. Segera lakukan konsultasi dengan psikolog atau psikiater untuk mendapatkan penanganan profesional. Jangan ragu untuk mencari bantuan - ini adalah langkah penting untuk kesehatan Anda.',
-    'Sangat Berat': 'Hasil tes menunjukkan gejala depresi yang sangat berat. Ini adalah situasi yang memerlukan perhatian medis segera. Segera hubungi psikiater, layanan kesehatan mental, atau hotline krisis untuk mendapatkan bantuan profesional.',
+    'Parah': 'Hasil tes menunjukkan gejala depresi parah. Segera lakukan konsultasi dengan psikolog atau psikiater untuk mendapatkan penanganan profesional. Jangan ragu untuk mencari bantuan - ini adalah langkah penting untuk kesehatan Anda.',
+    'Sangat Parah': 'Hasil tes menunjukkan gejala depresi yang sangat parah. Ini adalah situasi yang memerlukan perhatian medis segera. Segera hubungi psikiater, layanan kesehatan mental, atau hotline krisis untuk mendapatkan bantuan profesional.',
   };
 
   const interpretation = interpretations[data.level] || 'Konsultasikan hasil tes ini dengan profesional kesehatan mental untuk evaluasi lebih lanjut.';

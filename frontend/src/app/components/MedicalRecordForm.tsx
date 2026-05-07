@@ -295,8 +295,8 @@ export const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ onSave, on
                   <SelectItem value="Normal">Normal</SelectItem>
                   <SelectItem value="Ringan">Ringan</SelectItem>
                   <SelectItem value="Sedang">Sedang</SelectItem>
-                  <SelectItem value="Berat">Berat</SelectItem>
-                  <SelectItem value="Sangat Berat">Sangat Berat</SelectItem>
+                  <SelectItem value="Parah">Berat</SelectItem>
+                  <SelectItem value="Sangat Parah">Sangat Berat</SelectItem>
                 </SelectContent>
               </Select>
             </div>

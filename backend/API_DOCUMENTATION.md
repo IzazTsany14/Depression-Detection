@@ -327,8 +327,8 @@ Sistem menggunakan Fuzzy Logic untuk menginterpretasi skor DASS-21. Tingkat depr
 | Normal | 0-9 | Kesejahteraan mental baik |
 | Ringan | 10-13 | Self-care dan monitoring |
 | Sedang | 14-20 | Konsultasi dengan profesional |
-| Berat | 21-27 | Segera cari bantuan profesional |
-| Sangat Berat | 28+ | Cari bantuan darurat |
+| Parah | 21-27 | Segera cari bantuan profesional |
+| Sangat Parah | 28+ | Cari bantuan darurat |
 
 ### Membership Functions
 
@@ -336,8 +336,8 @@ Sistem menggunakan 5 membership functions untuk smooth transition antar level:
 - `fuzzyMembershipNormal(score)` - Normal level
 - `fuzzyMembershipMild(score)` - Ringan level
 - `fuzzyMembershipModerate(score)` - Sedang level
-- `fuzzyMembershipSevere(score)` - Berat level
-- `fuzzyMembershipExtremelySevere(score)` - Sangat Berat level
+- `fuzzyMembershipSevere(score)` - Parah level
+- `fuzzyMembershipExtremelySevere(score)` - Sangat Parah level
 
 Setiap membership function mengembalikan nilai 0-1 yang menunjukkan derajat keanggotaan ke level tersebut.
 

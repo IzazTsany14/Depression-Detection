@@ -212,8 +212,8 @@ export const getTestStatistics = async (req, res) => {
         COUNT(CASE WHEN level = 'Normal' THEN 1 END) as normal_count,
         COUNT(CASE WHEN level = 'Ringan' THEN 1 END) as mild_count,
         COUNT(CASE WHEN level = 'Sedang' THEN 1 END) as moderate_count,
-        COUNT(CASE WHEN level = 'Berat' THEN 1 END) as severe_count,
-        COUNT(CASE WHEN level = 'Sangat Berat' THEN 1 END) as extremely_severe_count
+        COUNT(CASE WHEN level = 'Parah' THEN 1 END) as severe_count,
+        COUNT(CASE WHEN level = 'Sangat Parah' THEN 1 END) as extremely_severe_count
       FROM test_results
       WHERE student_id = ?
     `;

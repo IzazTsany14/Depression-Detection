@@ -72,7 +72,7 @@ export const BKCounselingSchedule: React.FC = () => {
           status: 'scheduled',
           type: 'individual',
           priority: 'high',
-          notes: 'First session - Tingkat depresi sangat berat'
+          notes: 'First session - Tingkat depresi sangat parah'
         },
         {
           id: '2',

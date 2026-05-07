@@ -44,7 +44,7 @@ export const BKDashboard: React.FC = () => {
           latestTest: sTests[0] || null,
           trend: sTests.length > 1 ? (sTests[0].score < sTests[1].score ? 'improving' : 'worsening') : 'stable'
         };
-      }).filter(s => s.latestTest && ['Sedang', 'Berat', 'Sangat Berat'].includes(s.latestTest.level));
+      }).filter(s => s.latestTest && ['Sedang', 'Parah', 'Sangat Parah'].includes(s.latestTest.level));
       
       setStudentsNeedingAttention(processed);
     };
@@ -64,9 +64,9 @@ export const BKDashboard: React.FC = () => {
 
   const getPriorityColor = (level: string) => {
     switch (level) {
-      case 'Sangat Berat':
+      case 'Sangat Parah':
         return 'bg-purple-100 border-purple-300 text-purple-900';
-      case 'Berat':
+      case 'Parah':
         return 'bg-red-100 border-red-300 text-red-900';
       case 'Sedang':
         return 'bg-orange-100 border-orange-300 text-orange-900';
@@ -165,7 +165,7 @@ export const BKDashboard: React.FC = () => {
               Rekomendasi Tindakan
             </h4>
             <div className="space-y-3">
-              {student.latestTest.level === 'Sangat Berat' && (
+              {student.latestTest.level === 'Sangat Parah' && (
                 <>
                   <div className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
@@ -279,9 +279,9 @@ export const BKDashboard: React.FC = () => {
                 <Card className="p-6 bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-200">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-purple-700">Sangat Berat</p>
+                      <p className="text-sm font-medium text-purple-700">Sangat Parah</p>
                       <h3 className="text-3xl font-bold text-purple-900 mt-2">
-                        {studentsNeedingAttention.filter(s => s.latestTest.level === 'Sangat Berat').length}
+                        {studentsNeedingAttention.filter(s => s.latestTest.level === 'Sangat Parah').length}
                       </h3>
                     </div>
                     <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center">
@@ -293,9 +293,9 @@ export const BKDashboard: React.FC = () => {
                 <Card className="p-6 bg-gradient-to-br from-orange-50 to-orange-100 border-2 border-orange-200">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-orange-700">Berat</p>
+                      <p className="text-sm font-medium text-orange-700">Parah</p>
                       <h3 className="text-3xl font-bold text-orange-900 mt-2">
-                        {studentsNeedingAttention.filter(s => s.latestTest.level === 'Berat').length}
+                        {studentsNeedingAttention.filter(s => s.latestTest.level === 'Parah').length}
                       </h3>
                     </div>
                     <div className="w-12 h-12 bg-orange-600 rounded-full flex items-center justify-center">
@@ -310,8 +310,8 @@ export const BKDashboard: React.FC = () => {
               ) : (
                 <Tabs defaultValue="urgent" className="space-y-6">
                   <TabsList className="grid grid-cols-3 w-full max-w-2xl">
-                    <TabsTrigger value="urgent">Urgent (Sangat Berat)</TabsTrigger>
-                    <TabsTrigger value="high">Prioritas Tinggi (Berat)</TabsTrigger>
+                    <TabsTrigger value="urgent">Urgent (Sangat Parah)</TabsTrigger>
+                    <TabsTrigger value="high">Prioritas Tinggi (Parah)</TabsTrigger>
                     <TabsTrigger value="all">Semua Kasus</TabsTrigger>
                   </TabsList>
 
@@ -319,12 +319,12 @@ export const BKDashboard: React.FC = () => {
                     <Alert className="bg-purple-50 border-2 border-purple-300">
                       <AlertTriangle className="h-5 w-5 text-purple-600" />
                       <AlertDescription className="text-purple-900">
-                        <strong>Perhatian!</strong> Mahasiswa dengan tingkat depresi sangat berat memerlukan intervensi segera.
+                        <strong>Perhatian!</strong> Mahasiswa dengan tingkat depresi sangat parah memerlukan intervensi segera.
                       </AlertDescription>
                     </Alert>
 
                     {studentsNeedingAttention
-                      .filter(s => s.latestTest.level === 'Sangat Berat')
+                      .filter(s => s.latestTest.level === 'Sangat Parah')
                       .map((student, index) => (
                         <Card key={index} className="p-6 hover:shadow-lg transition-shadow border-2 border-purple-200">
                           <div className="flex items-start justify-between">
@@ -359,10 +359,10 @@ export const BKDashboard: React.FC = () => {
                         </Card>
                       ))}
 
-                    {studentsNeedingAttention.filter(s => s.latestTest.level === 'Sangat Berat').length === 0 && (
+                    {studentsNeedingAttention.filter(s => s.latestTest.level === 'Sangat Parah').length === 0 && (
                       <div className="text-center py-12">
                         <CheckCircle2 className="w-16 h-16 text-green-600 mx-auto mb-4" />
-                        <p className="text-gray-600">Tidak ada kasus sangat berat saat ini</p>
+                        <p className="text-gray-600">Tidak ada kasus sangat parah saat ini</p>
                       </div>
                     )}
                   </TabsContent>
@@ -371,12 +371,12 @@ export const BKDashboard: React.FC = () => {
                     <Alert className="bg-red-50 border-2 border-red-300">
                       <AlertTriangle className="h-5 w-5 text-red-600" />
                       <AlertDescription className="text-red-900">
-                        Mahasiswa dengan tingkat depresi berat perlu dijadwalkan untuk konseling.
+                        Mahasiswa dengan tingkat depresi parah perlu dijadwalkan untuk konseling.
                       </AlertDescription>
                     </Alert>
 
                     {studentsNeedingAttention
-                      .filter(s => s.latestTest.level === 'Berat')
+                      .filter(s => s.latestTest.level === 'Parah')
                       .map((student, index) => (
                         <Card key={index} className="p-6 hover:shadow-lg transition-shadow border-2 border-red-200">
                           <div className="flex items-start justify-between">
@@ -411,10 +411,10 @@ export const BKDashboard: React.FC = () => {
                         </Card>
                       ))}
 
-                    {studentsNeedingAttention.filter(s => s.latestTest.level === 'Berat').length === 0 && (
+                    {studentsNeedingAttention.filter(s => s.latestTest.level === 'Parah').length === 0 && (
                       <div className="text-center py-12">
                         <CheckCircle2 className="w-16 h-16 text-green-600 mx-auto mb-4" />
-                        <p className="text-gray-600">Tidak ada kasus berat saat ini</p>
+                        <p className="text-gray-600">Tidak ada kasus parah saat ini</p>
                       </div>
                     )}
                   </TabsContent>
@@ -422,7 +422,7 @@ export const BKDashboard: React.FC = () => {
                   <TabsContent value="all" className="space-y-4">
                     {studentsNeedingAttention.map((student, index) => (
                       <Card key={index} className={`p-6 hover:shadow-lg transition-shadow border-2 ${
-                        student.latestTest.level === 'Sangat Berat' ? 'border-purple-200' : 'border-red-200'
+                        student.latestTest.level === 'Sangat Parah' ? 'border-purple-200' : 'border-red-200'
                       }`}>
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
@@ -439,7 +439,7 @@ export const BKDashboard: React.FC = () => {
                             </div>
                             <div className="flex items-center gap-4">
                               <span className={`px-3 py-1 text-white rounded-full text-sm font-medium ${
-                                student.latestTest.level === 'Sangat Berat' ? 'bg-purple-600' : 'bg-red-600'
+                                student.latestTest.level === 'Sangat Parah' ? 'bg-purple-600' : 'bg-red-600'
                               }`}>
                                 {student.latestTest.level}
                               </span>
@@ -452,7 +452,7 @@ export const BKDashboard: React.FC = () => {
                             </div>
                           </div>
                           <Button onClick={() => setSelectedStudent(student)} className={
-                            student.latestTest.level === 'Sangat Berat'
+                            student.latestTest.level === 'Sangat Parah'
                               ? 'bg-purple-600 hover:bg-purple-700'
                               : 'bg-red-600 hover:bg-red-700'
                           }>

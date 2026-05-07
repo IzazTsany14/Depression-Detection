@@ -41,7 +41,7 @@ export const AdminReports: React.FC = () => {
   const stats = {
     totalTests: filteredTests.length,
     avgScore: Math.round(filteredTests.reduce((sum, t) => sum + t.score, 0) / filteredTests.length || 0),
-    criticalCases: filteredTests.filter(t => ['Berat', 'Sangat Berat'].includes(t.level)).length,
+    criticalCases: filteredTests.filter(t => ['Parah', 'Sangat Parah'].includes(t.level)).length,
     uniqueStudents: new Set(filteredTests.map(t => t.userId)).size,
   };
 
@@ -183,8 +183,8 @@ export const AdminReports: React.FC = () => {
                     'Normal': 'bg-green-500',
                     'Ringan': 'bg-yellow-500',
                     'Sedang': 'bg-orange-500',
-                    'Berat': 'bg-red-500',
-                    'Sangat Berat': 'bg-purple-500'
+                    'Parah': 'bg-red-500',
+                    'Sangat Parah': 'bg-purple-500'
                   };
                   
                   return (
@@ -229,8 +229,8 @@ export const AdminReports: React.FC = () => {
                       </div>
                       <div className="text-right">
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          test.level === 'Sangat Berat' ? 'bg-purple-100 text-purple-800' :
-                          test.level === 'Berat' ? 'bg-red-100 text-red-800' :
+                          test.level === 'Sangat Parah' ? 'bg-purple-100 text-purple-800' :
+                          test.level === 'Parah' ? 'bg-red-100 text-red-800' :
                           test.level === 'Sedang' ? 'bg-orange-100 text-orange-800' :
                           test.level === 'Ringan' ? 'bg-yellow-100 text-yellow-800' :
                           'bg-green-100 text-green-800'
@@ -259,7 +259,7 @@ export const AdminReports: React.FC = () => {
               <ul className="list-disc list-inside space-y-2 text-gray-700 mb-4">
                 <li>Total <strong>{stats.totalTests}</strong> tes telah dilakukan oleh <strong>{stats.uniqueStudents}</strong> mahasiswa unik</li>
                 <li>Rata-rata skor depresi adalah <strong>{stats.avgScore}</strong></li>
-                <li>Terdapat <strong>{stats.criticalCases}</strong> kasus yang memerlukan perhatian khusus (tingkat Berat dan Sangat Berat)</li>
+                <li>Terdapat <strong>{stats.criticalCases}</strong> kasus yang memerlukan perhatian khusus (tingkat Parah dan Sangat Parah)</li>
                 <li>
                   Distribusi tingkat depresi:
                   <ul className="list-circle list-inside ml-6 mt-2">
@@ -272,7 +272,7 @@ export const AdminReports: React.FC = () => {
               <div className="bg-blue-50 border-l-4 border-blue-600 p-4 mt-6">
                 <p className="text-sm text-blue-900">
                   <strong>Rekomendasi:</strong> Berdasarkan data di atas, disarankan untuk meningkatkan program konseling 
-                  dan dukungan mental bagi mahasiswa, terutama untuk kasus dengan tingkat depresi berat dan sangat berat.
+                  dan dukungan mental bagi mahasiswa, terutama untuk kasus dengan tingkat depresi parah dan sangat parah.
                 </p>
               </div>
             </div>

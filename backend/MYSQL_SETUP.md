@@ -208,7 +208,7 @@ CREATE TABLE test_results (
   student_id INT NOT NULL,
   date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   score INT CHECK (score BETWEEN 0 AND 42),
-  level ENUM('Normal', 'Ringan', 'Sedang', 'Berat', 'Sangat Berat'),
+  level ENUM('Normal', 'Ringan', 'Sedang', 'Parah', 'Sangat Parah'),
   fuzzy_score DECIMAL(4, 2),
   answers JSON CHECK (JSON_VALID(answers)),
   FOREIGN KEY (student_id) REFERENCES students(student_id)
