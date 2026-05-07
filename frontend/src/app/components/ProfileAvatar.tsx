@@ -18,12 +18,17 @@ export const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
   alt = 'Foto profil'
 }) => {
   const [imageFailed, setImageFailed] = React.useState(false);
+  const imageUrl = getProfilePictureUrl(profilePicture);
+
+  React.useEffect(() => {
+    setImageFailed(false);
+  }, [imageUrl]);
 
   return (
     <div className={`${className} ${fallbackClassName} rounded-full flex items-center justify-center overflow-hidden`}>
       {!imageFailed ? (
         <img
-          src={getProfilePictureUrl(profilePicture)}
+          src={imageUrl}
           alt={alt}
           className="h-full w-full object-cover"
           onError={() => setImageFailed(true)}

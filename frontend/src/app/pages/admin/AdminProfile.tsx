@@ -7,11 +7,12 @@ import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Alert, AlertDescription } from '../../components/ui/alert';
 import { useAuth } from '../../context/AuthContext';
-import { Mail, Lock, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Lock, AlertCircle, CheckCircle2, ImagePlus } from 'lucide-react';
 import { ProfileAvatar } from '../../components/ProfileAvatar';
+import { readProfileImageFile } from '../../utils/profileUpdate';
 
 export const AdminProfile: React.FC = () => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
@@ -22,6 +23,8 @@ export const AdminProfile: React.FC = () => {
   });
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [profileImage, setProfileImage] = useState<{ dataUrl: string; fileName: string } | null>(null);
+  const [profilePreview, setProfilePreview] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user || user.role !== 'admin') {
@@ -34,17 +37,50 @@ export const AdminProfile: React.FC = () => {
       name: user.name || '',
       email: user.email || ''
     }));
+    setProfilePreview(user.profile_picture || null);
   }, [user, navigate]);
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleUpdateProfile = (e: React.FormEvent) => {
+  const handleProfileImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const image = await readProfileImageFile(file);
+      setProfileImage(image);
+      setProfilePreview(image.dataUrl);
+      setMessage(null);
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.message });
+      e.target.value = '';
+    }
+  };
+
+  const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement actual profile update logic
-    setMessage({ type: 'success', text: 'Profil berhasil diperbarui' });
-    setTimeout(() => setMessage(null), 3000);
+    try {
+      const res = await fetch(`/api/users/${user?.accountId || user?.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          department: (user as any)?.department || null,
+          profileImage,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || data.error || 'Gagal memperbarui profil');
+      const updatedUser = updateUser(data.user);
+      setProfilePreview(updatedUser.profile_picture || null);
+      setProfileImage(null);
+      setMessage({ type: 'success', text: 'Profil berhasil diperbarui' });
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.message || 'Gagal memperbarui profil' });
+    }
   };
 
   const handleChangePassword = (e: React.FormEvent) => {
@@ -101,7 +137,7 @@ export const AdminProfile: React.FC = () => {
             <Card className="p-6 bg-white mb-6">
               <div className="flex items-center gap-6 mb-8">
                 <ProfileAvatar
-                  profilePicture={user?.profile_picture}
+                  profilePicture={profilePreview}
                   className="w-24 h-24"
                   iconClassName="w-12 h-12 text-white"
                   fallbackClassName="bg-blue-600"
@@ -115,6 +151,15 @@ export const AdminProfile: React.FC = () => {
               </div>
 
               <form onSubmit={handleUpdateProfile} className="space-y-4">
+                <div className="rounded-lg border border-gray-200 p-4">
+                  <Label htmlFor="profileImage">Foto Profil PNG/JPG</Label>
+                  <div className="mt-2 flex items-center gap-3">
+                    <Input id="profileImage" type="file" accept="image/png,image/jpeg" onChange={handleProfileImageChange} />
+                    <ImagePlus className="w-5 h-5 text-gray-400" />
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Maksimal 2MB.</p>
+                </div>
+
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="name">Nama Lengkap</Label>

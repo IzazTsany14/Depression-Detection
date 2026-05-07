@@ -12,6 +12,7 @@ import { fileURLToPath } from 'url';
 // Import routes
 import authRoutes from './routes/authRoutes.js';
 import testRoutes from './routes/testRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 // Import middleware
 import { errorHandler } from './middleware/authMiddleware.js';
@@ -53,7 +54,10 @@ app.get('/api/students', async (req, res) => {
     const [results] = await pool.query(query);
     res.json({ data: results });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      message: 'Gagal mengambil data mahasiswa dari database',
+      error: error.message
+    });
   }
 });
 
@@ -84,6 +88,7 @@ app.get('/api/health', (req, res) => {
  */
 app.use('/api/auth', authRoutes);
 app.use('/api/tests', testRoutes);
+app.use('/api/users', userRoutes);
 
 /**
  * Root endpoint
