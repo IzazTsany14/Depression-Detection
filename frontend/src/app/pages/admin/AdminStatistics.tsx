@@ -180,7 +180,9 @@ export const AdminStatistics: React.FC = () => {
                 <div>
                   <p className="text-sm font-medium text-orange-700">Rata-rata Skor</p>
                   <h3 className="text-3xl font-bold text-orange-900 mt-2">
-                    {Math.round(dummyTestResults.reduce((sum, t) => sum + t.score, 0) / dummyTestResults.length)}
+                    {dummyTestResults.length > 0
+                      ? Math.round(dummyTestResults.reduce((sum, t) => sum + t.score, 0) / dummyTestResults.length)
+                      : 0}
                   </h3>
                   <p className="text-xs text-orange-600 mt-1">-3% dari bulan lalu</p>
                 </div>

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 interface User {
   id: string;
@@ -31,6 +31,7 @@ interface AuthContextType {
   isGuest: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
+  updateUser: (apiUser: any) => User;
   register: (name: string, email: string, password: string) => Promise<boolean>;
   startAsGuest: () => void;
   saveTestResult: (result: TestResult) => void;
@@ -69,10 +70,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     semester: apiUser.semester || undefined,
   });
 
+  const updateUser = useCallback((apiUser: any): User => {
+    const updatedUser = mapApiUser(apiUser);
+    setUser(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    return updatedUser;
+  }, []);
+
   const getAuthHeaders = () => {
     const token = localStorage.getItem('token');
     return token ? { Authorization: `Bearer ${token}` } : {};
   };
+
+  const normalizeAnswers = (answers: any): number[] => {
+    if (Array.isArray(answers)) return answers;
+    if (typeof answers === 'string') {
+      try {
+        const parsed = JSON.parse(answers);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  };
+
+  const mapApiTestResult = (test: any): TestResult & Record<string, any> => ({
+    ...test,
+    id: String(test.id || test.test_id),
+    userId: test.userId || test.student_id,
+    userName: test.userName || test.name || test.student_name,
+    userEmail: test.userEmail || test.email,
+    date: test.date,
+    score: Number(test.score || 0),
+    level: test.level,
+    answers: normalizeAnswers(test.answers),
+  });
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
@@ -111,19 +144,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const fetchTestHistory = async (userId: string) => {
+  const fetchTestHistory = useCallback(async (userId: string) => {
     try {
       const res = await fetch(`${API_URL}/tests/student/${userId}`, {
         headers: getAuthHeaders()
       });
       if (res.ok) {
         const data = await res.json();
-        setTestHistory(data.data || data.results || []);
+        const mappedHistory = (data.data || data.results || [])
+          .map(mapApiTestResult)
+          .sort((a: TestResult, b: TestResult) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        setTestHistory(mappedHistory);
       }
     } catch (error) {
       console.error("Gagal load history dari database", error);
     }
-  };
+  }, [API_URL]);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
@@ -214,24 +250,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const getTestHistory = () => {
+  const getTestHistory = useCallback(() => {
     return testHistory;
-  };
+  }, [testHistory]);
 
-  const getAllTestResults = async (): Promise<any[]> => {
+  const getAllTestResults = useCallback(async (): Promise<any[]> => {
     try {
       const res = await fetch(`${API_URL}/tests`, {
         headers: getAuthHeaders()
       });
       const data = await res.json();
-      return data.data || [];
+      return (data.data || []).map(mapApiTestResult);
     } catch (e) {
       console.error(e);
       return [];
     }
-  };
+  }, [API_URL]);
 
-  const getAllStudents = async (): Promise<any[]> => {
+  const getAllStudents = useCallback(async (): Promise<any[]> => {
     try {
       const res = await fetch(`${API_URL}/students`, {
         headers: getAuthHeaders()
@@ -242,7 +278,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error(e);
       return [];
     }
-  };
+  }, [API_URL]);
 
   return (
     <AuthContext.Provider
@@ -251,6 +287,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isGuest,
         login,
         logout,
+        updateUser,
         register,
         startAsGuest,
         saveTestResult,

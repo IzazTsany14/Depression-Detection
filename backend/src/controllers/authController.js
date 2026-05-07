@@ -14,18 +14,19 @@ import path from 'path';
 const envPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../.env');
 dotenv.config({ path: envPath });
 
-const isDatabaseUnavailable = (error) => (
-  ['ECONNREFUSED', 'ER_BAD_DB_ERROR', 'PROTOCOL_CONNECTION_LOST'].includes(error?.code) ||
-  String(error?.message || '').includes('ECONNREFUSED')
-);
+const databaseUnavailableCodes = [
+  'ECONNREFUSED',
+  'ECONNRESET',
+  'ENOTFOUND',
+  'ETIMEDOUT',
+  'ER_BAD_DB_ERROR',
+  'PROTOCOL_CONNECTION_LOST'
+];
 
-const toPublicUser = (user) => {
-  const { password, account_id, ...publicUser } = user;
-  return {
-    ...publicUser,
-    accountId: account_id
-  };
-};
+const isDatabaseUnavailable = (error) => (
+  databaseUnavailableCodes.includes(error?.code) ||
+  databaseUnavailableCodes.some((code) => String(error?.message || '').includes(code))
+);
 
 const signToken = (account) => jwt.sign(
   {
@@ -159,22 +160,8 @@ export const login = async (req, res) => {
     });
   } catch (error) {
     if (isDatabaseUnavailable(error)) {
-      const demoUser = demoUsers.find((user) => (
-        user.email.toLowerCase() === String(req.body.email || '').toLowerCase() &&
-        user.password === req.body.password
-      ));
-
-      if (demoUser) {
-        const token = signToken(demoUser);
-        return res.status(200).json({
-          message: 'Login berhasil (mode demo tanpa database)',
-          token,
-          user: toPublicUser(demoUser)
-        });
-      }
-
       return res.status(503).json({
-        message: 'Database belum terhubung. Nyalakan MySQL atau gunakan akun demo yang tersedia di halaman login.'
+        message: 'Database belum terhubung. Nyalakan MySQL dan pastikan database depresi sudah di-import.'
       });
     }
 
@@ -339,15 +326,9 @@ export const getCurrentUser = async (req, res) => {
     res.status(200).json({ user });
   } catch (error) {
     if (isDatabaseUnavailable(error)) {
-      const demoUser = demoUsers.find((user) => (
-        user.account_id === req.user.accountId ||
-        user.account_id === req.user.id ||
-        user.email === req.user.email
-      ));
-
-      if (demoUser) {
-        return res.status(200).json({ user: toPublicUser(demoUser) });
-      }
+      return res.status(503).json({
+        message: 'Database belum terhubung. Nyalakan MySQL dan pastikan database depresi sudah di-import.'
+      });
     }
 
     res.status(500).json({ 

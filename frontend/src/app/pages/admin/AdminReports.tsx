@@ -18,8 +18,18 @@ export const AdminReports: React.FC = () => {
     if (!user || user.role !== 'admin') {
       navigate('/login');
     } else {
-      const results = getAllTestResults();
-      setDummyTestResults(results);
+      getAllTestResults().then((results) => {
+        setDummyTestResults(results);
+        const latestTest = results
+          .slice()
+          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+
+        if (latestTest) {
+          const latestDate = new Date(latestTest.date);
+          setSelectedMonth(latestDate.getMonth());
+          setSelectedYear(latestDate.getFullYear());
+        }
+      });
     }
   }, [user, navigate, getAllTestResults]);
 
@@ -42,7 +52,7 @@ export const AdminReports: React.FC = () => {
     totalTests: filteredTests.length,
     avgScore: Math.round(filteredTests.reduce((sum, t) => sum + t.score, 0) / filteredTests.length || 0),
     criticalCases: filteredTests.filter(t => ['Berat', 'Sangat Berat'].includes(t.level)).length,
-    uniqueStudents: new Set(filteredTests.map(t => t.userId)).size,
+    uniqueStudents: new Set(filteredTests.map(t => t.userId || t.student_id)).size,
   };
 
   const levelDistribution = filteredTests.reduce((acc, test) => {
@@ -218,7 +228,7 @@ export const AdminReports: React.FC = () => {
                   .map((test, index) => (
                     <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                       <div className="flex-1">
-                        <p className="font-medium text-gray-900">{test.userId}</p>
+                        <p className="font-medium text-gray-900">{test.userName || test.userId || test.student_id}</p>
                         <p className="text-sm text-gray-600">
                           {new Date(test.date).toLocaleDateString('id-ID', {
                             day: 'numeric',

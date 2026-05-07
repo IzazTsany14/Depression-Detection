@@ -23,6 +23,16 @@ const server = app.listen(PORT, () => {
   console.log('='.repeat(50) + '\n');
 });
 
+server.on('error', (error) => {
+  if (error.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} sudah dipakai. Hentikan proses backend lama atau jalankan hanya frontend jika backend sudah aktif.`);
+    process.exit(1);
+  }
+
+  console.error('Server error:', error);
+  process.exit(1);
+});
+
 /**
  * Graceful Shutdown
  * Handle server termination dengan baik
