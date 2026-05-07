@@ -187,7 +187,7 @@ export const BKDashboard: React.FC = () => {
                   </div>
                 </>
               )}
-              {student.latestTest.level === 'Berat' && (
+              {student.latestTest.level === 'Parah' && (
                 <>
                   <div className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
