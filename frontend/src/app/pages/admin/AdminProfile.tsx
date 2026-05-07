@@ -85,7 +85,7 @@ export const AdminProfile: React.FC = () => {
 
   const handleChangePassword = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (formData.newPassword !== formData.confirmPassword) {
       setMessage({ type: 'error', text: 'Password baru tidak cocok' });
       return;
@@ -154,7 +154,19 @@ export const AdminProfile: React.FC = () => {
                 <div className="rounded-lg border border-gray-200 p-4">
                   <Label htmlFor="profileImage">Foto Profil PNG/JPG</Label>
                   <div className="mt-2 flex items-center gap-3">
-                    <Input id="profileImage" type="file" accept="image/png,image/jpeg" onChange={handleProfileImageChange} />
+                    <Input id="profileImage" type="file" accept="image/png,image/jpeg" onChange={handleProfileImageChange}
+                      className="
+                    file:mr-5
+                    file:rounded-md
+                    file:border-0
+                    file:bg-blue-600
+                     file:px-4 file:py-0
+                     file:text-sm
+                     file:font-medium
+                     file:text-white
+                     hover:file:bg-blue-700
+                      cursor-pointer
+                       "/>
                     <ImagePlus className="w-5 h-5 text-gray-400" />
                   </div>
                   <p className="text-xs text-gray-500 mt-1">Maksimal 2MB.</p>
@@ -198,7 +210,7 @@ export const AdminProfile: React.FC = () => {
               </h3>
 
               {!showPasswordForm ? (
-                <Button 
+                <Button
                   onClick={() => setShowPasswordForm(true)}
                   variant="outline"
                   className="text-blue-600 border-blue-300"
@@ -247,7 +259,7 @@ export const AdminProfile: React.FC = () => {
                     <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
                       Simpan Password Baru
                     </Button>
-                    <Button 
+                    <Button
                       type="button"
                       variant="outline"
                       onClick={() => setShowPasswordForm(false)}

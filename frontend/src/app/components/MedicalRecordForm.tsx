@@ -36,6 +36,14 @@ export interface MedicalRecord {
   createdAt: string;
 }
 
+interface Student {
+  name: string;
+  nim: string;
+  faculty?: string;
+  major?: string;
+  semester?: number;
+}
+
 export const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ onSave, onCancel }) => {
   const [formData, setFormData] = useState<Partial<MedicalRecord>>({
     consultationDate: new Date().toISOString().split('T')[0],
@@ -64,7 +72,8 @@ export const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ onSave, on
       return;
     }
 
-    const student = null; // Akan diganti fetch dari Database
+    const [student, setStudent] = useState<Student | null>(null); 
+    // Akan diganti fetch dari Database
     
     if (student) {
       setFormData(prev => ({
@@ -295,8 +304,8 @@ export const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ onSave, on
                   <SelectItem value="Normal">Normal</SelectItem>
                   <SelectItem value="Ringan">Ringan</SelectItem>
                   <SelectItem value="Sedang">Sedang</SelectItem>
-                  <SelectItem value="Berat">Berat</SelectItem>
-                  <SelectItem value="Sangat Berat">Sangat Berat</SelectItem>
+                  <SelectItem value="Parah">Parah</SelectItem>
+                  <SelectItem value="Sangat Parah">Sangat Parah</SelectItem>
                 </SelectContent>
               </Select>
             </div>

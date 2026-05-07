@@ -527,21 +527,21 @@ Result: Score 4, Level "Ringan" (kurang akurat, need lebih banyak)
 ```
 Result: Score 16, Level "Sedang"
 
-### Berat (21-27)
+### Parah (21-27)
 ```json
 {
   "answers": [2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1]
 }
 ```
-Result: Score 40, Level "Berat"
+Result: Score 40, Level "Parah"
 
-### Sangat Berat (28+)
+### Sangat Parah (28+)
 ```json
 {
   "answers": [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
 }
 ```
-Result: Score 42, Level "Sangat Berat"
+Result: Score 42, Level "Sangat Parah"
 
 ---
 

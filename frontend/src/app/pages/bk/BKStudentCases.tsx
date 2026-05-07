@@ -82,9 +82,9 @@ export const BKStudentCases: React.FC = () => {
 
   const getPriorityColor = (level: string) => {
     switch (level) {
-      case 'Sangat Berat':
+      case 'Sangat Parah':
         return 'border-purple-300 bg-purple-50';
-      case 'Berat':
+      case 'Parah':
         return 'border-red-300 bg-red-50';
       case 'Sedang':
         return 'border-orange-300 bg-orange-50';
@@ -131,8 +131,8 @@ export const BKStudentCases: React.FC = () => {
                   <p className="text-sm">
                     <span className="font-medium">Tingkat:</span>{' '}
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      student.latestTest.level === 'Sangat Berat' ? 'bg-purple-600 text-white' :
-                      student.latestTest.level === 'Berat' ? 'bg-red-600 text-white' :
+                      student.latestTest.level === 'Sangat Parah' ? 'bg-purple-600 text-white' :
+                      student.latestTest.level === 'Parah' ? 'bg-red-600 text-white' :
                       'bg-orange-600 text-white'
                     }`}>
                       {student.latestTest.level}
@@ -204,7 +204,7 @@ export const BKStudentCases: React.FC = () => {
               Rekomendasi Intervensi
             </h4>
             <div className="space-y-3">
-              {student.latestTest.level === 'Sangat Berat' && (
+              {student.latestTest.level === 'Sangat Parah' && (
                 <>
                   <Alert className="bg-red-50 border-red-200">
                     <AlertDescription className="text-red-900">
@@ -220,7 +220,7 @@ export const BKStudentCases: React.FC = () => {
                   </ul>
                 </>
               )}
-              {student.latestTest.level === 'Berat' && (
+              {student.latestTest.level === 'Parah' && (
                 <>
                   <Alert className="bg-orange-50 border-orange-200">
                     <AlertDescription className="text-orange-900">
@@ -277,9 +277,9 @@ export const BKStudentCases: React.FC = () => {
             <Card className="p-6 bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-purple-700">Sangat Berat</p>
+                  <p className="text-sm font-medium text-purple-700">Sangat Parah</p>
                   <h3 className="text-3xl font-bold text-purple-900 mt-2">
-                    {students.filter(s => s.latestTest.level === 'Sangat Berat').length}
+                    {students.filter(s => s.latestTest.level === 'Sangat Parah').length}
                   </h3>
                 </div>
                 <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center">
@@ -291,9 +291,9 @@ export const BKStudentCases: React.FC = () => {
             <Card className="p-6 bg-gradient-to-br from-red-50 to-red-100 border-2 border-red-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-red-700">Berat</p>
+                  <p className="text-sm font-medium text-red-700">Parah</p>
                   <h3 className="text-3xl font-bold text-red-900 mt-2">
-                    {students.filter(s => s.latestTest.level === 'Berat').length}
+                    {students.filter(s => s.latestTest.level === 'Parah').length}
                   </h3>
                 </div>
                 <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center">
@@ -346,20 +346,20 @@ export const BKStudentCases: React.FC = () => {
                   Semua
                 </Button>
                 <Button
-                  variant={filterLevel === 'Sangat Berat' ? 'default' : 'outline'}
-                  onClick={() => setFilterLevel('Sangat Berat')}
+                  variant={filterLevel === 'Sangat Parah' ? 'default' : 'outline'}
+                  onClick={() => setFilterLevel('Sangat Parah')}
                   size="sm"
-                  className={filterLevel === 'Sangat Berat' ? 'bg-purple-600 hover:bg-purple-700' : ''}
+                  className={filterLevel === 'Sangat Parah' ? 'bg-purple-600 hover:bg-purple-700' : ''}
                 >
-                  Sangat Berat
+                  Sangat Parah
                 </Button>
                 <Button
-                  variant={filterLevel === 'Berat' ? 'default' : 'outline'}
-                  onClick={() => setFilterLevel('Berat')}
+                  variant={filterLevel === 'Parah' ? 'default' : 'outline'}
+                  onClick={() => setFilterLevel('Parah')}
                   size="sm"
-                  className={filterLevel === 'Berat' ? 'bg-purple-600 hover:bg-purple-700' : ''}
+                  className={filterLevel === 'Parah' ? 'bg-purple-600 hover:bg-purple-700' : ''}
                 >
-                  Berat
+                  Parah
                 </Button>
                 <Button
                   variant={filterLevel === 'Sedang' ? 'default' : 'outline'}
@@ -429,8 +429,8 @@ export const BKStudentCases: React.FC = () => {
                     </div>
                     <div className="flex items-center gap-4 flex-wrap">
                       <span className={`px-3 py-1 rounded-full text-sm font-medium text-white ${
-                        student.latestTest.level === 'Sangat Berat' ? 'bg-purple-600' :
-                        student.latestTest.level === 'Berat' ? 'bg-red-600' :
+                        student.latestTest.level === 'Sangat Parah' ? 'bg-purple-600' :
+                        student.latestTest.level === 'Parah' ? 'bg-red-600' :
                         'bg-orange-600'
                       }`}>
                         {student.latestTest.level}
@@ -445,8 +445,8 @@ export const BKStudentCases: React.FC = () => {
                   <Button
                     onClick={() => setSelectedStudent(student)}
                     className={
-                      student.latestTest.level === 'Sangat Berat' ? 'bg-purple-600 hover:bg-purple-700' :
-                      student.latestTest.level === 'Berat' ? 'bg-red-600 hover:bg-red-700' :
+                      student.latestTest.level === 'Sangat Parah' ? 'bg-purple-600 hover:bg-purple-700' :
+                      student.latestTest.level === 'Parah' ? 'bg-red-600 hover:bg-red-700' :
                       'bg-orange-600 hover:bg-orange-700'
                     }
                   >

@@ -49,16 +49,26 @@ export const AdminReports: React.FC = () => {
   });
 
   const stats = {
-    totalTests: filteredTests.length,
-    avgScore: Math.round(filteredTests.reduce((sum, t) => sum + t.score, 0) / filteredTests.length || 0),
-    criticalCases: filteredTests.filter(t => ['Berat', 'Sangat Berat'].includes(t.level)).length,
-    uniqueStudents: new Set(filteredTests.map(t => t.userId || t.student_id)).size,
-  };
+  totalTests: filteredTests.length,
+  avgScore: Math.round(
+    filteredTests.reduce((sum, t) => sum + t.score, 0) /
+    filteredTests.length || 0
+  ),
+  criticalCases: filteredTests.filter(t =>
+    ['Parah', 'Sangat Parah'].includes(t.level)
+  ).length,
+  uniqueStudents: new Set(
+    filteredTests.map(t => t.userId || t.student_id)
+  ).size,
+};
 
-  const levelDistribution = filteredTests.reduce((acc, test) => {
+  const levelDistribution = filteredTests.reduce(
+  (acc, test) => {
     acc[test.level] = (acc[test.level] || 0) + 1;
     return acc;
-  }, {} as Record<string, number>);
+  },
+  {} as Record<string, number>
+);
 
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-blue-50 to-white">
@@ -187,71 +197,44 @@ export const AdminReports: React.FC = () => {
                 Distribusi Tingkat Depresi
               </h3>
               <div className="space-y-4">
-                {Object.entries(levelDistribution).map(([level, count]) => {
-                  const percentage = ((count / stats.totalTests) * 100).toFixed(1);
-                  const colors = {
-                    'Normal': 'bg-green-500',
-                    'Ringan': 'bg-yellow-500',
-                    'Sedang': 'bg-orange-500',
-                    'Berat': 'bg-red-500',
-                    'Sangat Berat': 'bg-purple-500'
-                  };
-                  
-                  return (
-                    <div key={level}>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-gray-700">{level}</span>
-                        <span className="text-sm text-gray-600">{count} ({percentage}%)</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-3">
-                        <div
-                          className={`h-3 rounded-full ${colors[level as keyof typeof colors] || 'bg-gray-500'}`}
-                          style={{ width: `${percentage}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </Card>
+  {Object.entries(levelDistribution).map(([level, count]) => {
+    const safeCount = Number(count);
+    const percentage = stats.totalTests
+      ? ((safeCount / stats.totalTests) * 100).toFixed(1)
+      : '0';
 
-            {/* Recent Tests */}
-            <Card className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                Tes Terbaru
-              </h3>
-              <div className="space-y-3 max-h-96 overflow-y-auto">
-                {filteredTests
-                  .slice()
-                  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-                  .slice(0, 10)
-                  .map((test, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900">{test.userName || test.userId || test.student_id}</p>
-                        <p className="text-sm text-gray-600">
-                          {new Date(test.date).toLocaleDateString('id-ID', {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric'
-                          })}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          test.level === 'Sangat Berat' ? 'bg-purple-100 text-purple-800' :
-                          test.level === 'Berat' ? 'bg-red-100 text-red-800' :
-                          test.level === 'Sedang' ? 'bg-orange-100 text-orange-800' :
-                          test.level === 'Ringan' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-green-100 text-green-800'
-                        }`}>
-                          {test.level}
-                        </span>
-                        <p className="text-sm text-gray-600 mt-1">Skor: {test.score}</p>
-                      </div>
-                    </div>
-                  ))}
-              </div>
+    const colors = {
+      'Normal': 'bg-green-500',
+      'Ringan': 'bg-yellow-500',
+      'Sedang': 'bg-orange-500',
+      'Parah': 'bg-red-500',
+      'Sangat Parah': 'bg-purple-500'
+    };
+
+    return (
+      <div key={level}>
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm font-medium text-gray-700">
+            {level}
+          </span>
+
+          <span className="text-sm text-gray-600">
+            {safeCount} ({percentage}%)
+          </span>
+        </div>
+
+        <div className="w-full bg-gray-200 rounded-full h-3">
+          <div
+            className={`h-3 rounded-full ${
+              colors[level as keyof typeof colors] || 'bg-gray-500'
+            }`}
+            style={{ width: `${percentage}%` }}
+          ></div>
+        </div>
+      </div>
+    );
+  })}
+</div>
             </Card>
           </div>
 
@@ -269,20 +252,29 @@ export const AdminReports: React.FC = () => {
               <ul className="list-disc list-inside space-y-2 text-gray-700 mb-4">
                 <li>Total <strong>{stats.totalTests}</strong> tes telah dilakukan oleh <strong>{stats.uniqueStudents}</strong> mahasiswa unik</li>
                 <li>Rata-rata skor depresi adalah <strong>{stats.avgScore}</strong></li>
-                <li>Terdapat <strong>{stats.criticalCases}</strong> kasus yang memerlukan perhatian khusus (tingkat Berat dan Sangat Berat)</li>
+                <li>Terdapat <strong>{stats.criticalCases}</strong> kasus yang memerlukan perhatian khusus (tingkat Parah dan Sangat Parah)</li>
                 <li>
                   Distribusi tingkat depresi:
                   <ul className="list-circle list-inside ml-6 mt-2">
-                    {Object.entries(levelDistribution).map(([level, count]) => (
-                      <li key={level}>{level}: {count} kasus ({((count / stats.totalTests) * 100).toFixed(1)}%)</li>
-                    ))}
+                   {Object.entries(levelDistribution).map(([level, count]) => {
+  const safeCount = Number(count);
+  const percentage = stats.totalTests
+    ? ((safeCount / stats.totalTests) * 100).toFixed(1)
+    : '0';
+
+  return (
+    <li key={level}>
+      {level}: {safeCount} kasus ({percentage}%)
+    </li>
+  );
+})}
                   </ul>
                 </li>
               </ul>
               <div className="bg-blue-50 border-l-4 border-blue-600 p-4 mt-6">
                 <p className="text-sm text-blue-900">
                   <strong>Rekomendasi:</strong> Berdasarkan data di atas, disarankan untuk meningkatkan program konseling 
-                  dan dukungan mental bagi mahasiswa, terutama untuk kasus dengan tingkat depresi berat dan sangat berat.
+                  dan dukungan mental bagi mahasiswa, terutama untuk kasus dengan tingkat depresi parah dan sangat parah.
                 </p>
               </div>
             </div>

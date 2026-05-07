@@ -28,8 +28,8 @@ Sistem ini adalah aplikasi web untuk mendeteksi tingkat depresi mahasiswa menggu
 - **Interface dengan Sidebar** untuk navigasi mudah
 - Melihat **daftar mahasiswa yang memerlukan perhatian**
 - Filter berdasarkan tingkat keparahan:
-  - Urgent (Sangat Berat)
-  - Prioritas Tinggi (Berat)
+  - Urgent (Sangat Parah)
+  - Prioritas Tinggi (Parah)
   - Semua Kasus
 - **Detail mahasiswa** dengan:
   - Info lengkap (NPM, Fakultas, Prodi, Semester)
@@ -79,7 +79,7 @@ Sistem ini adalah aplikasi web untuk mendeteksi tingkat depresi mahasiswa menggu
 
 #### Mahasiswa (5 akun dengan berbagai tingkat depresi)
 
-1. **Ahmad Fauzi** - Tingkat Depresi Berat
+1. **Ahmad Fauzi** - Tingkat Depresi Parah
    - Email: `mahasiswa1@student.ac.id`
    - Password: `student123`
    - NPM: 2021110001
@@ -105,7 +105,7 @@ Sistem ini adalah aplikasi web untuk mendeteksi tingkat depresi mahasiswa menggu
    - NPM: 2022110030
    - Total Tes: 1
 
-5. **Eko Prasetyo** - Sangat Berat (URGENT)
+5. **Eko Prasetyo** - Sangat Parah (URGENT)
    - Email: `mahasiswa5@student.ac.id`
    - Password: `student123`
    - NPM: 2021110045
@@ -118,8 +118,8 @@ Sistem ini adalah aplikasi web untuk mendeteksi tingkat depresi mahasiswa menggu
 - **Hijau Mint:** `#28A745`, `#D4EDDA` - untuk status normal/positif
 - **Lavender:** `#6F4E7C`, `#E6E6FA` - untuk aksen
 - **Orange:** `#FF9800` - untuk warning/perhatian
-- **Red:** `#F44336` - untuk kondisi berat
-- **Purple:** `#9C27B0` - untuk kondisi sangat berat
+- **Red:** `#F44336` - untuk kondisi parah
+- **Purple:** `#9C27B0` - untuk kondisi sangat parah
 
 ### Prinsip Desain
 - **Bersih & Minimalis**
@@ -141,8 +141,8 @@ Berdasarkan total skor:
 - **Normal:** 0-9
 - **Ringan:** 10-20
 - **Sedang:** 21-27
-- **Berat:** 28-55
-- **Sangat Berat:** >55
+- **Parah:** 28-55
+- **Sangat Parah:** >55
 
 ### Fuzzy Logic
 Sistem menggunakan fuzzy logic untuk:

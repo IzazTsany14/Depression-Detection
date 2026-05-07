@@ -37,14 +37,14 @@ export const AdminDashboard: React.FC = () => {
       setAllTestResults(results);
       setAllStudents(students);
 
-      const levelDist = { Normal: 0, Ringan: 0, Sedang: 0, Berat: 0, 'Sangat Berat': 0 };
+      const levelDist = { Normal: 0, Ringan: 0, Sedang: 0, Parah: 0, 'Sangat Parah': 0 };
       let critical = 0;
 
       results.forEach(r => {
         if (levelDist[r.level as keyof typeof levelDist] !== undefined) {
           levelDist[r.level as keyof typeof levelDist]++;
         }
-        if (r.level === 'Berat' || r.level === 'Sangat Berat') critical++;
+        if (r.level === 'Parah' || r.level === 'Sangat Parah') critical++;
       });
 
       setStats({
@@ -77,8 +77,8 @@ export const AdminDashboard: React.FC = () => {
     'Normal': '#28A745',
     'Ringan': '#FFC107',
     'Sedang': '#FF9800',
-    'Berat': '#F44336',
-    'Sangat Berat': '#9C27B0'
+    'Parah': '#F44336',
+    'Sangat Parah': '#9C27B0'
   };
 
   // Get monthly test trend
@@ -317,7 +317,7 @@ export const AdminDashboard: React.FC = () => {
                                 ? 'bg-yellow-100 text-yellow-800'
                                 : test.level === 'Sedang'
                                 ? 'bg-orange-100 text-orange-800'
-                                : test.level === 'Berat'
+                                : test.level === 'Parah'
                                 ? 'bg-red-100 text-red-800'
                                 : 'bg-purple-100 text-purple-800'
                             }`}

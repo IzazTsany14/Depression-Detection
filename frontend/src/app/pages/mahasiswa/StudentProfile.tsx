@@ -183,7 +183,19 @@ export const StudentProfile: React.FC = () => {
                 <div className="rounded-lg border border-gray-200 p-4">
                   <Label htmlFor="profileImage">Foto Profil PNG/JPG</Label>
                   <div className="mt-2 flex items-center gap-3">
-                    <Input id="profileImage" type="file" accept="image/png,image/jpeg" onChange={handleProfileImageChange} />
+                    <Input id="profileImage" type="file" accept="image/png,image/jpeg" onChange={handleProfileImageChange}
+                    className="
+                    file:mr-5
+                    file:rounded-md
+                    file:border-0
+                    file:bg-blue-600
+                     file:px-4 file:py-0
+                     file:text-sm
+                     file:font-medium
+                     file:text-white
+                     hover:file:bg-blue-700
+                      cursor-pointer
+                       " />
                     <ImagePlus className="w-5 h-5 text-gray-400" />
                   </div>
                   <p className="text-xs text-gray-500 mt-1">Maksimal 2MB.</p>

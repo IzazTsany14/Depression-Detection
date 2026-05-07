@@ -67,8 +67,8 @@ export const Guide: React.FC = () => {
           description: 'Disarankan untuk berkonsultasi dengan profesional kesehatan mental.',
           focus: ['Professional Help', 'Self-Care']
         };
-      case 'Berat':
-      case 'Sangat Berat':
+      case 'Parah':
+      case 'Sangat Parah':
         return {
           title: 'Segera Cari Bantuan Profesional',
           description: 'Sangat penting untuk segera berkonsultasi dengan psikolog atau psikiater.',
@@ -143,7 +143,7 @@ export const Guide: React.FC = () => {
             <Lock className="h-5 w-5 text-amber-600" />
             <AlertDescription className="text-amber-900">
               <strong>Catatan Penting:</strong> Panduan ini bersifat edukatif dan umum, <strong>bukan pengganti terapi profesional</strong>. 
-              Untuk kondisi depresi sedang hingga berat, sangat disarankan untuk berkonsultasi dengan psikolog atau psikiater.
+              Untuk kondisi depresi sedang hingga parah, sangat disarankan untuk berkonsultasi dengan psikolog atau psikiater.
             </AlertDescription>
           </Alert>
 
@@ -439,7 +439,7 @@ export const Guide: React.FC = () => {
                     <li>• Evaluasi medis lengkap</li>
                     <li>• Resep obat antidepresan jika diperlukan</li>
                     <li>• Kombinasi terapi obat dan psikoterapi</li>
-                    <li>• Penanganan kondisi berat</li>
+                    <li>• Penanganan kondisi parah</li>
                   </ul>
                 </Card>
               </div>

@@ -91,9 +91,9 @@ export function getDepressionLevel(score) {
   } else if (score <= 20) {
     return 'Sedang';
   } else if (score <= 27) {
-    return 'Berat';
+    return 'Parah';
   } else {
-    return 'Sangat Berat';
+    return 'Sangat Parah';
   }
 }
 
@@ -162,8 +162,8 @@ export function getDepressionDescription(level) {
     'Normal': 'Tingkat depresi Anda berada dalam rentang normal. Anda menunjukkan kesejahteraan mental yang baik.',
     'Ringan': 'Anda mengalami gejala depresi ringan. Pertimbangkan untuk menjaga kesehatan mental dengan self-care.',
     'Sedang': 'Anda mengalami gejala depresi sedang. Disarankan untuk berkonsultasi dengan profesional kesehatan mental.',
-    'Berat': 'Anda mengalami gejala depresi berat. Sangat disarankan untuk segera berkonsultasi dengan psikolog atau psikiater.',
-    'Sangat Berat': 'Anda mengalami gejala depresi sangat berat. Segera cari bantuan profesional kesehatan mental.'
+    'Parah': 'Anda mengalami gejala depresi parah. Sangat disarankan untuk segera berkonsultasi dengan psikolog atau psikiater.',
+    'Sangat Parah': 'Anda mengalami gejala depresi sangat parah. Segera cari bantuan profesional kesehatan mental.'
   };
   return descriptions[level] || 'Level tidak dikenali';
 }

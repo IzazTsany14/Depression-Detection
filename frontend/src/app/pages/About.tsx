@@ -267,7 +267,7 @@ export const About: React.FC = () => {
                   21 - 27
                 </div>
                 <div className="flex-1">
-                  <div className="font-semibold text-gray-900">Berat</div>
+                  <div className="font-semibold text-gray-900">Parah</div>
                   <div className="text-sm text-gray-600">Sangat disarankan segera berkonsultasi</div>
                 </div>
               </div>
@@ -277,7 +277,7 @@ export const About: React.FC = () => {
                   28+
                 </div>
                 <div className="flex-1">
-                  <div className="font-semibold text-gray-900">Sangat Berat</div>
+                  <div className="font-semibold text-gray-900">Sangat Parah</div>
                   <div className="text-sm text-gray-600">Butuh intervensi profesional segera</div>
                 </div>
               </div>

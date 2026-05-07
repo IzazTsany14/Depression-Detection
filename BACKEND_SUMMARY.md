@@ -84,7 +84,7 @@ pnpm dev
 ✅ **Business Logic**
 - `src/services/fuzzyService.js` - Implementasi Fuzzy Logic dari TypeScript ke JavaScript
   - `calculateDepressionScore()` - Hitung skor dari 21 jawaban
-  - `getDepressionLevel()` - Tentukan level (Normal/Ringan/Sedang/Berat/Sangat Berat)
+  - `getDepressionLevel()` - Tentukan level (Normal/Ringan/Sedang/Parah/Sangat Parah)
   - `calculateFuzzy()` - Kombinasi scoring dan membership functions
 
 ✅ **Controllers (Request Handlers)**
@@ -221,7 +221,7 @@ Backend ini menggunakan 5 tabel yang sudah ada di `depresi.sql`:
 
 ### Fuzzy Logic Implementation
 Backend sudah mengimplementasikan fuzzy logic dari frontend:
-- 5 membership functions (Normal, Ringan, Sedang, Berat, Sangat Berat)
+- 5 membership functions (Normal, Ringan, Sedang, Parah, Sangat Parah)
 - Smooth transition antar level
 - Weighted fuzzy scoring
 

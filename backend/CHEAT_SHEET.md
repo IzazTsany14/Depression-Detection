@@ -148,8 +148,8 @@ errorHandler(err, req, res, next)
 | 0-9 | Normal | Good mental health |
 | 10-13 | Ringan | Self-care & monitoring |
 | 14-20 | Sedang | Consult professional |
-| 21-27 | Berat | Seek immediate help |
-| 28+ | Sangat Berat | Emergency help needed |
+| 21-27 | Parah | Seek immediate help |
+| 28+ | Sangat Parah | Emergency help needed |
 
 ## 🐛 Common Errors & Solutions
 

@@ -54,20 +54,20 @@ export function getDepressionLevel(score: number): DepressionLevel {
     };
   } else if (score <= 27) {
     return {
-      level: "Berat",
+      level: "Parah",
       score,
       color: "#F44336",
       bgColor: "#FFCDD2",
-      description: "Anda mengalami gejala depresi berat. Sangat disarankan untuk segera berkonsultasi dengan psikolog atau psikiater.",
+      description: "Anda mengalami gejala depresi parah. Sangat disarankan untuk segera berkonsultasi dengan psikolog atau psikiater.",
       emoji: "😢"
     };
   } else {
     return {
-      level: "Sangat Berat",
+      level: "Sangat Parah",
       score,
       color: "#C62828",
       bgColor: "#FFCDD2",
-      description: "Anda mengalami gejala depresi sangat berat. Segera cari bantuan profesional kesehatan mental.",
+      description: "Anda mengalami gejala depresi sangat parah. Segera cari bantuan profesional kesehatan mental.",
       emoji: "😰"
     };
   }
@@ -121,8 +121,8 @@ export function getFuzzyInterpretation(score: number): string {
     { level: "Normal", value: normal },
     { level: "Ringan", value: mild },
     { level: "Sedang", value: moderate },
-    { level: "Berat", value: severe },
-    { level: "Sangat Berat", value: extremelySevere },
+    { level: "Parah", value: severe },
+    { level: "Sangat Parah", value: extremelySevere },
   ];
 
   // Find the highest membership value

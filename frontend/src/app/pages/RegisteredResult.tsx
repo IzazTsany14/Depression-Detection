@@ -45,9 +45,9 @@ export const RegisteredResult: React.FC = () => {
         return { color: '#FFC107', bgColor: '#FFF3CD', emoji: '😐' };
       case 'Sedang':
         return { color: '#FF9800', bgColor: '#FFE0B2', emoji: '😟' };
-      case 'Berat':
+      case 'Parah':
         return { color: '#F44336', bgColor: '#FFCDD2', emoji: '😢' };
-      case 'Sangat Berat':
+      case 'Sangat Parah':
         return { color: '#C62828', bgColor: '#FFCDD2', emoji: '😰' };
       default:
         return { color: '#28A745', bgColor: '#D4EDDA', emoji: '😊' };
