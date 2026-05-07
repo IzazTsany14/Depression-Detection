@@ -37,7 +37,10 @@ router.get('/', async (req, res) => {
     const [results] = await pool.query(query);
     res.json({ data: results });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      message: 'Gagal mengambil data test dari database',
+      error: error.message
+    });
   }
 });
 

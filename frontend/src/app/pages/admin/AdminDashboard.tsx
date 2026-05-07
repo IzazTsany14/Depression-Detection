@@ -56,7 +56,7 @@ export const AdminDashboard: React.FC = () => {
       });
     };
     loadData();
-  }, [user, navigate, getAllTestResults]);
+  }, [user, navigate, getAllTestResults, getAllStudents]);
 
   if (!stats) {
     return (
