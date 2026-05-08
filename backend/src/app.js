@@ -22,14 +22,19 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // ============ MIDDLEWARE ============
 
-const allowedOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || 'http://localhost:5173,http://127.0.0.1:5173')
-  .split(',')
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  ...(process.env.FRONTEND_URLS || process.env.FRONTEND_URL || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+];
+const allowedOriginSet = new Set(allowedOrigins);
 
 app.use(cors({
   origin(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOriginSet.has(origin)) {
       callback(null, true);
       return;
     }

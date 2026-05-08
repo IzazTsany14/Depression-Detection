@@ -9,6 +9,7 @@ import { useAuth } from '../context/AuthContext';
 import { calculateDepressionScore, getDepressionLevel } from '../utils/fuzzyLogic';
 import { AlertTriangle, RefreshCw, UserPlus, Home, TrendingUp, Download } from 'lucide-react';
 import { generateTestResultPDF, downloadPDF } from '../utils/pdfGenerator';
+import { getDisplayLevel, getGuidanceByLevel, getLevelDescription, getSubscaleResults } from '../utils/assessment';
 
 export const GuestResult: React.FC = () => {
   const { currentTestAnswers, isGuest } = useAuth();
@@ -25,21 +26,24 @@ export const GuestResult: React.FC = () => {
     // Calculate result
     const score = calculateDepressionScore(currentTestAnswers);
     const level = getDepressionLevel(score);
-    setResult(level);
+    setResult({ ...level, answers: currentTestAnswers });
   }, [currentTestAnswers, isGuest, navigate]);
 
   if (!result) {
     return null;
   }
 
+  const displayLevel = getDisplayLevel(result.level);
+  const subscaleResults = getSubscaleResults(result.answers);
+
   const handleDownloadPDF = () => {
     const pdf = generateTestResultPDF({
-      level: result.level,
+      level: displayLevel,
       score: result.score,
       date: new Date().toISOString(),
       color: result.color,
       emoji: result.emoji,
-      description: result.description,
+      description: getLevelDescription(result.level),
     });
     
     const filename = `hasil-tes-dass21-guest-${new Date().getTime()}.pdf`;
@@ -74,7 +78,7 @@ export const GuestResult: React.FC = () => {
             <div className="text-center">
               <div className="text-6xl mb-6">{result.emoji}</div>
               <h1 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: result.color }}>
-                Tingkat Depresi: {result.level}
+                Tingkat Depresi: {displayLevel}
               </h1>
               <div className="inline-flex items-center gap-3 bg-white px-6 py-3 rounded-full shadow-md mb-6">
                 <TrendingUp className="w-6 h-6" style={{ color: result.color }} />
@@ -83,10 +87,40 @@ export const GuestResult: React.FC = () => {
                 </span>
               </div>
               <p className="text-lg text-gray-800 max-w-2xl mx-auto leading-relaxed">
-                {result.description}
+                {getLevelDescription(result.level)}
               </p>
             </div>
           </Card>
+
+          <Card className="p-6 mb-8">
+            <h3 className="font-semibold text-gray-900 mb-3 text-lg">
+              Panduan Awal Berdasarkan Kategori
+            </h3>
+            <div className="grid md:grid-cols-3 gap-3">
+              {getGuidanceByLevel(result.level).map((item, index) => (
+                <div key={index} className="rounded-lg border border-blue-100 bg-blue-50 p-4 text-sm text-blue-950">
+                  {item}
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {subscaleResults.length > 0 && (
+            <Card className="p-6 mb-8">
+              <h3 className="font-semibold text-gray-900 mb-4 text-lg">
+                Skor Subskala DASS-21
+              </h3>
+              <div className="grid md:grid-cols-3 gap-4">
+                {subscaleResults.map((item) => (
+                  <div key={item.key} className="rounded-lg border border-gray-200 p-4 bg-white">
+                    <p className="text-sm text-gray-600 mb-1">{item.label}</p>
+                    <p className="text-2xl font-bold text-gray-900">{item.score}</p>
+                    <p className="text-sm font-medium text-blue-700">{item.level}</p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
 
           {/* Disclaimer */}
           <Card className="p-6 mb-8 bg-red-50 border-2 border-red-200">

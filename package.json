@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
-    "dev": "start /B cmd /C \"npm --prefix backend start\" && vite --host 127.0.0.1 --port 5173",
+    "dev": "node scripts/dev.js",
     "dev:frontend": "vite",
     "dev:backend": "npm --prefix backend start"
   },

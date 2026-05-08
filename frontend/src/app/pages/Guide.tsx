@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { PDFViewer } from '../components/PDFViewer';
+import { getDisplayLevel } from '../utils/assessment';
 
 export const Guide: React.FC = () => {
   const { user, getTestHistory } = useAuth();
@@ -121,7 +122,7 @@ export const Guide: React.FC = () => {
                     {recommendation.title}
                   </h2>
                   <p className="text-gray-700 mb-4">
-                    Berdasarkan hasil tes terakhir Anda (<strong>Tingkat Depresi: {latestResult.level}</strong>), {recommendation.description}
+                    Berdasarkan hasil tes terakhir Anda (<strong>Tingkat Depresi: {getDisplayLevel(latestResult.level)}</strong>), {recommendation.description}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {recommendation.focus.map((focus, index) => (
@@ -454,6 +455,11 @@ export const Guide: React.FC = () => {
                 </div>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="bg-white p-4 rounded-lg">
+                    <h4 className="font-semibold text-gray-800 mb-2">BK UNESA</h4>
+                    <p className="text-lg font-bold text-blue-600 mb-1">Unit BK/Kemahasiswaan</p>
+                    <p className="text-sm text-gray-600">Layanan konseling kampus dan rujukan bantuan profesional</p>
+                  </div>
+                  <div className="bg-white p-4 rounded-lg">
                     <h4 className="font-semibold text-gray-800 mb-2">Hotline Nasional</h4>
                     <p className="text-2xl font-bold text-blue-600 mb-1">119 (ext. 8)</p>
                     <p className="text-sm text-gray-600">Pencegahan Bunuh Diri</p>
@@ -468,11 +474,6 @@ export const Guide: React.FC = () => {
                     <p className="text-2xl font-bold text-blue-600 mb-1">021-9696-9293</p>
                     <p className="text-sm text-gray-600">Senin-Jumat 09:00-17:00</p>
                   </div>
-                  <div className="bg-white p-4 rounded-lg">
-                    <h4 className="font-semibold text-gray-800 mb-2">Crisis Center Kemenkes</h4>
-                    <p className="text-2xl font-bold text-blue-600 mb-1">500-454</p>
-                    <p className="text-sm text-gray-600">24 Jam</p>
-                  </div>
                 </div>
               </Card>
 
@@ -483,8 +484,8 @@ export const Guide: React.FC = () => {
                   Layanan Konseling Kampus
                 </h3>
                 <p className="text-gray-700 mb-4">
-                  Banyak universitas menyediakan layanan konseling gratis untuk mahasiswa. 
-                  Hubungi bagian kemahasiswaan atau Unit Pelayanan Psikologi kampus Anda.
+                  Untuk mahasiswa UNESA, hubungi BK UNESA atau bagian kemahasiswaan fakultas untuk membuat janji konseling. 
+                  Layanan ini dapat menjadi pintu awal untuk dukungan psikologis dan rujukan profesional bila diperlukan.
                 </p>
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600">
