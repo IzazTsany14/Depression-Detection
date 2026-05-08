@@ -3,22 +3,21 @@
  * Menggunakan mysql2/promise untuk performa async yang optimal.
  */
 import mysql from 'mysql2/promise';
-import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
-import path from 'path';
+import './env.js';
 
-const envPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../.env');
-dotenv.config({ path: envPath });
+const useSsl = String(process.env.DB_SSL || '').toLowerCase() === 'true';
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
+  port: Number(process.env.DB_PORT || 3306),
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'depresi',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  enableKeepAlive: true
+  enableKeepAlive: true,
+  ...(useSsl && { ssl: { rejectUnauthorized: false } })
 });
 
 pool.getConnection()

@@ -4,12 +4,7 @@
  * Memeriksa role user untuk authorization
  */
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
-import path from 'path';
-
-const envPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../.env');
-dotenv.config({ path: envPath });
+import '../config/env.js';
 
 /**
  * Middleware untuk verifikasi JWT token

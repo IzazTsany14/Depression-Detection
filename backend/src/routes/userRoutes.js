@@ -10,6 +10,29 @@ const router = express.Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const profileUploadDir = path.resolve(__dirname, '../../uploads/profiles');
 
+const facultyFolderMap = [
+  { pattern: /fisipol|ilmu sosial/i, folder: 'fisipol' },
+  { pattern: /feb|ekonomi/i, folder: 'feb' },
+  { pattern: /ft|teknik/i, folder: 'ft' },
+  { pattern: /fv|vokasi/i, folder: 'fv' },
+  { pattern: /fh|hukum/i, folder: 'fh' },
+  { pattern: /fmipa|matematika|pengetahuan alam/i, folder: 'fmipa' },
+  { pattern: /psdku/i, folder: 'psdku' }
+];
+
+const getProfileFolder = (role, faculty) => {
+  if (role !== 'student') return 'staff';
+
+  const matchedFaculty = facultyFolderMap.find(({ pattern }) => pattern.test(faculty || ''));
+  if (matchedFaculty) return matchedFaculty.folder;
+
+  return String(faculty || 'unknown')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'unknown';
+};
+
 const getUsersQuery = `
   SELECT
     a.account_id,
@@ -52,7 +75,7 @@ const getUserByAccountId = async (accountId) => {
   return rows[0] ? normalizeUser(rows[0]) : null;
 };
 
-const saveProfileImage = async (profileImage, accountId) => {
+const saveProfileImage = async (profileImage, { accountId, role, faculty }) => {
   if (!profileImage?.dataUrl) return null;
 
   const match = String(profileImage.dataUrl).match(/^data:(image\/(?:png|jpeg));base64,([A-Za-z0-9+/=]+)$/);
@@ -72,11 +95,14 @@ const saveProfileImage = async (profileImage, accountId) => {
     throw error;
   }
 
-  await fs.mkdir(profileUploadDir, { recursive: true });
-  const fileName = `${accountId}-${Date.now()}.${extension}`;
-  await fs.writeFile(path.join(profileUploadDir, fileName), buffer);
+  const folder = getProfileFolder(role, faculty);
+  const accountUploadDir = path.join(profileUploadDir, folder, accountId);
+  const fileName = `profile.${extension}`;
 
-  return `/uploads/profiles/${fileName}`;
+  await fs.mkdir(accountUploadDir, { recursive: true });
+  await fs.writeFile(path.join(accountUploadDir, fileName), buffer);
+
+  return `uploads/profiles/${folder}/${accountId}/${fileName}`;
 };
 
 router.get('/', async (req, res) => {
@@ -121,7 +147,7 @@ router.post('/', async (req, res) => {
     }
 
     const accountId = `${role}-${uuidv4().slice(0, 8)}`;
-    const profilePicture = await saveProfileImage(profileImage, accountId);
+    const profilePicture = await saveProfileImage(profileImage, { accountId, role, faculty });
     const hashedPassword = await bcrypt.hash(password, 12);
 
     await connection.beginTransaction();
@@ -186,7 +212,11 @@ router.put('/:accountId', async (req, res) => {
       profileImage
     } = req.body;
 
-    const profilePicture = await saveProfileImage(profileImage, accountId);
+    const profilePicture = await saveProfileImage(profileImage, {
+      accountId,
+      role: existingUser.role,
+      faculty: existingUser.role === 'student' ? (faculty || existingUser.faculty) : null
+    });
     const accountFields = ['email = ?'];
     const accountValues = [email];
 

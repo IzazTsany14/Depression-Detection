@@ -6,13 +6,8 @@
 import pool from '../config/db.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import dotenv from 'dotenv';
+import '../config/env.js';
 import { v4 as uuidv4 } from 'uuid';
-import { fileURLToPath } from 'url';
-import path from 'path';
-
-const envPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../.env');
-dotenv.config({ path: envPath });
 
 const databaseUnavailableCodes = [
   'ECONNREFUSED',
