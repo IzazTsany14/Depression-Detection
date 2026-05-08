@@ -5,6 +5,7 @@ import { Card } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../../components/ui/dialog';
 import { useAuth } from '../../context/AuthContext';
+import { apiUrl } from '../../utils/api';
 import { ProfileAvatar } from '../../components/ProfileAvatar';
 import { Users, Search, Plus, Edit2, Trash2, CheckCircle2 } from 'lucide-react';
 
@@ -41,7 +42,7 @@ export const AdminUserManagement: React.FC = () => {
   const loadUsers = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/users');
+      const res = await fetch(apiUrl('/users'));
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || data.error || 'Gagal mengambil user');
       setUsers(data.data || []);
@@ -125,7 +126,7 @@ export const AdminUserManagement: React.FC = () => {
     };
 
     try {
-      const res = await fetch(editingUser ? `/api/users/${editingUser.account_id || editingUser.accountId}` : '/api/users', {
+      const res = await fetch(editingUser ? apiUrl(`/users/${editingUser.account_id || editingUser.accountId}`) : apiUrl('/users'), {
         method: editingUser ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -146,7 +147,7 @@ export const AdminUserManagement: React.FC = () => {
     if (!window.confirm(`Hapus user ${userToDelete.name}? Data profile dan relasinya akan terhapus dari database.`)) return;
 
     try {
-      const res = await fetch(`/api/users/${userToDelete.account_id || userToDelete.accountId}`, { method: 'DELETE' });
+      const res = await fetch(apiUrl(`/users/${userToDelete.account_id || userToDelete.accountId}`), { method: 'DELETE' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || data.error || 'Gagal menghapus user');
       await loadUsers();

@@ -1,6 +1,6 @@
 import React from 'react';
 import { User } from 'lucide-react';
-import { getProfilePictureUrl } from '../utils/profilePicture';
+import { getProfilePictureUrl, hasProfilePicture } from '../utils/profilePicture';
 
 interface ProfileAvatarProps {
   profilePicture?: string | null;
@@ -18,7 +18,8 @@ export const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
   alt = 'Foto profil'
 }) => {
   const [imageFailed, setImageFailed] = React.useState(false);
-  const imageUrl = getProfilePictureUrl(profilePicture);
+  const hasImage = hasProfilePicture(profilePicture);
+  const imageUrl = hasImage ? getProfilePictureUrl(profilePicture) : '';
 
   React.useEffect(() => {
     setImageFailed(false);
@@ -26,7 +27,7 @@ export const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
 
   return (
     <div className={`${className} ${fallbackClassName} rounded-full flex items-center justify-center overflow-hidden`}>
-      {!imageFailed ? (
+      {hasImage && !imageFailed ? (
         <img
           src={imageUrl}
           alt={alt}

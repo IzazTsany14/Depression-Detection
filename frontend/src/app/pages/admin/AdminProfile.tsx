@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from '../../components/ui/alert';
 import { useAuth } from '../../context/AuthContext';
 import { Lock, AlertCircle, CheckCircle2, ImagePlus } from 'lucide-react';
 import { ProfileAvatar } from '../../components/ProfileAvatar';
+import { apiUrl } from '../../utils/api';
 import { readProfileImageFile } from '../../utils/profileUpdate';
 
 export const AdminProfile: React.FC = () => {
@@ -62,7 +63,7 @@ export const AdminProfile: React.FC = () => {
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch(`/api/users/${user?.accountId || user?.id}`, {
+      const res = await fetch(apiUrl(`/users/${user?.accountId || user?.id}`), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

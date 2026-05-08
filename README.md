@@ -5,10 +5,10 @@
 </div>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Frontend-React%2F-61DAFB?style=for-the-badge&logo=react" alt="React Badge">
+  <img src="https://img.shields.io/badge/Frontend-React-61DAFB?style=for-the-badge&logo=react" alt="React Badge">
   <img src="https://img.shields.io/badge/Language-TypeScript-3178C6?style=for-the-badge&logo=typescript" alt="TypeScript Badge">
   <img src="https://img.shields.io/badge/Styling-TailwindCSS-06B6D4?style=for-the-badge&logo=tailwind-css" alt="Tailwind Badge">
-  <img src="https://img.shields.io/badge/Backend-Node.Js-092E20?style=for-the-badge&logo=django" alt="Node Js Badge">
+  <img src="https://img.shields.io/badge/Backend-Node.Js-092E20?style=for-the-badge&logo=Node.Js" alt="Node Js Badge">
   <img src="https://img.shields.io/badge/Database-MySQL-4479A1?style=for-the-badge&logo=mysql" alt="MySQL Badge">
 </p>
 
@@ -41,9 +41,9 @@ Sistem ini mengintegrasikan instrumen psikometrik **DASS-21** (Depression Anxiet
 
 | Komponen | Teknologi |
 |-----------|------------|
-| **Frontend** | React, Next.js, TypeScript, Tailwind CSS, Shadcn/UI |
+| **Frontend** | React, TypeScript, Tailwind CSS, Shadcn/UI |
 | **Logic Engine** |JavaScript (Fuzzy Logic Implementation) |
-| **Backend** | Python (Django Framework)  |
+| **Backend** | Node.Js  |
 | **Database** | MySQL (Main DB) & Redis (Caching) |
 | **UI/UX** | Figma (Design System)  |
 

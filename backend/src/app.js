@@ -4,7 +4,7 @@
  */
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
+import './config/env.js';
 import pool from './config/db.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -17,18 +17,27 @@ import userRoutes from './routes/userRoutes.js';
 // Import middleware
 import { errorHandler } from './middleware/authMiddleware.js';
 
-dotenv.config();
-
 const app = express();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // ============ MIDDLEWARE ============
 
-/**
- * CORS Configuration
- * Mengizinkan request dari frontend (React Vite di localhost:5173)
- */
-app.use(cors());
+const allowedOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || 'http://localhost:5173,http://127.0.0.1:5173')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+app.use(cors({
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+      return;
+    }
+
+    callback(new Error(`Origin ${origin} tidak diizinkan oleh CORS`));
+  },
+  credentials: true
+}));
 
 /**
  * Body Parser

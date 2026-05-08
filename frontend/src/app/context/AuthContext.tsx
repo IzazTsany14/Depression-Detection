@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { apiUrl } from '../utils/api';
 
 interface User {
   id: string;
@@ -49,8 +50,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isGuest, setIsGuest] = useState(false);
   const [testHistory, setTestHistory] = useState<TestResult[]>([]);
   const [currentTestAnswers, setCurrentTestAnswers] = useState<number[]>([]);
-
-  const API_URL = import.meta.env.VITE_API_URL || '/api';
 
   const mapApiUser = (apiUser: any): User => ({
     id: String(apiUser.id || apiUser.student_id || apiUser.bk_id || apiUser.admin_id || apiUser.account_id),
@@ -122,7 +121,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     if (token) {
-      fetch(`${API_URL}/auth/me`, {
+      fetch(apiUrl('/auth/me'), {
         headers: getAuthHeaders()
       })
         .then(async (res) => {
@@ -146,7 +145,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchTestHistory = useCallback(async (userId: string) => {
     try {
-      const res = await fetch(`${API_URL}/tests/student/${userId}`, {
+      const res = await fetch(apiUrl(`/tests/student/${userId}`), {
         headers: getAuthHeaders()
       });
       if (res.ok) {
@@ -159,11 +158,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error("Gagal load history dari database", error);
     }
-  }, [API_URL]);
+  }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      const res = await fetch(`${API_URL}/auth/login`, {
+      const res = await fetch(apiUrl('/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -186,7 +185,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } catch (error) {
       console.error("Network Error Login:", error);
-      alert("Gagal terhubung ke backend. Pastikan terminal server backend berjalan di port 5000.");
+      alert("Gagal terhubung ke backend. Pastikan URL API backend sudah benar.");
       return false;
     }
   };
@@ -205,7 +204,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Generate NIM & NIK otomatis karena MySQL mewajibkan kolom nim (NOT NULL)
       const autoNim = Math.floor(Math.random() * 10000000000).toString();
 
-      const res = await fetch(`${API_URL}/auth/register`, {
+      const res = await fetch(apiUrl('/auth/register'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, role: 'student', nim: autoNim })
@@ -227,7 +226,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return false;
     } catch (error) {
       console.error("Network Error Register:", error);
-      alert("Gagal terhubung ke backend. Pastikan terminal server backend berjalan di port 5000.");
+      alert("Gagal terhubung ke backend. Pastikan URL API backend sudah benar.");
       return false;
     }
   };
@@ -239,7 +238,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const saveTestResult = (result: TestResult) => {
     if (user && !isGuest) {
-      fetch(`${API_URL}/tests/submit`, {
+      fetch(apiUrl('/tests/submit'), {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -256,7 +255,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const getAllTestResults = useCallback(async (): Promise<any[]> => {
     try {
-      const res = await fetch(`${API_URL}/tests`, {
+      const res = await fetch(apiUrl('/tests'), {
         headers: getAuthHeaders()
       });
       const data = await res.json();
@@ -265,11 +264,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error(e);
       return [];
     }
-  }, [API_URL]);
+  }, []);
 
   const getAllStudents = useCallback(async (): Promise<any[]> => {
     try {
-      const res = await fetch(`${API_URL}/students`, {
+      const res = await fetch(apiUrl('/students'), {
         headers: getAuthHeaders()
       });
       const data = await res.json();
@@ -278,7 +277,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error(e);
       return [];
     }
-  }, [API_URL]);
+  }, []);
 
   return (
     <AuthContext.Provider
