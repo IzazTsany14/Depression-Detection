@@ -18,12 +18,15 @@ import {
   LogOut,
   Book,
   Download,
+  Eye,
   Clock,
   CheckCircle2,
   XCircle
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { generateTestResultPDF, downloadPDF } from '../../utils/pdfGenerator';
+import { getDisplayLevel, getLevelDescription } from '../../utils/assessment';
+import { ProfileAvatar } from '../../components/ProfileAvatar';
 
 export const Dashboard: React.FC = () => {
   const { user, getTestHistory, logout } = useAuth();
@@ -88,12 +91,13 @@ export const Dashboard: React.FC = () => {
   const handleDownloadTestPDF = (test: any) => {
     const testStyle = getColorForLevel(test.level);
     const pdf = generateTestResultPDF({
-      level: test.level,
+      level: getDisplayLevel(test.level),
       score: test.score,
       date: test.date,
       name: user?.name,
       color: testStyle.color,
       emoji: testStyle.emoji,
+      description: getLevelDescription(test.level),
     });
     
     const filename = `hasil-tes-dass21-${new Date(test.date).getTime()}.pdf`;
@@ -139,7 +143,7 @@ export const Dashboard: React.FC = () => {
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Tes Terakhir</p>
                   <p className="text-lg font-bold text-gray-900">
-                    {latestTest ? latestTest.level : '-'}
+                    {latestTest ? getDisplayLevel(latestTest.level) : '-'}
                   </p>
                   {latestTest && (
                     <p className="text-sm text-gray-500">
@@ -352,9 +356,18 @@ export const Dashboard: React.FC = () => {
                     {history.slice().reverse().map((test, index) => {
                       const testStyle = getColorForLevel(test.level);
                       return (
-                        <div 
+                        <div
                           key={test.id}
-                          className="p-4 rounded-lg border-2 flex items-center justify-between hover:shadow-md transition-shadow"
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => navigate('/result/registered', { state: { result: test } })}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                              event.preventDefault();
+                              navigate('/result/registered', { state: { result: test } });
+                            }
+                          }}
+                          className="w-full cursor-pointer text-left p-4 rounded-lg border-2 flex items-center justify-between hover:shadow-md transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500"
                           style={{ 
                             backgroundColor: testStyle.bgColor,
                             borderColor: testStyle.color
@@ -381,14 +394,28 @@ export const Dashboard: React.FC = () => {
                           <div className="flex items-center gap-4">
                             <div className="text-right">
                               <p className="font-bold text-lg" style={{ color: testStyle.color }}>
-                                {test.level}
+                                {getDisplayLevel(test.level)}
                               </p>
                               <p className="text-sm text-gray-600">
                                 Skor: {test.score}
                               </p>
                             </div>
                             <Button
-                              onClick={() => handleDownloadTestPDF(test)}
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                navigate('/result/registered', { state: { result: test } });
+                              }}
+                              size="sm"
+                              variant="outline"
+                              title="Lihat detail hasil tes"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                handleDownloadTestPDF(test);
+                              }}
                               size="sm"
                               className="bg-blue-600 hover:bg-blue-700"
                               title="Unduh hasil test sebagai PDF"
@@ -425,12 +452,17 @@ export const Dashboard: React.FC = () => {
                 </h3>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
-                      <User className="w-8 h-8 text-white" />
-                    </div>
+                    <ProfileAvatar
+                      profilePicture={user.profile_picture}
+                      cacheKey={user.profileUpdatedAt}
+                      className="w-16 h-16"
+                      iconClassName="w-8 h-8 text-white"
+                      fallbackClassName="bg-gradient-to-br from-blue-400 to-blue-600"
+                      alt={`Foto profil ${user.name}`}
+                    />
                     <div>
                       <p className="font-semibold text-gray-900">{user.name}</p>
-                      <p className="text-sm text-gray-500">Registered User</p>
+                      <p className="text-sm text-gray-500">Mahasiswa</p>
                     </div>
                   </div>
                   
@@ -438,6 +470,16 @@ export const Dashboard: React.FC = () => {
                     <div className="flex items-center gap-3 text-gray-700">
                       <Mail className="w-4 h-4 text-gray-400" />
                       <span className="text-sm">{user.email}</span>
+                    </div>
+                    <div className="flex items-start gap-3 text-gray-700">
+                      <User className="w-4 h-4 text-gray-400 mt-0.5" />
+                      <div className="text-sm space-y-1">
+                        <p>NIM: {user.nim || '-'}</p>
+                        <p>NIK: {user.nik || '-'}</p>
+                        <p>Fakultas: {user.faculty || '-'}</p>
+                        <p>Program Studi: {user.major || '-'}</p>
+                        <p>Semester: {user.semester || '-'}</p>
+                      </div>
                     </div>
                     <div className="flex items-center gap-3 text-gray-700">
                       <Shield className="w-4 h-4 text-gray-400" />
@@ -495,9 +537,13 @@ export const Dashboard: React.FC = () => {
                   Pengaturan Akun
                 </h3>
                 <div className="space-y-2">
-                  <Button variant="ghost" className="w-full justify-start" disabled>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    onClick={() => navigate('/student/profile')}
+                  >
                     <Settings className="w-4 h-4 mr-2" />
-                    Pengaturan (Segera)
+                    Pengaturan Profil
                   </Button>
                   <Button 
                     variant="ghost" 

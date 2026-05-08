@@ -9,6 +9,7 @@ interface User {
   role: 'student' | 'admin' | 'bk';
   profile_picture?: string | null;
   profilePicture?: string | null;
+  profileUpdatedAt?: number;
   nik?: string;
   nim?: string;
   nip?: string;
@@ -35,7 +36,7 @@ interface AuthContextType {
   updateUser: (apiUser: any) => User;
   register: (name: string, email: string, password: string) => Promise<boolean>;
   startAsGuest: () => void;
-  saveTestResult: (result: TestResult) => void;
+  saveTestResult: (result: TestResult) => Promise<TestResult | null>;
   getTestHistory: () => TestResult[];
   getAllTestResults: () => Promise<any[]>;
   getAllStudents: () => Promise<any[]>;
@@ -70,7 +71,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   const updateUser = useCallback((apiUser: any): User => {
-    const updatedUser = mapApiUser(apiUser);
+    const updatedUser = {
+      ...mapApiUser(apiUser),
+      profileUpdatedAt: Date.now()
+    };
     setUser(updatedUser);
     localStorage.setItem('user', JSON.stringify(updatedUser));
     return updatedUser;
@@ -236,17 +240,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
   };
 
-  const saveTestResult = (result: TestResult) => {
+  const saveTestResult = async (result: TestResult): Promise<TestResult | null> => {
     if (user && !isGuest) {
-      fetch(apiUrl('/tests/submit'), {
+      const res = await fetch(apiUrl('/tests/submit'), {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
         },
         body: JSON.stringify({ student_id: user.id, answers: result.answers })
-      }).then(() => fetchTestHistory(user.id));
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || data.error || 'Gagal menyimpan hasil tes');
+      }
+
+      const savedResult = mapApiTestResult({
+        ...data.testResult,
+        id: data.testResult?.test_id,
+        test_id: data.testResult?.test_id,
+        date: data.testResult?.timestamp || result.date,
+        answers: result.answers
+      });
+
+      setTestHistory(prev => [...prev, savedResult].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()));
+      fetchTestHistory(user.id);
+      return savedResult;
     }
+
+    return null;
   };
 
   const getTestHistory = useCallback(() => {

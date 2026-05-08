@@ -1,20 +1,32 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { useAuth } from '../context/AuthContext';
-import { AlertTriangle, RefreshCw, BookOpen, Download, TrendingUp, Calendar, BarChart3 } from 'lucide-react';
+import { AlertTriangle, RefreshCw, BookOpen, Download, TrendingUp, Calendar, BarChart3, Phone } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { generateTestResultPDF, downloadPDF } from '../utils/pdfGenerator';
+import { getDisplayLevel, getGuidanceByLevel, getLevelDescription, getSubscaleResults, isCriticalEmergencyLevel } from '../utils/assessment';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../components/ui/alert-dialog';
 
 export const RegisteredResult: React.FC = () => {
   const { user, getTestHistory } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [history, setHistory] = useState<any[]>([]);
   const [latestResult, setLatestResult] = useState<any>(null);
+  const [showEmergencyDialog, setShowEmergencyDialog] = useState(false);
 
   useEffect(() => {
     // If not logged in, redirect
@@ -27,11 +39,11 @@ export const RegisteredResult: React.FC = () => {
     const testHistory = getTestHistory();
     setHistory(testHistory);
 
-    // Get latest result
-    if (testHistory.length > 0) {
-      setLatestResult(testHistory[testHistory.length - 1]);
-    }
-  }, [user, navigate, getTestHistory]);
+    const selectedResult = (location.state as { result?: any } | null)?.result;
+    const result = selectedResult || (testHistory.length > 0 ? testHistory[testHistory.length - 1] : null);
+    setLatestResult(result);
+    setShowEmergencyDialog(isCriticalEmergencyLevel(result?.level));
+  }, [user, navigate, getTestHistory, location.state]);
 
   if (!latestResult) {
     return null;
@@ -55,6 +67,8 @@ export const RegisteredResult: React.FC = () => {
   };
 
   const resultStyle = getColorForLevel(latestResult.level);
+  const displayLevel = getDisplayLevel(latestResult.level);
+  const subscaleResults = getSubscaleResults(latestResult.answers);
 
   // Prepare chart data
   const chartData = history.map((test, index) => ({
@@ -65,12 +79,13 @@ export const RegisteredResult: React.FC = () => {
 
   const handleDownloadPDF = () => {
     const pdf = generateTestResultPDF({
-      level: latestResult.level,
+      level: displayLevel,
       score: latestResult.score,
       date: latestResult.date,
       name: user?.name,
       color: resultStyle.color,
       emoji: resultStyle.emoji,
+      description: getLevelDescription(latestResult.level),
     });
     
     const filename = `hasil-tes-dass21-${new Date().getTime()}.pdf`;
@@ -111,7 +126,7 @@ export const RegisteredResult: React.FC = () => {
             <div className="text-center">
               <div className="text-6xl mb-6">{resultStyle.emoji}</div>
               <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: resultStyle.color }}>
-                Tingkat Depresi: {latestResult.level}
+                Tingkat Depresi: {displayLevel}
               </h2>
               <div className="inline-flex items-center gap-3 bg-white px-6 py-3 rounded-full shadow-md mb-4">
                 <TrendingUp className="w-6 h-6" style={{ color: resultStyle.color }} />
@@ -154,6 +169,27 @@ export const RegisteredResult: React.FC = () => {
             </div>
           </Card>
 
+          <AlertDialog open={showEmergencyDialog} onOpenChange={setShowEmergencyDialog}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="text-red-700">
+                  Perlu Dukungan Segera
+                </AlertDialogTitle>
+                <AlertDialogDescription className="text-gray-700">
+                  Hasil Anda berada pada kategori sangat berat. Jika Anda merasa tidak aman, muncul dorongan menyakiti diri, atau butuh bantuan saat ini, segera hubungi orang terdekat, BK UNESA, layanan darurat 112, atau hotline 119 ext. 8.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <div className="rounded-lg bg-red-50 border border-red-200 p-4 text-sm text-red-900">
+                BK UNESA: hubungi Unit Bimbingan Konseling/kemahasiswaan kampus untuk membuat janji konseling. Dalam kondisi darurat, datangi fasilitas kesehatan terdekat.
+              </div>
+              <AlertDialogFooter>
+                <AlertDialogAction className="bg-red-600 hover:bg-red-700">
+                  Saya Mengerti
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
           {/* Disclaimer */}
           <Alert className="mb-8 bg-red-50 border-2 border-red-200">
             <AlertTriangle className="h-5 w-5 text-red-600" />
@@ -162,6 +198,39 @@ export const RegisteredResult: React.FC = () => {
               Jika Anda merasa perlu bantuan, segera konsultasi dengan psikolog atau psikiater profesional.
             </AlertDescription>
           </Alert>
+
+          <Card className="p-6 mb-8">
+            <h3 className="font-semibold text-gray-900 mb-3 text-lg">
+              Ringkasan Kondisi
+            </h3>
+            <p className="text-gray-700 leading-relaxed mb-4">
+              {getLevelDescription(latestResult.level)}
+            </p>
+            <div className="grid md:grid-cols-3 gap-3">
+              {getGuidanceByLevel(latestResult.level).map((item, index) => (
+                <div key={index} className="rounded-lg border border-blue-100 bg-blue-50 p-4 text-sm text-blue-950">
+                  {item}
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {subscaleResults.length > 0 && (
+            <Card className="p-6 mb-8">
+              <h3 className="font-semibold text-gray-900 mb-4 text-lg">
+                Skor Subskala DASS-21
+              </h3>
+              <div className="grid md:grid-cols-3 gap-4">
+                {subscaleResults.map((item) => (
+                  <div key={item.key} className="rounded-lg border border-gray-200 p-4 bg-white">
+                    <p className="text-sm text-gray-600 mb-1">{item.label}</p>
+                    <p className="text-2xl font-bold text-gray-900">{item.score}</p>
+                    <p className="text-sm font-medium text-blue-700">{item.level}</p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
 
           {/* History and Chart Section */}
           <div className="grid md:grid-cols-2 gap-8 mb-8">
@@ -228,7 +297,7 @@ export const RegisteredResult: React.FC = () => {
                             })}
                           </p>
                           <p className="font-semibold" style={{ color: testStyle.color }}>
-                            {test.level} (Skor: {test.score})
+                            {getDisplayLevel(test.level)} (Skor: {test.score})
                           </p>
                         </div>
                         <span className="text-2xl">{testStyle.emoji}</span>
@@ -273,6 +342,23 @@ export const RegisteredResult: React.FC = () => {
               </Button>
             </Link>
           </div>
+
+          <Card className="mt-8 p-6 bg-blue-50 border-blue-200">
+            <h3 className="font-semibold text-gray-900 mb-4 text-lg flex items-center gap-2">
+              <Phone className="w-5 h-5 text-blue-600" />
+              Kontak Bantuan
+            </h3>
+            <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-700">
+              <div className="rounded-lg bg-white p-4">
+                <p className="font-semibold text-gray-900">BK UNESA</p>
+                <p>Hubungi Unit Bimbingan Konseling/kemahasiswaan kampus untuk informasi jadwal konseling.</p>
+              </div>
+              <div className="rounded-lg bg-white p-4">
+                <p className="font-semibold text-gray-900">Darurat</p>
+                <p>112 atau 119 ext. 8 jika membutuhkan bantuan segera.</p>
+              </div>
+            </div>
+          </Card>
         </div>
       </main>
 

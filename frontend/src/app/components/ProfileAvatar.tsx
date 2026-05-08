@@ -8,6 +8,7 @@ interface ProfileAvatarProps {
   iconClassName?: string;
   fallbackClassName?: string;
   alt?: string;
+  cacheKey?: string | number;
 }
 
 export const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
@@ -15,11 +16,20 @@ export const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
   className = 'w-10 h-10',
   iconClassName = 'w-5 h-5 text-white',
   fallbackClassName = 'bg-blue-600',
-  alt = 'Foto profil'
+  alt = 'Foto profil',
+  cacheKey
 }) => {
   const [imageFailed, setImageFailed] = React.useState(false);
   const hasImage = hasProfilePicture(profilePicture);
-  const imageUrl = hasImage ? getProfilePictureUrl(profilePicture) : '';
+  const imageUrl = React.useMemo(() => {
+    if (!hasImage) return '';
+
+    const url = getProfilePictureUrl(profilePicture);
+    if (!cacheKey) return url;
+
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}v=${encodeURIComponent(String(cacheKey))}`;
+  }, [cacheKey, hasImage, profilePicture]);
 
   React.useEffect(() => {
     setImageFailed(false);

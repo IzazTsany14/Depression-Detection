@@ -9,6 +9,18 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area
 } from 'recharts';
 
+const getFacultyShortName = (faculty: string) => {
+  const normalized = faculty.toLowerCase();
+  if (normalized.includes('fisipol') || normalized.includes('sosial')) return 'FISIPOL';
+  if (normalized.includes('ekonomi') || normalized.includes('feb')) return 'FEB';
+  if (normalized.includes('teknik') || normalized.includes('ft')) return 'FT';
+  if (normalized.includes('vokasi') || normalized.includes('fv')) return 'FV';
+  if (normalized.includes('hukum') || normalized.includes('fh')) return 'FH';
+  if (normalized.includes('matematika') || normalized.includes('fmipa')) return 'FMIPA';
+  if (normalized.includes('psdku')) return 'PSDKU';
+  return faculty.length > 14 ? `${faculty.slice(0, 14)}...` : faculty;
+};
+
 export const AdminStatistics: React.FC = () => {
   const { user, getAllTestResults, getAllStudents } = useAuth();
   const navigate = useNavigate();
@@ -65,7 +77,8 @@ export const AdminStatistics: React.FC = () => {
 
   const facultyChartData = Object.values(facultyLevelData).map((item: any, index) => ({
     id: `faculty-${index}`,
-    ...item
+    ...item,
+    facultyLabel: getFacultyShortName(item.faculty)
   }));
 
   // Weekly trend (last 8 weeks)
@@ -286,12 +299,12 @@ export const AdminStatistics: React.FC = () => {
                 <Users className="w-5 h-5 text-orange-600" />
                 Distribusi per Fakultas
               </h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={facultyChartData} layout="horizontal">
+              <ResponsiveContainer width="100%" height={Math.max(320, facultyChartData.length * 52)}>
+                <BarChart data={facultyChartData} layout="vertical" margin={{ left: 8, right: 16 }}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis type="category" dataKey="faculty" angle={-45} textAnchor="end" height={100} />
-                  <YAxis type="number" />
-                  <Tooltip />
+                  <XAxis type="number" allowDecimals={false} />
+                  <YAxis type="category" dataKey="facultyLabel" width={92} tick={{ fontSize: 12 }} />
+                  <Tooltip labelFormatter={(_, payload) => payload?.[0]?.payload?.faculty || ''} />
                   <Legend />
                   <Bar dataKey="Normal" stackId="a" fill={COLORS['Normal']}>
                     {facultyChartData.map((entry) => (

@@ -14,12 +14,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Badge } from './ui/badge';
 import {
   ConfigurableQuestion,
-  AnswerConfig,
   loadQuestionConfigs,
   saveQuestionConfigs,
   DEFAULT_QUESTION_CONFIGS,
 } from '../pages/bk/questionConfig';
-import { Edit2, Save, X, RotateCcw, Plus, Trash2 } from 'lucide-react';
+import { Edit2, Save, X, RotateCcw } from 'lucide-react';
 
 interface QuestionEditorProps {
   onSave?: (questions: ConfigurableQuestion[]) => void;
@@ -67,32 +66,6 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({ onSave }) => {
     }
   };
 
-  const handleWeightChange = (answerIndex: number, newWeight: number) => {
-    if (editingQuestion && editingQuestion.answers[answerIndex]) {
-      const updatedAnswers = [...editingQuestion.answers];
-      updatedAnswers[answerIndex].weight = newWeight;
-      setEditingQuestion({
-        ...editingQuestion,
-        answers: updatedAnswers
-      });
-    }
-  };
-
-  const handleRandomizeWeights = () => {
-    if (editingQuestion) {
-      const randomWeights = [0, 1, 2, 3].sort(() => Math.random() - 0.5);
-      const updatedAnswers = editingQuestion.answers.map((answer, index) => ({
-        ...answer,
-        weight: randomWeights[index]
-      }));
-      setEditingQuestion({
-        ...editingQuestion,
-        answers: updatedAnswers,
-        randomizeWeights: true
-      });
-    }
-  };
-
   const handleSaveAllChanges = () => {
     saveQuestionConfigs(questions);
     setSaveSuccess(true);
@@ -127,33 +100,22 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({ onSave }) => {
           </div>
 
           <div>
-            <div className="flex justify-between items-center mb-3">
-              <label className="block text-sm font-medium">Bobot Jawaban</label>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleRandomizeWeights}
-                className="gap-2"
-              >
-                <RotateCcw className="w-4 h-4" />
-                Acak Bobot
-              </Button>
-            </div>
-            <div className="space-y-2">
+            <label className="block text-sm font-medium mb-3">
+              Bobot Jawaban {editingQuestion.reverseScored ? 'Terbalik' : 'Standar'}
+            </label>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               {editingQuestion.answers.map((answer, index) => (
-                <div key={index} className="flex items-center gap-3">
-                  <span className="flex-1">{answer.label}</span>
-                  <Input
-                    type="number"
-                    min="0"
-                    max="3"
-                    value={answer.weight}
-                    onChange={(e) => handleWeightChange(index, parseInt(e.target.value) || 0)}
-                    className="w-20"
-                  />
+                <div key={index} className="p-3 bg-white border rounded text-sm text-center">
+                  <div className="text-xs text-gray-600">{answer.label}</div>
+                  <div className="font-semibold text-lg">{answer.weight}</div>
                 </div>
               ))}
             </div>
+            <p className="text-xs text-gray-600 mt-2">
+              {editingQuestion.reverseScored
+                ? 'Pertanyaan ini bernada positif, sehingga bobot dibalik: Tidak pernah=3, Kadang-kadang=2, Sering=1, Sangat sering=0.'
+                : 'Pertanyaan ini bernada gejala, sehingga bobot standar: Tidak pernah=0, Kadang-kadang=1, Sering=2, Sangat sering=3.'}
+            </p>
           </div>
 
           <div className="flex gap-2 pt-4 border-t">
@@ -220,7 +182,7 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({ onSave }) => {
                             <p className="text-sm text-gray-700 mb-3">{question.text}</p>
                           </div>
                           <Badge variant="outline">
-                            {question.randomizeWeights ? '🎲 Acak' : 'Normal'}
+                            {question.reverseScored ? 'Bobot Terbalik' : 'Bobot Standar'}
                           </Badge>
                         </div>
 
