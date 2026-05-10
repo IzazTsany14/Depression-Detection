@@ -6,7 +6,7 @@ import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { useAuth } from '../context/AuthContext';
-import { calculateDepressionScore, getDepressionLevel } from '../utils/fuzzyLogic';
+import { calculateDepressionScore, getDepressionLevel } from '../utils/dassScoring';
 import { AlertTriangle, RefreshCw, UserPlus, Home, TrendingUp, Download } from 'lucide-react';
 import { generateTestResultPDF, downloadPDF } from '../utils/pdfGenerator';
 import { getDisplayLevel, getGuidanceByLevel, getLevelDescription, getSubscaleResults } from '../utils/assessment';

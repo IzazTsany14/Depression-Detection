@@ -35,7 +35,7 @@ export const Home: React.FC = () => {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <div className="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium mb-6">
-                Metode DASS-21 & Logika Fuzzy
+                Skrining DASS-21
               </div>
               <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
                 Deteksi Dini Tingkat Depresi Mahasiswa
@@ -213,7 +213,7 @@ export const Home: React.FC = () => {
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Metode Ilmiah DASS-21</h3>
                 <p className="text-gray-600">
-                  Menggunakan instrumen DASS-21 yang tervalidasi secara internasional dan metode Logika Fuzzy
+                  Menggunakan instrumen DASS-21 yang tervalidasi secara internasional dengan ambang kategori standar
                 </p>
               </div>
 

@@ -182,7 +182,7 @@ export const About: React.FC = () => {
             </div>
           </Card>
 
-          {/* Fuzzy Logic */}
+          {/* Scoring Method */}
           <Card className="p-8 mb-8">
             <div className="flex items-start gap-4 mb-6">
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -190,31 +190,29 @@ export const About: React.FC = () => {
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                  Metode Logika Fuzzy
+                  Metode Penilaian
                 </h2>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  Sistem ini menggunakan <strong>Logika Fuzzy</strong> untuk menginterpretasi hasil tes DASS-21. 
-                  Logika fuzzy memungkinkan klasifikasi tingkat depresi yang lebih fleksibel dan mendekati 
-                  penilaian manusia.
+                  Sistem ini menghitung skor berdasarkan 7 item subskala depresi DASS-21. Total skor mentah 
+                  dikalikan 2, lalu dikelompokkan ke kategori Normal, Ringan, Sedang, Parah, dan Sangat Parah.
                 </p>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  Berbeda dengan logika boolean (ya/tidak), logika fuzzy dapat menangani nilai-nilai di antara 
-                  kategori yang ada, memberikan hasil yang lebih akurat dan personalisasi.
+                  Kategori yang muncul adalah hasil skrining awal berdasarkan ambang skor DASS-21, bukan diagnosis medis.
                 </p>
                 <div className="bg-blue-50 p-4 rounded-lg mt-4">
-                  <h4 className="font-semibold text-gray-900 mb-2">Keuntungan Logika Fuzzy:</h4>
+                  <h4 className="font-semibold text-gray-900 mb-2">Dasar Penilaian:</h4>
                   <ul className="space-y-2 text-sm text-gray-700">
                     <li className="flex items-start gap-2">
                       <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                      <span>Klasifikasi yang lebih halus dan akurat</span>
+                      <span>Skor dihitung dari jawaban 0 sampai 3 pada item depresi</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                      <span>Dapat menangani ketidakpastian dalam data</span>
+                      <span>Skor akhir mengikuti aturan DASS-21 dengan pengali 2</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                      <span>Interpretasi yang lebih mendekati penilaian klinis</span>
+                      <span>Interpretasi menggunakan rentang kategori standar DASS-21</span>
                     </li>
                   </ul>
                 </div>

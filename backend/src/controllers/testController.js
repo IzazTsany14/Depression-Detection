@@ -1,15 +1,15 @@
 /**
  * Test Controller
  * Menangani CRUD operasi untuk test results (DASS-21)
- * Menerima 21 jawaban, menghitung fuzzy logic, dan menyimpan ke database
+ * Menerima 21 jawaban, menghitung skor DASS-21, dan menyimpan ke database
  */
 import pool from '../config/db.js';
-import { calculateFuzzy, getDepressionDescription } from '../services/fuzzyService.js';
+import { calculateDassResult, getDepressionDescription } from '../services/dassScoringService.js';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Submit test baru
- * Menerima 21 jawaban dari frontend, kalkulasi fuzzy logic, simpan ke database
+ * Menerima 21 jawaban dari frontend, kalkulasi DASS-21, simpan ke database
  * 
  * Request body:
  * {
@@ -42,9 +42,9 @@ export const submitTest = async (req, res) => {
       });
     }
 
-    // Kalkulasi fuzzy logic
-    const fuzzyResult = calculateFuzzy(answers);
-    const { score, level, fuzzy_score } = fuzzyResult;
+    // Kalkulasi DASS-21 berdasarkan ambang kategori standar.
+    const dassResult = calculateDassResult(answers);
+    const { score, level, severity_score } = dassResult;
 
     // Generate unique test ID
     const test_id = `test-${uuidv4().substring(0, 8)}`;
@@ -63,7 +63,7 @@ export const submitTest = async (req, res) => {
       student_id,
       score,
       level,
-      fuzzy_score,
+      severity_score,
       answersJSON
     ]);
 
@@ -77,7 +77,7 @@ export const submitTest = async (req, res) => {
         student_id,
         score,
         level,
-        fuzzy_score,
+        severity_score,
         description,
         timestamp: new Date().toISOString()
       }

@@ -28,6 +28,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { PDFViewer } from '../components/PDFViewer';
 import { getDisplayLevel } from '../utils/assessment';
+import { BK_CONTACTS, getWhatsAppUrl } from '../utils/bkContacts';
 
 export const Guide: React.FC = () => {
   const { user, getTestHistory } = useAuth();
@@ -456,8 +457,21 @@ export const Guide: React.FC = () => {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="bg-white p-4 rounded-lg">
                     <h4 className="font-semibold text-gray-800 mb-2">BK UNESA</h4>
-                    <p className="text-lg font-bold text-blue-600 mb-1">Unit BK/Kemahasiswaan</p>
+                    <p className="text-lg font-bold text-blue-600 mb-1">WhatsApp BK</p>
                     <p className="text-sm text-gray-600">Layanan konseling kampus dan rujukan bantuan profesional</p>
+                    <div className="mt-3 space-y-2">
+                      {BK_CONTACTS.map((contact) => (
+                        <a
+                          key={contact.whatsappNumber}
+                          href={getWhatsAppUrl(contact.whatsappNumber)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex w-full items-center justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-700"
+                        >
+                          {contact.phone}
+                        </a>
+                      ))}
+                    </div>
                   </div>
                   <div className="bg-white p-4 rounded-lg">
                     <h4 className="font-semibold text-gray-800 mb-2">Hotline Nasional</h4>
@@ -639,7 +653,7 @@ export const Guide: React.FC = () => {
                 <BookOpen className="h-5 w-5 text-purple-600" />
                 <AlertDescription className="text-purple-900">
                   Berikut adalah dokumen referensi penelitian yang menjadi dasar pengembangan sistem ini.
-                  Dokumen ini berisi informasi tentang metode DASS-21 dan logika fuzzy yang digunakan.
+                  Dokumen ini berisi informasi tentang metode DASS-21 yang digunakan.
                 </AlertDescription>
               </Alert>
 

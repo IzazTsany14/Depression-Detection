@@ -44,7 +44,7 @@ FILES=(
     "src/middleware/authMiddleware.js"
     "src/routes/authRoutes.js"
     "src/routes/testRoutes.js"
-    "src/services/fuzzyService.js"
+    "src/services/dassScoringService.js"
     "package.json"
     ".env"
 )

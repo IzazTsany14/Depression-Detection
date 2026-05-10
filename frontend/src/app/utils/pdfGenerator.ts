@@ -41,7 +41,7 @@ export const generateTestResultPDF = (data: TestResultPDF) => {
   pdf.setFontSize(10);
   pdf.setFont('Helvetica', 'normal');
   pdf.setTextColor(200, 220, 255);
-  pdf.text('Sistem Deteksi Depresi Berbasis Fuzzy Logic', pageWidth / 2, 28, { align: 'center' });
+  pdf.text('Sistem Skrining Depresi Berbasis DASS-21', pageWidth / 2, 28, { align: 'center' });
 
   // Horizontal line
   pdf.setDrawColor(59, 130, 246);
@@ -207,7 +207,7 @@ export const generateTestResultPDF = (data: TestResultPDF) => {
   pdf.setLineWidth(0.5);
   pdf.line(margin, pageHeight - 15, pageWidth - margin, pageHeight - 15);
 
-  pdf.text('Sistem Deteksi Depresi Berbasis Fuzzy Logic', pageWidth / 2, pageHeight - 10, { align: 'center' });
+  pdf.text('Sistem Skrining Depresi Berbasis DASS-21', pageWidth / 2, pageHeight - 10, { align: 'center' });
   pdf.text(`Tahun ${new Date().getFullYear()} | Dokumen Rahasia - Hanya untuk Keperluan Pribadi`, pageWidth / 2, pageHeight - 6, { align: 'center' });
 
   return pdf;

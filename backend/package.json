@@ -1,7 +1,7 @@
 {
   "name": "depression-detection-backend",
   "version": "1.0.0",
-  "description": "Backend API untuk Depression Detection System menggunakan DASS-21 dan Fuzzy Logic",
+  "description": "Backend API untuk Depression Detection System menggunakan DASS-21",
   "main": "src/server.js",
   "type": "module",
   "scripts": {
@@ -12,7 +12,7 @@
   "keywords": [
     "depression-detection",
     "dass-21",
-    "fuzzy-logic",
+    "dass-21-scoring",
     "backend",
     "nodejs",
     "mysql"

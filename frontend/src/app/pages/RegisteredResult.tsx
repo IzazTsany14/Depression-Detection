@@ -6,10 +6,11 @@ import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { useAuth } from '../context/AuthContext';
-import { AlertTriangle, RefreshCw, BookOpen, Download, TrendingUp, Calendar, BarChart3, Phone } from 'lucide-react';
+import { AlertTriangle, RefreshCw, BookOpen, Download, TrendingUp, Calendar, BarChart3, Phone, MessageCircle } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { generateTestResultPDF, downloadPDF } from '../utils/pdfGenerator';
 import { getDisplayLevel, getGuidanceByLevel, getLevelDescription, getSubscaleResults, isCriticalEmergencyLevel } from '../utils/assessment';
+import { BK_CONTACTS, getWhatsAppUrl } from '../utils/bkContacts';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -180,7 +181,7 @@ export const RegisteredResult: React.FC = () => {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <div className="rounded-lg bg-red-50 border border-red-200 p-4 text-sm text-red-900">
-                BK UNESA: hubungi Unit Bimbingan Konseling/kemahasiswaan kampus untuk membuat janji konseling. Dalam kondisi darurat, datangi fasilitas kesehatan terdekat.
+                BK UNESA: 0852-3126-4685 atau 0857-9157-0735. Dalam kondisi darurat, datangi fasilitas kesehatan terdekat.
               </div>
               <AlertDialogFooter>
                 <AlertDialogAction className="bg-red-600 hover:bg-red-700">
@@ -351,7 +352,21 @@ export const RegisteredResult: React.FC = () => {
             <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-700">
               <div className="rounded-lg bg-white p-4">
                 <p className="font-semibold text-gray-900">BK UNESA</p>
-                <p>Hubungi Unit Bimbingan Konseling/kemahasiswaan kampus untuk informasi jadwal konseling.</p>
+                <p className="mb-3">Hubungi BK melalui WhatsApp untuk informasi jadwal konseling.</p>
+                <div className="space-y-2">
+                  {BK_CONTACTS.map((contact) => (
+                    <a
+                      key={contact.whatsappNumber}
+                      href={getWhatsAppUrl(contact.whatsappNumber, `Halo ${contact.label}, saya ${user?.name || 'mahasiswa'} ingin berkonsultasi terkait hasil skrining DASS-21 kategori ${displayLevel}.`)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex w-full items-center justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-700"
+                    >
+                      <MessageCircle className="mr-2 h-4 w-4" />
+                      {contact.phone}
+                    </a>
+                  ))}
+                </div>
               </div>
               <div className="rounded-lg bg-white p-4">
                 <p className="font-semibold text-gray-900">Darurat</p>

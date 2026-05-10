@@ -19,7 +19,7 @@ export const Footer: React.FC = () => {
               </div>
             </div>
             <p className="text-sm text-gray-600">
-              Sistem skrining mandiri tingkat depresi menggunakan instrumen DASS-21 dan metode Logika Fuzzy.
+              Sistem skrining mandiri tingkat depresi menggunakan instrumen DASS-21 dan ambang kategori standar.
             </p>
           </div>
 
