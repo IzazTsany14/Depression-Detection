@@ -9,7 +9,7 @@ import { RadioGroup, RadioGroupItem } from '../components/ui/radio-group';
 import { Label } from '../components/ui/label';
 import { useAuth } from '../context/AuthContext';
 import { ConfigurableQuestion, loadQuestionConfigs } from './bk/questionConfig';
-import { calculateDepressionScore, getDepressionLevel } from '../utils/fuzzyLogic';
+import { calculateDepressionScore, getDepressionLevel } from '../utils/dassScoring';
 import { ArrowLeft, ArrowRight, AlertCircle, ShieldAlert } from 'lucide-react';
 import { Alert, AlertDescription } from '../components/ui/alert';
 

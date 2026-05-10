@@ -21,12 +21,15 @@ import {
   Eye,
   Clock,
   CheckCircle2,
-  XCircle
+  XCircle,
+  AlertTriangle,
+  MessageCircle
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { generateTestResultPDF, downloadPDF } from '../../utils/pdfGenerator';
 import { getDisplayLevel, getLevelDescription } from '../../utils/assessment';
 import { ProfileAvatar } from '../../components/ProfileAvatar';
+import { BK_CONTACTS, getWhatsAppUrl, isSevereLevel } from '../../utils/bkContacts';
 
 export const Dashboard: React.FC = () => {
   const { user, getTestHistory, logout } = useAuth();
@@ -77,6 +80,7 @@ export const Dashboard: React.FC = () => {
   // Calculate statistics
   const totalTests = history.length;
   const latestTest = history.length > 0 ? history[history.length - 1] : null;
+  const shouldShowSevereBanner = isSevereLevel(latestTest?.level);
   const averageScore = history.length > 0 
     ? Math.round(history.reduce((sum, test) => sum + test.score, 0) / history.length)
     : 0;
@@ -123,6 +127,39 @@ export const Dashboard: React.FC = () => {
               Selamat datang kembali, <strong>{user.name}</strong>!
             </p>
           </div>
+
+          {shouldShowSevereBanner && (
+            <div className="mb-8 rounded-lg border-2 border-red-700 bg-red-600 p-5 text-white shadow-lg">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-white/15">
+                    <AlertTriangle className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold">Perlu Konsultasi BK</h2>
+                    <p className="mt-1 text-sm text-red-50">
+                      Hasil tes terakhir Anda berada pada kategori {getDisplayLevel(latestTest?.level)}. Notifikasi ini akan tetap muncul sampai tes berikutnya berada pada kategori Sedang, Ringan, atau Normal.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  {BK_CONTACTS.map((contact) => (
+                    <a
+                      key={contact.whatsappNumber}
+                      href={getWhatsAppUrl(contact.whatsappNumber, `Halo ${contact.label}, saya ${user.name} ingin berkonsultasi terkait hasil skrining DASS-21 kategori ${getDisplayLevel(latestTest?.level)}.`)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Button className="w-full bg-white text-red-700 hover:bg-red-50 sm:w-auto">
+                        <MessageCircle className="mr-2 h-4 w-4" />
+                        {contact.phone}
+                      </Button>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Stats Cards */}
           <div className="grid md:grid-cols-3 gap-6 mb-8">
@@ -524,11 +561,27 @@ export const Dashboard: React.FC = () => {
                 <p className="text-sm text-gray-700 mb-4">
                   Jika Anda merasa perlu berbicara dengan seseorang, jangan ragu untuk menghubungi layanan kesehatan mental.
                 </p>
-                <Link to="/guide">
-                  <Button size="sm" className="w-full bg-green-600 hover:bg-green-700">
-                    Lihat Kontak Bantuan
-                  </Button>
-                </Link>
+                <div className="space-y-2">
+                  {BK_CONTACTS.map((contact) => (
+                    <a
+                      key={contact.whatsappNumber}
+                      href={getWhatsAppUrl(contact.whatsappNumber, `Halo ${contact.label}, saya ${user.name} ingin berkonsultasi dengan BK.`)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block"
+                    >
+                      <Button size="sm" className="w-full bg-green-600 hover:bg-green-700">
+                        <MessageCircle className="mr-2 h-4 w-4" />
+                        WhatsApp {contact.phone}
+                      </Button>
+                    </a>
+                  ))}
+                  <Link to="/guide" className="block">
+                    <Button size="sm" variant="outline" className="w-full">
+                      Lihat Kontak Bantuan
+                    </Button>
+                  </Link>
+                </div>
               </Card>
 
               {/* Account Settings */}
