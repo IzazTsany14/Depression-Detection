@@ -19,6 +19,7 @@ import {
   DEFAULT_QUESTION_CONFIGS,
 } from '../pages/bk/questionConfig';
 import { Edit2, Save, X, RotateCcw } from 'lucide-react';
+import { showSuccessDialog } from '../utils/successDialog';
 
 interface QuestionEditorProps {
   onSave?: (questions: ConfigurableQuestion[]) => void;
@@ -30,7 +31,6 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({ onSave }) => {
   const [editingQuestion, setEditingQuestion] = useState<ConfigurableQuestion | null>(null);
   const [activeTab, setActiveTab] = useState<'depression' | 'anxiety' | 'stress'>('depression');
   const [showResetDialog, setShowResetDialog] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
 
   // Load questions on component mount
   useEffect(() => {
@@ -68,8 +68,7 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({ onSave }) => {
 
   const handleSaveAllChanges = () => {
     saveQuestionConfigs(questions);
-    setSaveSuccess(true);
-    setTimeout(() => setSaveSuccess(false), 3000);
+    showSuccessDialog('Data berhasil diperbarui');
     if (onSave) {
       onSave(questions);
     }
@@ -143,13 +142,6 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({ onSave }) => {
 
   return (
     <div className="space-y-6">
-      {/* Success Message */}
-      {saveSuccess && (
-        <div className="p-4 bg-green-100 border border-green-400 text-green-700 rounded">
-          ✓ Perubahan berhasil disimpan!
-        </div>
-      )}
-
       {/* Tab Navigation */}
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
         <TabsList className="grid w-full grid-cols-3">

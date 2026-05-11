@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
 import { useAuth } from '../context/AuthContext';
-import { 
+import {
   Home, 
   Users, 
   FileText, 
@@ -14,6 +14,7 @@ import {
   Settings
 } from 'lucide-react';
 import { Button } from './ui/button';
+import { ProfileAvatar } from './ProfileAvatar';
 
 interface SidebarProps {
   role: 'admin' | 'bk';
@@ -108,7 +109,24 @@ export const DashboardSidebar: React.FC<SidebarProps> = ({ role }) => {
         <h2 className="text-xl font-bold mb-1">
           {role === 'admin' ? 'Admin Panel' : 'BK Panel'}
         </h2>
-        <p className="text-sm opacity-90">{user?.name}</p>
+        <button
+          type="button"
+          onClick={() => navigate(role === 'admin' ? '/admin/profile' : '/bk/profile')}
+          className="mt-4 flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/70"
+        >
+          <ProfileAvatar
+            profilePicture={user?.profile_picture}
+            cacheKey={user?.profileUpdatedAt}
+            className="h-12 w-12"
+            iconClassName={role === 'admin' ? 'h-6 w-6 text-blue-700' : 'h-6 w-6 text-purple-700'}
+            fallbackClassName="bg-white"
+            alt={`Foto profil ${user?.name || 'pengguna'}`}
+          />
+          <span className="min-w-0">
+            <span className="block truncate text-sm font-semibold">{user?.name}</span>
+            <span className="block text-xs font-medium text-white/80">Profil Saya</span>
+          </span>
+        </button>
       </div>
 
       {/* Menu Items */}

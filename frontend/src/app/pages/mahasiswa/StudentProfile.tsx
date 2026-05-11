@@ -6,10 +6,11 @@ import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Alert, AlertDescription } from '../../components/ui/alert';
 import { useAuth } from '../../context/AuthContext';
-import { Lock, BookOpen, AlertCircle, CheckCircle2, ArrowLeft, ImagePlus } from 'lucide-react';
+import { Lock, BookOpen, AlertCircle, ArrowLeft, ImagePlus } from 'lucide-react';
 import { ProfileAvatar } from '../../components/ProfileAvatar';
 import { apiUrl } from '../../utils/api';
 import { readProfileImageFile } from '../../utils/profileUpdate';
+import { showSuccessDialog } from '../../utils/successDialog';
 
 export const StudentProfile: React.FC = () => {
   const { user, updateUser } = useAuth();
@@ -91,7 +92,7 @@ export const StudentProfile: React.FC = () => {
       const updatedUser = updateUser(data.user);
       setProfilePreview(updatedUser.profile_picture || null);
       setProfileImage(null);
-      setMessage({ type: 'success', text: 'Profil berhasil diperbarui' });
+      showSuccessDialog('Data berhasil diperbarui');
     } catch (error: any) {
       setMessage({ type: 'error', text: error.message || 'Gagal memperbarui profil' });
     }
@@ -111,7 +112,7 @@ export const StudentProfile: React.FC = () => {
     }
 
     // TODO: Implement actual password change logic
-    setMessage({ type: 'success', text: 'Password berhasil diubah' });
+    showSuccessDialog('Password berhasil diubah');
     setShowPasswordForm(false);
     setFormData(prev => ({
       ...prev,
@@ -119,7 +120,6 @@ export const StudentProfile: React.FC = () => {
       newPassword: '',
       confirmPassword: ''
     }));
-    setTimeout(() => setMessage(null), 3000);
   };
 
   return (
@@ -141,14 +141,10 @@ export const StudentProfile: React.FC = () => {
 
         <main className="p-8">
           <div className="max-w-2xl mx-auto">
-            {message && (
+            {message?.type === 'error' && (
               <Alert className={`mb-6 ${message.type === 'success' ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}`}>
-                {message.type === 'success' ? (
-                  <CheckCircle2 className={`h-5 w-5 ${message.type === 'success' ? 'text-green-600' : 'text-red-600'}`} />
-                ) : (
-                  <AlertCircle className="h-5 w-5 text-red-600" />
-                )}
-                <AlertDescription className={message.type === 'success' ? 'text-green-900' : 'text-red-900'}>
+                <AlertCircle className="h-5 w-5 text-red-600" />
+                <AlertDescription className="text-red-900">
                   {message.text}
                 </AlertDescription>
               </Alert>

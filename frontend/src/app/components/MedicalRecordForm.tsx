@@ -9,6 +9,7 @@ import { FileText, Save, Download, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from './ui/alert';
 import jsPDF from 'jspdf';
 import { toast } from 'sonner';
+import { showSuccessDialog } from '../utils/successDialog';
 
 interface MedicalRecordFormProps {
   onSave: (record: MedicalRecord) => void;
@@ -132,7 +133,7 @@ export const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ onSave, on
     };
 
     onSave(record);
-    toast.success('Rekam medis berhasil disimpan');
+    showSuccessDialog('Data berhasil diperbarui');
   };
 
   return (

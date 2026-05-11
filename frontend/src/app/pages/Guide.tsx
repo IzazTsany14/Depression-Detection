@@ -28,7 +28,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { PDFViewer } from '../components/PDFViewer';
 import { getDisplayLevel } from '../utils/assessment';
-import { BK_CONTACTS, getWhatsAppUrl } from '../utils/bkContacts';
+import { BK_CONTACTS, createConsultationMessage, getWhatsAppUrl } from '../utils/bkContacts';
 
 export const Guide: React.FC = () => {
   const { user, getTestHistory } = useAuth();
@@ -463,7 +463,14 @@ export const Guide: React.FC = () => {
                       {BK_CONTACTS.map((contact) => (
                         <a
                           key={contact.whatsappNumber}
-                          href={getWhatsAppUrl(contact.whatsappNumber)}
+                          href={getWhatsAppUrl(contact.whatsappNumber, createConsultationMessage({
+                            bkName: contact.label,
+                            studentName: user?.name,
+                            nim: user?.nim,
+                            studyProgram: user?.major,
+                            faculty: user?.faculty,
+                            latestCategory: latestResult ? getDisplayLevel(latestResult.level) : undefined,
+                          }))}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex w-full items-center justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-700"
