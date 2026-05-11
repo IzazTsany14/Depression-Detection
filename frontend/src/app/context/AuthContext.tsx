@@ -278,8 +278,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const getAllTestResults = useCallback(async (): Promise<any[]> => {
     try {
-      const res = await fetch(apiUrl('/tests'), {
-        headers: getAuthHeaders()
+      const res = await fetch(apiUrl(`/tests?_=${Date.now()}`), {
+        cache: 'no-store',
+        headers: {
+          ...getAuthHeaders(),
+          'Cache-Control': 'no-cache',
+        }
       });
       const data = await res.json();
       return (data.data || []).map(mapApiTestResult);

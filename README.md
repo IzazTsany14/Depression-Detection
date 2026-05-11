@@ -1,6 +1,6 @@
 <div align='center'>
   <a href="https://git.io/typing-svg">
-    <img src="https://readme-typing-svg.herokuapp.com?font=Poppins&weight=600&size=38&pause=1000&color=0B84F3&center=true&vCenter=true&width=800&height=70&lines=MindCheck;Sistem+Deteksi+Dini+Tingkat+Depresi;Logika+Fuzzy+%2B+Instrumen+DASS-21" alt="Typing SVG" />
+    <img src="https://readme-typing-svg.herokuapp.com?font=Poppins&weight=600&size=38&pause=1000&color=0B84F3&center=true&vCenter=true&width=800&height=70&lines=MindCheck;Sistem+Deteksi+Dini+Tingkat+Depresi;+DASS-21" alt="Typing SVG" />
   </a>
 </div>
 
@@ -20,7 +20,7 @@
 
 **MindCheck** adalah platform berbasis web yang dikembangkan untuk mendeteksi tingkat depresi secara dini pada mahasiswa, khususnya di lingkungan **Universitas Negeri Surabaya (UNESA)**. 
 
-Sistem ini mengintegrasikan instrumen psikometrik **DASS-21** (Depression Anxiety Stress Scale-21) dengan **Logika Fuzzy** sebagai inti penalaran untuk menangani subjektivitas dan ketidakpastian jawaban pengguna. 
+Sistem ini mengintegrasikan instrumen psikometrik **DASS-21** (Depression Anxiety Stress Scale-21) sebagai inti penalaran untuk menangani subjektivitas dan ketidakpastian jawaban pengguna. 
 
 **Disclaimer**: Proyek ini merupakan instrumen skrining awal dan tidak menggantikan diagnosis klinis dari tenaga profesional (psikolog/psikiater).
 
@@ -42,7 +42,6 @@ Sistem ini mengintegrasikan instrumen psikometrik **DASS-21** (Depression Anxiet
 | Komponen | Teknologi |
 |-----------|------------|
 | **Frontend** | React, TypeScript, Tailwind CSS, Shadcn/UI |
-| **Logic Engine** |JavaScript (Fuzzy Logic Implementation) |
 | **Backend** | Node.Js  |
 | **Database** | MySQL (Main DB) & Redis (Caching) |
 | **UI/UX** | Figma (Design System)  |

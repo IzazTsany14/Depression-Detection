@@ -7,8 +7,9 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Card } from '../components/ui/card';
 import { Alert, AlertDescription } from '../components/ui/alert';
-import { Eye, EyeOff, AlertCircle, CheckCircle2, Lock } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle, Lock } from 'lucide-react';
 import { verifyResetToken, resetPassword } from '../utils/emailService';
+import { showSuccessDialog } from '../utils/successDialog';
 
 export const ResetPassword: React.FC = () => {
   const navigate = useNavigate();
@@ -81,10 +82,8 @@ export const ResetPassword: React.FC = () => {
     const success = resetPassword(email!, token!, formData.newPassword);
 
     if (success) {
-      setMessage({ 
-        type: 'success', 
-        text: 'Password berhasil direset! Silakan login dengan password baru Anda.' 
-      });
+      setMessage(null);
+      showSuccessDialog('Password berhasil direset');
 
       // Redirect to login after 3 seconds
       setTimeout(() => {
@@ -165,14 +164,10 @@ export const ResetPassword: React.FC = () => {
               </p>
             </div>
 
-            {message && (
+            {message?.type === 'error' && (
               <Alert className={`mb-6 ${message.type === 'success' ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}`}>
-                {message.type === 'success' ? (
-                  <CheckCircle2 className="h-5 w-5 text-green-600" />
-                ) : (
-                  <AlertCircle className="h-5 w-5 text-red-600" />
-                )}
-                <AlertDescription className={message.type === 'success' ? 'text-green-900' : 'text-red-900'}>
+                <AlertCircle className="h-5 w-5 text-red-600" />
+                <AlertDescription className="text-red-900">
                   {message.text}
                 </AlertDescription>
               </Alert>

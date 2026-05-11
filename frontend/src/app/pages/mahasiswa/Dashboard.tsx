@@ -29,7 +29,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { generateTestResultPDF, downloadPDF } from '../../utils/pdfGenerator';
 import { getDisplayLevel, getLevelDescription } from '../../utils/assessment';
 import { ProfileAvatar } from '../../components/ProfileAvatar';
-import { BK_CONTACTS, getWhatsAppUrl, isSevereLevel } from '../../utils/bkContacts';
+import { BK_CONTACTS, createConsultationMessage, getWhatsAppUrl, isSevereLevel } from '../../utils/bkContacts';
 
 export const Dashboard: React.FC = () => {
   const { user, getTestHistory, logout } = useAuth();
@@ -146,7 +146,14 @@ export const Dashboard: React.FC = () => {
                   {BK_CONTACTS.map((contact) => (
                     <a
                       key={contact.whatsappNumber}
-                      href={getWhatsAppUrl(contact.whatsappNumber, `Halo ${contact.label}, saya ${user.name} ingin berkonsultasi terkait hasil skrining DASS-21 kategori ${getDisplayLevel(latestTest?.level)}.`)}
+                      href={getWhatsAppUrl(contact.whatsappNumber, createConsultationMessage({
+                        bkName: contact.label,
+                        studentName: user.name,
+                        nim: user.nim,
+                        studyProgram: user.major,
+                        faculty: user.faculty,
+                        latestCategory: getDisplayLevel(latestTest?.level),
+                      }))}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -565,7 +572,14 @@ export const Dashboard: React.FC = () => {
                   {BK_CONTACTS.map((contact) => (
                     <a
                       key={contact.whatsappNumber}
-                      href={getWhatsAppUrl(contact.whatsappNumber, `Halo ${contact.label}, saya ${user.name} ingin berkonsultasi dengan BK.`)}
+                      href={getWhatsAppUrl(contact.whatsappNumber, createConsultationMessage({
+                        bkName: contact.label,
+                        studentName: user.name,
+                        nim: user.nim,
+                        studyProgram: user.major,
+                        faculty: user.faculty,
+                        latestCategory: latestTest ? getDisplayLevel(latestTest.level) : undefined,
+                      }))}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="block"

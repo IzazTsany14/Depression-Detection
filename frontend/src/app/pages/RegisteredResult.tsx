@@ -10,7 +10,7 @@ import { AlertTriangle, RefreshCw, BookOpen, Download, TrendingUp, Calendar, Bar
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { generateTestResultPDF, downloadPDF } from '../utils/pdfGenerator';
 import { getDisplayLevel, getGuidanceByLevel, getLevelDescription, getSubscaleResults, isCriticalEmergencyLevel } from '../utils/assessment';
-import { BK_CONTACTS, getWhatsAppUrl } from '../utils/bkContacts';
+import { BK_CONTACTS, createConsultationMessage, getWhatsAppUrl } from '../utils/bkContacts';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -357,7 +357,14 @@ export const RegisteredResult: React.FC = () => {
                   {BK_CONTACTS.map((contact) => (
                     <a
                       key={contact.whatsappNumber}
-                      href={getWhatsAppUrl(contact.whatsappNumber, `Halo ${contact.label}, saya ${user?.name || 'mahasiswa'} ingin berkonsultasi terkait hasil skrining DASS-21 kategori ${displayLevel}.`)}
+                      href={getWhatsAppUrl(contact.whatsappNumber, createConsultationMessage({
+                        bkName: contact.label,
+                        studentName: user?.name,
+                        nim: user?.nim,
+                        studyProgram: user?.major,
+                        faculty: user?.faculty,
+                        latestCategory: displayLevel,
+                      }))}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex w-full items-center justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-700"
