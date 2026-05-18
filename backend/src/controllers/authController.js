@@ -15,7 +15,9 @@ const databaseUnavailableCodes = [
   'ENOTFOUND',
   'ETIMEDOUT',
   'ER_BAD_DB_ERROR',
-  'PROTOCOL_CONNECTION_LOST'
+  'PROTOCOL_CONNECTION_LOST',
+  '28P01',
+  '3D000'
 ];
 
 const isDatabaseUnavailable = (error) => (
@@ -129,7 +131,7 @@ export const login = async (req, res) => {
 
     const user = rows[0];
 
-    if (user.is_active === 0) {
+    if (user.is_active === false || user.is_active === 0) {
       return res.status(403).json({
         message: 'Akun tidak aktif'
       });
@@ -156,7 +158,7 @@ export const login = async (req, res) => {
   } catch (error) {
     if (isDatabaseUnavailable(error)) {
       return res.status(503).json({
-        message: 'Database belum terhubung. Nyalakan MySQL dan pastikan database depresi sudah di-import.'
+        message: 'Database belum terhubung. Pastikan DATABASE_URL Supabase PostgreSQL benar dan schema sudah dijalankan.'
       });
     }
 
@@ -322,7 +324,7 @@ export const getCurrentUser = async (req, res) => {
   } catch (error) {
     if (isDatabaseUnavailable(error)) {
       return res.status(503).json({
-        message: 'Database belum terhubung. Nyalakan MySQL dan pastikan database depresi sudah di-import.'
+        message: 'Database belum terhubung. Pastikan DATABASE_URL Supabase PostgreSQL benar dan schema sudah dijalankan.'
       });
     }
 

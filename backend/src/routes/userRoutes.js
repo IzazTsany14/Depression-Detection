@@ -70,9 +70,22 @@ const normalizeUser = (user) => ({
   profilePicture: user.profile_picture
 });
 
+const verifyStoredPassword = async (plainPassword, storedPassword) => {
+  if (typeof storedPassword === 'string' && storedPassword.startsWith('$2')) {
+    return bcrypt.compare(plainPassword, storedPassword);
+  }
+
+  return plainPassword === storedPassword;
+};
+
 const getUserByAccountId = async (accountId) => {
   const [rows] = await pool.query(`${getUsersQuery} WHERE a.account_id = ? LIMIT 1`, [accountId]);
   return rows[0] ? normalizeUser(rows[0]) : null;
+};
+
+const getAccountPassword = async (accountId) => {
+  const [rows] = await pool.query('SELECT password FROM accounts WHERE account_id = ? LIMIT 1', [accountId]);
+  return rows[0]?.password || null;
 };
 
 const saveProfileImage = async (profileImage, { accountId, role, faculty }) => {
@@ -221,6 +234,10 @@ router.put('/:accountId', async (req, res) => {
     const accountValues = [email];
 
     if (password) {
+      if (String(password).length < 6) {
+        return res.status(400).json({ message: 'Password minimal 6 karakter' });
+      }
+
       accountFields.push('password = ?');
       accountValues.push(await bcrypt.hash(password, 12));
     }
@@ -265,6 +282,47 @@ router.put('/:accountId', async (req, res) => {
     connection.release();
   }
 });
+
+const handlePasswordChange = async (req, res) => {
+  try {
+    const { accountId } = req.params;
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: 'Password saat ini dan password baru wajib diisi' });
+    }
+
+    if (String(newPassword).length < 6) {
+      return res.status(400).json({ message: 'Password minimal 6 karakter' });
+    }
+
+    if (currentPassword === newPassword) {
+      return res.status(400).json({ message: 'Password baru harus berbeda dari password saat ini' });
+    }
+
+    const existingUser = await getUserByAccountId(accountId);
+    if (!existingUser) return res.status(404).json({ message: 'User tidak ditemukan' });
+
+    const storedPassword = await getAccountPassword(accountId);
+    const passwordMatches = await verifyStoredPassword(currentPassword, storedPassword);
+    if (!passwordMatches) {
+      return res.status(401).json({ message: 'Password saat ini salah' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    await pool.query('UPDATE accounts SET password = ? WHERE account_id = ?', [hashedPassword, accountId]);
+
+    res.json({ message: 'Password berhasil diubah' });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Gagal mengubah password',
+      error: error.message
+    });
+  }
+};
+
+router.patch('/:accountId/password', handlePasswordChange);
+router.put('/:accountId/password', handlePasswordChange);
 
 router.delete('/:accountId', async (req, res) => {
   try {

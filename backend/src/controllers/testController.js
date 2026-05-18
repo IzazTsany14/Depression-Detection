@@ -7,6 +7,10 @@ import pool from '../config/db.js';
 import { calculateDassResult, getDepressionDescription } from '../services/dassScoringService.js';
 import { v4 as uuidv4 } from 'uuid';
 
+const parseAnswers = (answers) => (
+  typeof answers === 'string' ? JSON.parse(answers) : answers
+);
+
 /**
  * Submit test baru
  * Menerima 21 jawaban dari frontend, kalkulasi DASS-21, simpan ke database
@@ -52,10 +56,10 @@ export const submitTest = async (req, res) => {
     // Simpan ke database (sesuai tabel test_results Anda)
     const insertQuery = `
       INSERT INTO test_results (test_id, student_id, date, score, level, fuzzy_score, answers)
-      VALUES (?, ?, NOW(), ?, ?, ?, ?)
+      VALUES (?, ?, NOW(), ?, ?, ?, ?::jsonb)
     `;
 
-    // Convert answers array ke JSON string (database menge-check json_valid)
+    // Convert answers array ke JSON string untuk kolom jsonb PostgreSQL.
     const answersJSON = JSON.stringify(answers);
 
     const result = await pool.query(insertQuery, [
@@ -121,7 +125,7 @@ export const getTestsByStudent = async (req, res) => {
     // Parse JSON answers kembali ke array
     const parsedResults = results.map(result => ({
       ...result,
-      answers: JSON.parse(result.answers)
+      answers: parseAnswers(result.answers)
     }));
 
     res.status(200).json({
@@ -176,7 +180,7 @@ export const getTestDetail = async (req, res) => {
       message: 'Test detail berhasil diambil',
       result: {
         ...result,
-        answers: JSON.parse(result.answers),
+        answers: parseAnswers(result.answers),
         description
       }
     });

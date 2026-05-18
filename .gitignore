@@ -10,6 +10,7 @@ build/
 
 # Guidelines folder (as requested)
 guidelines/
+.agents/
 
 # Environment variables
 .env

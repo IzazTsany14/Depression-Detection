@@ -72,8 +72,8 @@ echo "Checking dependencies in package.json..."
 if grep -q "express" package.json; then
     echo -e "${GREEN}✓${NC} express"
 fi
-if grep -q "mysql2" package.json; then
-    echo -e "${GREEN}✓${NC} mysql2"
+if grep -q "\"pg\"" package.json; then
+    echo -e "${GREEN}✓${NC} pg"
 fi
 if grep -q "jsonwebtoken" package.json; then
     echo -e "${GREEN}✓${NC} jsonwebtoken"
@@ -88,14 +88,8 @@ fi
 # Check .env
 echo ""
 echo "Checking .env configuration..."
-if grep -q "DB_HOST" .env; then
-    echo -e "${GREEN}✓${NC} DB_HOST configured"
-fi
-if grep -q "DB_USER" .env; then
-    echo -e "${GREEN}✓${NC} DB_USER configured"
-fi
-if grep -q "DB_PASSWORD" .env; then
-    echo -e "${GREEN}✓${NC} DB_PASSWORD configured"
+if grep -q "DATABASE_URL" .env; then
+    echo -e "${GREEN}✓${NC} DATABASE_URL configured"
 fi
 if grep -q "JWT_SECRET" .env; then
     echo -e "${GREEN}✓${NC} JWT_SECRET configured"
@@ -115,7 +109,7 @@ echo "✅ Backend verification complete!"
 echo ""
 echo "Next steps:"
 echo "1. Update .env with your database credentials"
-echo "2. Make sure MySQL is running"
+echo "2. Run database/supabase-schema.sql in Supabase SQL Editor"
 echo "3. Run: pnpm install (if not done yet)"
 echo "4. Run: pnpm dev"
 echo ""
