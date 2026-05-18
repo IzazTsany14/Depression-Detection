@@ -3,7 +3,7 @@
  * Menangani endpoint /api/auth/*
  */
 import express from 'express';
-import { login, register, logout, getCurrentUser } from '../controllers/authController.js';
+import { login, register, logout, getCurrentUser, getStudentByNim } from '../controllers/authController.js';
 import { verifyToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -21,6 +21,12 @@ router.post('/login', login);
  * Body: { email, password, role? }
  */
 router.post('/register', register);
+
+/**
+ * GET /api/auth/students/nim/:nim
+ * Ambil data pribadi mahasiswa untuk autofill registrasi
+ */
+router.get('/students/nim/:nim', getStudentByNim);
 
 /**
  * POST /api/auth/logout

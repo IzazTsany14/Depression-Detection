@@ -76,7 +76,7 @@ if (backendAlreadyRunning) {
     process.exit(1);
   }
 
-  console.log(`Backend sudah berjalan di ${BACKEND_URL}. Lanjut menjalankan frontend.`);
+  console.log(`Backend sudah berjalan di ${BACKEND_URL}.`);
 } else {
   processes.push(runCommand('npm --prefix backend start'));
 }

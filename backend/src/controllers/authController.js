@@ -97,6 +97,52 @@ const getUserWithProfile = async (accountId) => {
   };
 };
 
+export const getStudentByNim = async (req, res) => {
+  try {
+    const nim = String(req.params.nim || '').trim();
+
+    if (!nim) {
+      return res.status(400).json({ message: 'NIM harus diisi' });
+    }
+
+    const [rows] = await pool.query(
+      `SELECT
+        s.student_id,
+        s.account_id,
+        s.nim,
+        s.nik,
+        s.name,
+        s.faculty,
+        s.major,
+        s.semester,
+        s.phone_number,
+        a.email
+      FROM students s
+      JOIN accounts a ON s.account_id = a.account_id
+      WHERE s.nim = ?
+      LIMIT 1`,
+      [nim]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Data mahasiswa dengan NIM tersebut tidak ditemukan' });
+    }
+
+    res.json({ student: rows[0] });
+  } catch (error) {
+    if (isDatabaseUnavailable(error)) {
+      return res.status(503).json({
+        message: 'Database belum terhubung. Pastikan DATABASE_URL Supabase PostgreSQL benar dan schema sudah dijalankan.'
+      });
+    }
+
+    res.status(500).json({
+      message: 'Gagal mengambil data mahasiswa',
+      error: error.message
+    });
+  }
+};
+
 /**
  * Login user dengan email dan password
  * Memeriksa tabel 'accounts' dan mengembalikan JWT token
@@ -214,47 +260,78 @@ export const register = async (req, res) => {
       });
     }
 
-    // Cek apakah email sudah terdaftar
-    const checkQuery = 'SELECT * FROM accounts WHERE email = ?';
-    const [existingUser] = await pool.query(checkQuery, [email]);
-
-    if (existingUser.length > 0) {
-      return res.status(409).json({ 
-        message: 'Email sudah terdaftar' 
-      });
-    }
-
     const connection = await pool.getConnection();
     let accountId;
 
     try {
       await connection.beginTransaction();
 
-      accountId = `${role}-${uuidv4().substring(0, 8)}`;
       const hashedPassword = await bcrypt.hash(password, 12);
-      await connection.query(
-        'INSERT INTO accounts (account_id, email, password, role) VALUES (?, ?, ?, ?)',
-        [accountId, email, hashedPassword, role]
-      );
 
       if (role === 'student') {
-        const studentId = `student-${uuidv4().substring(0, 8)}`;
-        const generatedNim = nim || Date.now().toString().slice(-10);
+        if (!nim) {
+          await connection.rollback();
+          return res.status(400).json({ message: 'NIM harus diisi' });
+        }
+
+        const [studentRows] = await connection.query(
+          'SELECT * FROM students WHERE nim = ? LIMIT 1',
+          [nim]
+        );
+
+        if (studentRows.length === 0) {
+          await connection.rollback();
+          return res.status(404).json({ message: 'Data mahasiswa dengan NIM tersebut tidak ditemukan' });
+        }
+
+        const student = studentRows[0];
+        accountId = student.account_id;
+
+        const [emailRows] = await connection.query(
+          'SELECT account_id FROM accounts WHERE email = ? AND account_id <> ? LIMIT 1',
+          [email, accountId]
+        );
+
+        if (emailRows.length > 0) {
+          await connection.rollback();
+          return res.status(409).json({ message: 'Email sudah digunakan akun lain' });
+        }
+
         await connection.query(
-          `INSERT INTO students (student_id, account_id, nim, nik, name, faculty, major, semester)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          'UPDATE accounts SET email = ?, password = ?, role = ?, is_active = 1 WHERE account_id = ?',
+          [email, hashedPassword, role, accountId]
+        );
+
+        await connection.query(
+          `UPDATE students
+           SET nik = COALESCE(?, nik),
+               name = COALESCE(?, name),
+               faculty = COALESCE(?, faculty),
+               major = COALESCE(?, major),
+               semester = COALESCE(?, semester)
+           WHERE account_id = ?`,
           [
-            studentId,
-            accountId,
-            generatedNim,
             nik || null,
-            name || email.split('@')[0],
+            name || null,
             faculty || null,
             major || null,
-            semester || null
+            semester || null,
+            accountId
           ]
         );
       } else if (role === 'bk') {
+        const [existingUser] = await connection.query('SELECT * FROM accounts WHERE email = ? LIMIT 1', [email]);
+        if (existingUser.length > 0) {
+          await connection.rollback();
+          return res.status(409).json({ message: 'Email sudah terdaftar' });
+        }
+
+        accountId = `${role}-${uuidv4().substring(0, 8)}`;
+        await connection.query(
+          'INSERT INTO accounts (account_id, email, password, role) VALUES (?, ?, ?, ?)',
+          [accountId, email, hashedPassword, role]
+        );
+
         const bkId = `bk-${uuidv4().substring(0, 8)}`;
         await connection.query(
           `INSERT INTO bk_staff (bk_id, account_id, nip, nidn, nuptk, name)
@@ -262,6 +339,18 @@ export const register = async (req, res) => {
           [bkId, accountId, nip || null, nidn || null, nuptk || null, name || email.split('@')[0]]
         );
       } else if (role === 'admin') {
+        const [existingUser] = await connection.query('SELECT * FROM accounts WHERE email = ? LIMIT 1', [email]);
+        if (existingUser.length > 0) {
+          await connection.rollback();
+          return res.status(409).json({ message: 'Email sudah terdaftar' });
+        }
+
+        accountId = `${role}-${uuidv4().substring(0, 8)}`;
+        await connection.query(
+          'INSERT INTO accounts (account_id, email, password, role) VALUES (?, ?, ?, ?)',
+          [accountId, email, hashedPassword, role]
+        );
+
         const adminId = `admin-${uuidv4().substring(0, 8)}`;
         await connection.query(
           'INSERT INTO admins (admin_id, account_id, name, department) VALUES (?, ?, ?, ?)',

@@ -256,6 +256,30 @@ export const Login: React.FC = () => {
               </Button>
             </div>
           </Card>
+
+          {/* Demo Credentials - untuk testing */}
+          <Card className="p-6 mt-6 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200">
+            <h3 className="font-semibold text-gray-900 mb-4 text-center">
+              🔐 Demo Credentials (untuk Testing)
+            </h3>
+            <div className="space-y-3 text-sm">
+              <div className="bg-white p-3 rounded-lg">
+                <p className="font-semibold text-blue-900 mb-1">👤 Mahasiswa</p>
+                <p className="text-gray-600">Email: <code className="bg-gray-100 px-2 py-0.5 rounded">ahmadfauzi01@mhs.universitas.ac.id</code></p>
+                <p className="text-gray-600">Password: <code className="bg-gray-100 px-2 py-0.5 rounded">student123</code></p>
+              </div>
+              <div className="bg-white p-3 rounded-lg">
+                <p className="font-semibold text-purple-900 mb-1">👨‍⚕️ Konselor BK</p>
+                <p className="text-gray-600">Email: <code className="bg-gray-100 px-2 py-0.5 rounded">budisantoso@universitas.ac.id</code></p>
+                <p className="text-gray-600">Password: <code className="bg-gray-100 px-2 py-0.5 rounded">bk123</code></p>
+              </div>
+              <div className="bg-white p-3 rounded-lg">
+                <p className="font-semibold text-red-900 mb-1">⚙️ Admin</p>
+                <p className="text-gray-600">Email: <code className="bg-gray-100 px-2 py-0.5 rounded">adminsistem@universitas.ac.id</code></p>
+                <p className="text-gray-600">Password: <code className="bg-gray-100 px-2 py-0.5 rounded">admin123</code></p>
+              </div>
+            </div>
+          </Card>
         </div>
       </main>
 
