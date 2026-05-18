@@ -1,4 +1,32 @@
 import { spawn, spawnSync } from 'child_process';
+import net from 'net';
+
+const BACKEND_PORT = Number(process.env.PORT || 5000);
+const FRONTEND_PORT = Number(process.env.FRONTEND_PORT || 5173);
+const BACKEND_URL = `http://127.0.0.1:${BACKEND_PORT}`;
+
+const isPortOpen = (port) => new Promise((resolve) => {
+  const socket = net.createConnection({ host: '127.0.0.1', port });
+
+  socket.once('connect', () => {
+    socket.destroy();
+    resolve(true);
+  });
+
+  socket.once('error', () => {
+    socket.destroy();
+    resolve(false);
+  });
+});
+
+const isBackendHealthy = async () => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/health`);
+    return response.ok;
+  } catch {
+    return false;
+  }
+};
 
 const runCommand = (command) => {
   if (process.platform === 'win32') {
@@ -14,10 +42,7 @@ const runCommand = (command) => {
   });
 };
 
-const processes = [
-  runCommand('npm --prefix backend start'),
-  runCommand('npm run dev:frontend -- --host 127.0.0.1 --port 5173')
-];
+const processes = [];
 
 let shuttingDown = false;
 
@@ -39,6 +64,24 @@ const shutdown = (exitCode = 0) => {
 
   process.exit(exitCode);
 };
+
+const backendAlreadyRunning = await isPortOpen(BACKEND_PORT);
+
+if (backendAlreadyRunning) {
+  const healthy = await isBackendHealthy();
+
+  if (!healthy) {
+    console.error(`Port ${BACKEND_PORT} sudah dipakai, tapi backend tidak merespons ${BACKEND_URL}/api/health.`);
+    console.error('Tutup proses yang memakai port 5000 dulu, lalu jalankan npm run dev lagi.');
+    process.exit(1);
+  }
+
+  console.log(`Backend sudah berjalan di ${BACKEND_URL}. Lanjut menjalankan frontend.`);
+} else {
+  processes.push(runCommand('npm --prefix backend start'));
+}
+
+processes.push(runCommand(`npm run dev:frontend -- --host 127.0.0.1 --port ${FRONTEND_PORT}`));
 
 for (const child of processes) {
   child.on('exit', (code) => {

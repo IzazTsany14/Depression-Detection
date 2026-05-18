@@ -12,6 +12,7 @@ import { ProfileAvatar } from '../../components/ProfileAvatar';
 import { apiUrl } from '../../utils/api';
 import { readProfileImageFile } from '../../utils/profileUpdate';
 import { showSuccessDialog } from '../../utils/successDialog';
+import { changeAccountPassword } from '../../utils/passwordChange';
 
 export const BKProfile: React.FC = () => {
   const { user, updateUser } = useAuth();
@@ -27,6 +28,7 @@ export const BKProfile: React.FC = () => {
     confirmPassword: ''
   });
   const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [profileImage, setProfileImage] = useState<{ dataUrl: string; fileName: string } | null>(null);
   const [profilePreview, setProfilePreview] = useState<string | null>(null);
@@ -93,7 +95,7 @@ export const BKProfile: React.FC = () => {
     }
   };
 
-  const handleChangePassword = (e: React.FormEvent) => {
+  const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (formData.newPassword !== formData.confirmPassword) {
@@ -106,15 +108,27 @@ export const BKProfile: React.FC = () => {
       return;
     }
 
-    // TODO: Implement actual password change logic
-    showSuccessDialog('Password berhasil diubah');
-    setShowPasswordForm(false);
-    setFormData(prev => ({
-      ...prev,
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: ''
-    }));
+    try {
+      setIsChangingPassword(true);
+      await changeAccountPassword(
+        String(user?.accountId || user?.id),
+        formData.currentPassword,
+        formData.newPassword
+      );
+      setMessage({ type: 'success', text: 'Password berhasil diubah. Gunakan password baru saat login berikutnya.' });
+      showSuccessDialog('Password berhasil diubah');
+      setShowPasswordForm(false);
+      setFormData(prev => ({
+        ...prev,
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      }));
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.message || 'Gagal mengubah password' });
+    } finally {
+      setIsChangingPassword(false);
+    }
   };
 
   return (
@@ -129,10 +143,10 @@ export const BKProfile: React.FC = () => {
 
         <main className="p-8">
           <div className="max-w-2xl">
-            {message?.type === 'error' && (
+            {message && (
               <Alert className={`mb-6 ${message.type === 'success' ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}`}>
-                <AlertCircle className="h-5 w-5 text-red-600" />
-                <AlertDescription className="text-red-900">
+                <AlertCircle className={`h-5 w-5 ${message.type === 'success' ? 'text-green-600' : 'text-red-600'}`} />
+                <AlertDescription className={message.type === 'success' ? 'text-green-900' : 'text-red-900'}>
                   {message.text}
                 </AlertDescription>
               </Alert>
@@ -246,7 +260,10 @@ export const BKProfile: React.FC = () => {
 
               {!showPasswordForm ? (
                 <Button 
-                  onClick={() => setShowPasswordForm(true)}
+                  onClick={() => {
+                    setMessage(null);
+                    setShowPasswordForm(true);
+                  }}
                   variant="outline"
                   className="text-purple-600 border-purple-300"
                 >
@@ -291,12 +308,13 @@ export const BKProfile: React.FC = () => {
                   </div>
 
                   <div className="flex gap-2 pt-4">
-                    <Button type="submit" className="bg-purple-600 hover:bg-purple-700">
-                      Simpan Password Baru
+                    <Button type="submit" disabled={isChangingPassword} className="bg-purple-600 hover:bg-purple-700">
+                      {isChangingPassword ? 'Menyimpan...' : 'Simpan Password Baru'}
                     </Button>
                     <Button 
                       type="button"
                       variant="outline"
+                      disabled={isChangingPassword}
                       onClick={() => setShowPasswordForm(false)}
                     >
                       Batal
