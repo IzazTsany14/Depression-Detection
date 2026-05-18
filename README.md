@@ -13,8 +13,6 @@
 </p>
 
 ---
-## Link priview
-**https://depression-detection-kelompok8.netlify.app/**
 
 ## 🌐 Tentang Proyek
 
