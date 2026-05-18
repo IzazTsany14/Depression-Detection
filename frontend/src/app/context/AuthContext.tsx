@@ -34,7 +34,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   updateUser: (apiUser: any) => User;
-  register: (name: string, email: string, password: string) => Promise<boolean>;
+  register: (name: string, email: string, password: string, profile?: Partial<User>) => Promise<boolean>;
   startAsGuest: () => void;
   saveTestResult: (result: TestResult) => Promise<TestResult | null>;
   getTestHistory: () => TestResult[];
@@ -203,15 +203,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('token');
   };
 
-  const register = async (name: string, email: string, password: string): Promise<boolean> => {
+  const register = async (name: string, email: string, password: string, profile: Partial<User> = {}): Promise<boolean> => {
     try {
-      // Generate NIM & NIK otomatis karena MySQL mewajibkan kolom nim (NOT NULL)
-      const autoNim = Math.floor(Math.random() * 10000000000).toString();
-
       const res = await fetch(apiUrl('/auth/register'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, role: 'student', nim: autoNim })
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          role: 'student',
+          nim: profile.nim,
+          nik: profile.nik,
+          faculty: profile.faculty,
+          major: profile.major,
+          semester: profile.semester
+        })
       });
       const data = await res.json();
 

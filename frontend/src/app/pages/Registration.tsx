@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
@@ -10,13 +10,19 @@ import { Checkbox } from '../components/ui/checkbox';
 import { useAuth } from '../context/AuthContext';
 import { Eye, EyeOff, UserPlus, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '../components/ui/alert';
+import { apiUrl } from '../utils/api';
 
 export const Registration: React.FC = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
+    nim: '',
     name: '',
+    nik: '',
+    faculty: '',
+    major: '',
+    semester: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -27,6 +33,8 @@ export const Registration: React.FC = () => {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loadingStudent, setLoadingStudent] = useState(false);
+  const [studentFound, setStudentFound] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -36,13 +44,74 @@ export const Registration: React.FC = () => {
     setError('');
   };
 
+  useEffect(() => {
+    const nim = formData.nim.trim();
+
+    setStudentFound(false);
+    if (nim.length < 6) {
+      setFormData(prev => ({
+        ...prev,
+        name: '',
+        nik: '',
+        faculty: '',
+        major: '',
+        semester: '',
+      }));
+      return;
+    }
+
+    const timeout = window.setTimeout(async () => {
+      setLoadingStudent(true);
+      try {
+        const res = await fetch(apiUrl(`/auth/students/nim/${encodeURIComponent(nim)}`));
+        const data = await res.json();
+
+        if (!res.ok) {
+          setStudentFound(false);
+          setFormData(prev => ({
+            ...prev,
+            name: '',
+            nik: '',
+            faculty: '',
+            major: '',
+            semester: '',
+          }));
+          return;
+        }
+
+        const student = data.student;
+        setStudentFound(true);
+        setFormData(prev => ({
+          ...prev,
+          name: student.name || '',
+          nik: student.nik || '',
+          faculty: student.faculty || '',
+          major: student.major || '',
+          semester: student.semester ? String(student.semester) : '',
+          email: prev.email || student.email || '',
+        }));
+      } catch {
+        setStudentFound(false);
+      } finally {
+        setLoadingStudent(false);
+      }
+    }, 350);
+
+    return () => window.clearTimeout(timeout);
+  }, [formData.nim]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
     // Validation
-    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+    if (!formData.nim || !formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
       setError('Semua field harus diisi');
+      return;
+    }
+
+    if (!studentFound) {
+      setError('NIM tidak ditemukan. Masukkan NIM yang terdaftar di data mahasiswa.');
       return;
     }
 
@@ -62,7 +131,13 @@ export const Registration: React.FC = () => {
     }
 
     setLoading(true);
-    const success = await register(formData.name, formData.email, formData.password);
+    const success = await register(formData.name, formData.email, formData.password, {
+      nim: formData.nim,
+      nik: formData.nik,
+      faculty: formData.faculty,
+      major: formData.major,
+      semester: Number(formData.semester) || undefined,
+    });
     setLoading(false);
 
     if (success) {
@@ -134,6 +209,26 @@ export const Registration: React.FC = () => {
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div>
+                    <Label htmlFor="nim">NIM</Label>
+                    <Input
+                      id="nim"
+                      name="nim"
+                      type="text"
+                      value={formData.nim}
+                      onChange={handleChange}
+                      placeholder="Contoh: 2021110001"
+                      className="mt-1"
+                    />
+                    <p className={`mt-1 text-xs ${studentFound ? 'text-green-700' : 'text-gray-500'}`}>
+                      {loadingStudent
+                        ? 'Mencari data mahasiswa...'
+                        : studentFound
+                          ? 'Data mahasiswa ditemukan dan terisi otomatis.'
+                          : 'Nama, NIK, fakultas, prodi, dan semester akan terisi otomatis.'}
+                    </p>
+                  </div>
+
+                  <div>
                     <Label htmlFor="name">Nama Lengkap</Label>
                     <Input
                       id="name"
@@ -143,6 +238,64 @@ export const Registration: React.FC = () => {
                       onChange={handleChange}
                       placeholder="Masukkan nama lengkap"
                       className="mt-1"
+                      readOnly
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="nik">NIK</Label>
+                    <Input
+                      id="nik"
+                      name="nik"
+                      type="text"
+                      value={formData.nik}
+                      onChange={handleChange}
+                      placeholder="NIK akan terisi otomatis"
+                      className="mt-1"
+                      readOnly
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                      <Label htmlFor="faculty">Fakultas</Label>
+                      <Input
+                        id="faculty"
+                        name="faculty"
+                        type="text"
+                        value={formData.faculty}
+                        onChange={handleChange}
+                        placeholder="Fakultas akan terisi otomatis"
+                        className="mt-1"
+                        readOnly
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="major">Program Studi</Label>
+                      <Input
+                        id="major"
+                        name="major"
+                        type="text"
+                        value={formData.major}
+                        onChange={handleChange}
+                        placeholder="Prodi akan terisi otomatis"
+                        className="mt-1"
+                        readOnly
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="semester">Semester</Label>
+                    <Input
+                      id="semester"
+                      name="semester"
+                      type="text"
+                      value={formData.semester}
+                      onChange={handleChange}
+                      placeholder="Semester akan terisi otomatis"
+                      className="mt-1"
+                      readOnly
                     />
                   </div>
 
