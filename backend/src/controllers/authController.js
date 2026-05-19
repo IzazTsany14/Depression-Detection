@@ -25,13 +25,26 @@ const isDatabaseUnavailable = (error) => (
   databaseUnavailableCodes.some((code) => String(error?.message || '').includes(code))
 );
 
+const getJwtSecret = () => {
+  const secret = process.env.JWT_SECRET;
+
+  if (!secret || secret === 'your-secret-key') {
+    const error = new Error('JWT_SECRET belum dikonfigurasi dengan aman di backend/.env');
+    error.status = 500;
+    throw error;
+  }
+
+  return secret;
+};
+
 const signToken = (account) => jwt.sign(
   {
+    sub: account.account_id,
     accountId: account.account_id,
     email: account.email,
     role: account.role
   },
-  process.env.JWT_SECRET || 'your-secret-key',
+  getJwtSecret(),
   { expiresIn: '24h' }
 );
 
@@ -252,11 +265,18 @@ export const register = async (req, res) => {
       });
     }
 
-    // Validasi role
+    // Registrasi publik hanya boleh membuat akun mahasiswa.
+    // Akun admin/BK harus dibuat oleh admin melalui /api/users.
     const validRoles = ['student', 'bk', 'admin'];
     if (!validRoles.includes(role)) {
       return res.status(400).json({ 
         message: `Role harus salah satu dari: ${validRoles.join(', ')}` 
+      });
+    }
+
+    if (role !== 'student') {
+      return res.status(403).json({
+        message: 'Registrasi admin/BK tidak diizinkan dari endpoint publik'
       });
     }
 

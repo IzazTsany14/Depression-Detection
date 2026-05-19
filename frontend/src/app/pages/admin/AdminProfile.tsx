@@ -30,6 +30,11 @@ export const AdminProfile: React.FC = () => {
   const [profileImage, setProfileImage] = useState<{ dataUrl: string; fileName: string } | null>(null);
   const [profilePreview, setProfilePreview] = useState<string | null>(null);
 
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('token');
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
   useEffect(() => {
     if (!user || user.role !== 'admin') {
       navigate('/login');
@@ -68,7 +73,7 @@ export const AdminProfile: React.FC = () => {
     try {
       const res = await fetch(apiUrl(`/users/${user?.accountId || user?.id}`), {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,

@@ -11,6 +11,31 @@ const parseAnswers = (answers) => (
   typeof answers === 'string' ? JSON.parse(answers) : answers
 );
 
+const getAuthenticatedAccountId = (req) => req.user?.accountId || req.user?.id;
+
+const getStudentIdForAccount = async (accountId) => {
+  const [rows] = await pool.query(
+    'SELECT student_id FROM students WHERE account_id = ? LIMIT 1',
+    [accountId]
+  );
+  return rows[0]?.student_id || null;
+};
+
+const canAccessStudent = async (req, studentId) => {
+  if (req.user?.role !== 'student') return false;
+
+  const authenticatedStudentId = await getStudentIdForAccount(getAuthenticatedAccountId(req));
+  return String(authenticatedStudentId) === String(studentId);
+};
+
+const getTestOwnerStudentId = async (testId) => {
+  const [rows] = await pool.query(
+    'SELECT student_id FROM test_results WHERE test_id = ? LIMIT 1',
+    [testId]
+  );
+  return rows[0]?.student_id || null;
+};
+
 /**
  * Submit test baru
  * Menerima 21 jawaban dari frontend, kalkulasi DASS-21, simpan ke database
@@ -23,13 +48,22 @@ const parseAnswers = (answers) => (
  */
 export const submitTest = async (req, res) => {
   try {
-    const { student_id, answers } = req.body;
+    const { answers } = req.body;
 
     // Validasi input
-    if (!student_id || !answers) {
+    if (!answers) {
       return res.status(400).json({ 
-        message: 'student_id dan answers harus diisi' 
+        message: 'answers harus diisi' 
       });
+    }
+
+    if (req.user?.role !== 'student') {
+      return res.status(403).json({ message: 'Hanya mahasiswa yang dapat mengirim test' });
+    }
+
+    const student_id = await getStudentIdForAccount(getAuthenticatedAccountId(req));
+    if (!student_id) {
+      return res.status(403).json({ message: 'Akun mahasiswa pada token tidak ditemukan' });
     }
 
     if (!Array.isArray(answers) || answers.length !== 21) {
@@ -112,6 +146,10 @@ export const getTestsByStudent = async (req, res) => {
       });
     }
 
+    if (!(await canAccessStudent(req, student_id))) {
+      return res.status(403).json({ message: 'Akses ditolak. Anda hanya boleh melihat history milik sendiri' });
+    }
+
     // Query test results untuk student
     const query = `
       SELECT test_id, student_id, date, score, level, fuzzy_score, answers
@@ -157,6 +195,17 @@ export const getTestDetail = async (req, res) => {
       return res.status(400).json({ 
         message: 'test_id harus diisi' 
       });
+    }
+
+    const ownerStudentId = await getTestOwnerStudentId(test_id);
+    if (!ownerStudentId) {
+      return res.status(404).json({
+        message: 'Test tidak ditemukan'
+      });
+    }
+
+    if (!(await canAccessStudent(req, ownerStudentId))) {
+      return res.status(403).json({ message: 'Akses ditolak. Anda tidak boleh melihat detail test ini' });
     }
 
     const query = `
@@ -205,6 +254,10 @@ export const getTestStatistics = async (req, res) => {
       return res.status(400).json({ 
         message: 'student_id harus diisi' 
       });
+    }
+
+    if (!(await canAccessStudent(req, student_id))) {
+      return res.status(403).json({ message: 'Akses ditolak. Anda hanya boleh melihat statistik milik sendiri' });
     }
 
     const query = `

@@ -302,7 +302,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const getAllStudents = useCallback(async (): Promise<any[]> => {
     try {
-      const res = await fetch(apiUrl('/students'), {
+      const res = await fetch(apiUrl('/history_students'), {
         headers: getAuthHeaders()
       });
       const data = await res.json();

@@ -5,6 +5,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import pool from '../config/db.js';
+import { authorizeRole, verifyToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -88,6 +89,22 @@ const getAccountPassword = async (accountId) => {
   return rows[0]?.password || null;
 };
 
+const getAuthenticatedAccountId = (req) => req.user?.accountId || req.user?.id;
+
+const authorizeSelfOrAdmin = (req, res, next) => {
+  const authenticatedAccountId = getAuthenticatedAccountId(req);
+
+  if (!authenticatedAccountId) {
+    return res.status(401).json({ message: 'User tidak authenticated' });
+  }
+
+  if (req.user.role === 'admin' || authenticatedAccountId === req.params.accountId) {
+    return next();
+  }
+
+  return res.status(403).json({ message: 'Akses ditolak. Anda hanya boleh mengakses data akun sendiri' });
+};
+
 const saveProfileImage = async (profileImage, { accountId, role, faculty }) => {
   if (!profileImage?.dataUrl) return null;
 
@@ -118,7 +135,9 @@ const saveProfileImage = async (profileImage, { accountId, role, faculty }) => {
   return `uploads/profiles/${folder}/${accountId}/${fileName}`;
 };
 
-router.get('/', async (req, res) => {
+router.use(verifyToken);
+
+router.get('/', authorizeRole('admin'), async (req, res) => {
   try {
     const [rows] = await pool.query(`${getUsersQuery} ORDER BY a.role ASC, name ASC`);
     res.json({ data: rows.map(normalizeUser) });
@@ -130,7 +149,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', authorizeRole('admin'), async (req, res) => {
   const connection = await pool.getConnection();
 
   try {
@@ -201,7 +220,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.put('/:accountId', async (req, res) => {
+router.put('/:accountId', authorizeSelfOrAdmin, async (req, res) => {
   const connection = await pool.getConnection();
 
   try {
@@ -224,6 +243,10 @@ router.put('/:accountId', async (req, res) => {
       department,
       profileImage
     } = req.body;
+
+    if (password && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Akses ditolak. Ubah password harus melalui endpoint password dengan password saat ini' });
+    }
 
     const profilePicture = await saveProfileImage(profileImage, {
       accountId,
@@ -321,10 +344,10 @@ const handlePasswordChange = async (req, res) => {
   }
 };
 
-router.patch('/:accountId/password', handlePasswordChange);
-router.put('/:accountId/password', handlePasswordChange);
+router.patch('/:accountId/password', authorizeSelfOrAdmin, handlePasswordChange);
+router.put('/:accountId/password', authorizeSelfOrAdmin, handlePasswordChange);
 
-router.delete('/:accountId', async (req, res) => {
+router.delete('/:accountId', authorizeRole('admin'), async (req, res) => {
   try {
     const [result] = await pool.query('DELETE FROM accounts WHERE account_id = ?', [req.params.accountId]);
     if (result.affectedRows === 0) return res.status(404).json({ message: 'User tidak ditemukan' });
