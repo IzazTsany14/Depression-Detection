@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/badge/Frontend-React-61DAFB?style=for-the-badge&logo=react" alt="React Badge">
   <img src="https://img.shields.io/badge/Language-TypeScript-3178C6?style=for-the-badge&logo=typescript" alt="TypeScript Badge">
   <img src="https://img.shields.io/badge/Styling-TailwindCSS-06B6D4?style=for-the-badge&logo=tailwind-css" alt="Tailwind Badge">
-  <img src="https://img.shields.io/badge/Backend-Node.Js-092E20?style=for-the-badge&logo=Node.Js" alt="Node Js Badge">
+  <img src="https://img.shields.io/badge/Backend-Express.Js-092E20?style=for-the-badge&logo=Express.Js" alt="Node Js Badge">
   <img src="https://img.shields.io/badge/Database-MySQL-4479A1?style=for-the-badge&logo=mysql" alt="MySQL Badge">
 </p>
 
