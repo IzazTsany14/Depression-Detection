@@ -31,10 +31,9 @@ interface TestResult {
 interface AuthContextType {
   user: User | null;
   isGuest: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<User | null>;
   logout: () => void;
   updateUser: (apiUser: any) => User;
-  register: (name: string, email: string, password: string, profile?: Partial<User>) => Promise<boolean>;
   startAsGuest: () => void;
   saveTestResult: (result: TestResult) => Promise<TestResult | null>;
   getTestHistory: () => TestResult[];
@@ -45,6 +44,25 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const sensitiveLocalStorageKeys = [
+  'user',
+  'token',
+  'medicalRecords',
+  'registeredUsers',
+  'adminAddedUsers',
+  'passwordResets',
+  'resetTokens',
+  'dummyDataInitialized',
+  'counselingSessions'
+];
+
+const clearSensitiveLocalStorage = () => {
+  sensitiveLocalStorageKeys.forEach((key) => localStorage.removeItem(key));
+  Object.keys(localStorage)
+    .filter((key) => key.startsWith('history_'))
+    .forEach((key) => localStorage.removeItem(key));
+};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -76,12 +94,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       profileUpdatedAt: Date.now()
     };
     setUser(updatedUser);
-    localStorage.setItem('user', JSON.stringify(updatedUser));
     return updatedUser;
   }, []);
 
   const getAuthHeaders = () => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     return token ? { Authorization: `Bearer ${token}` } : {};
   };
 
@@ -110,43 +127,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     answers: normalizeAnswers(test.answers),
   });
 
-  useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    const token = localStorage.getItem('token');
-
-    if (savedUser) {
-      try {
-        const parsedUser = JSON.parse(savedUser);
-        setUser(parsedUser);
-        if (parsedUser.role === 'student') fetchTestHistory(parsedUser.id);
-      } catch (e) {
-        localStorage.removeItem('user');
-      }
-    }
-
-    if (token) {
-      fetch(apiUrl('/auth/me'), {
-        headers: getAuthHeaders()
-      })
-        .then(async (res) => {
-          if (!res.ok) throw new Error('Token tidak valid');
-          return res.json();
-        })
-        .then((data) => {
-          if (!data.user) return;
-          const freshUser = mapApiUser(data.user);
-          setUser(freshUser);
-          localStorage.setItem('user', JSON.stringify(freshUser));
-          if (freshUser.role === 'student') fetchTestHistory(freshUser.id);
-        })
-        .catch(() => {
-          localStorage.removeItem('user');
-          localStorage.removeItem('token');
-          setUser(null);
-        });
-    }
-  }, []);
-
   const fetchTestHistory = useCallback(async (userId: string) => {
     try {
       const res = await fetch(apiUrl(`/tests/student/${userId}`), {
@@ -160,11 +140,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setTestHistory(mappedHistory);
       }
     } catch (error) {
-      console.error("Gagal load history dari database", error);
+      console.error('Gagal load history dari database', error);
     }
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  useEffect(() => {
+    clearSensitiveLocalStorage();
+    const token = sessionStorage.getItem('token');
+
+    if (token) {
+      fetch(apiUrl('/auth/me'), { headers: getAuthHeaders() })
+        .then(async (res) => {
+          if (!res.ok) throw new Error('Token tidak valid');
+          return res.json();
+        })
+        .then((data) => {
+          if (!data.user) return;
+          const freshUser = mapApiUser(data.user);
+          setUser(freshUser);
+          if (freshUser.role === 'student') fetchTestHistory(freshUser.id);
+        })
+        .catch(() => {
+          sessionStorage.removeItem('token');
+          setUser(null);
+        });
+    }
+  }, [fetchTestHistory]);
+
+  const login = async (email: string, password: string): Promise<User | null> => {
     try {
       const res = await fetch(apiUrl('/auth/login'), {
         method: 'POST',
@@ -172,25 +175,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         body: JSON.stringify({ email, password })
       });
       const data = await res.json();
-      
+
       if (res.ok && data.user) {
         const loggedInUser = mapApiUser(data.user);
         setUser(loggedInUser);
         setIsGuest(false);
-        localStorage.setItem('user', JSON.stringify(loggedInUser));
-        localStorage.setItem('token', data.token);
-        
+        clearSensitiveLocalStorage();
+        sessionStorage.setItem('token', data.token);
         if (loggedInUser.role === 'student') fetchTestHistory(loggedInUser.id);
-        return true;
-      } else {
-        console.error("Login Error:", data);
-        alert(`Login gagal: ${data.message || 'Email atau password salah.'}`);
-        return false;
+        return loggedInUser;
       }
+
+      console.error('Login Error:', data);
+      alert(`Login gagal: ${data.message || 'Email atau password salah.'}`);
+      return null;
     } catch (error) {
-      console.error("Network Error Login:", error);
-      alert("Gagal terhubung ke backend. Pastikan URL API backend sudah benar.");
-      return false;
+      console.error('Network Error Login:', error);
+      alert('Gagal terhubung ke backend. Pastikan URL API backend sudah benar.');
+      return null;
     }
   };
 
@@ -199,47 +201,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsGuest(false);
     setTestHistory([]);
     setCurrentTestAnswers([]);
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-  };
-
-  const register = async (name: string, email: string, password: string, profile: Partial<User> = {}): Promise<boolean> => {
-    try {
-      const res = await fetch(apiUrl('/auth/register'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name,
-          email,
-          password,
-          role: 'student',
-          nim: profile.nim,
-          nik: profile.nik,
-          faculty: profile.faculty,
-          major: profile.major,
-          semester: profile.semester
-        })
-      });
-      const data = await res.json();
-
-      if (res.ok && data.user) {
-        const registeredUser = mapApiUser(data.user);
-        setUser(registeredUser);
-        setIsGuest(false);
-        localStorage.setItem('user', JSON.stringify(registeredUser));
-        localStorage.setItem('token', data.token);
-        if (registeredUser.role === 'student') fetchTestHistory(registeredUser.id);
-        return true;
-      }
-
-      console.error("Register Error:", data);
-      alert(`Pendaftaran gagal: ${data.message || 'Silakan cek terminal backend Anda untuk detail error MySQL'}`);
-      return false;
-    } catch (error) {
-      console.error("Network Error Register:", error);
-      alert("Gagal terhubung ke backend. Pastikan URL API backend sudah benar.");
-      return false;
-    }
+    sessionStorage.removeItem('token');
+    clearSensitiveLocalStorage();
   };
 
   const startAsGuest = () => {
@@ -253,9 +216,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+          Authorization: `Bearer ${sessionStorage.getItem('token') || ''}`
         },
-        body: JSON.stringify({ student_id: user.id, answers: result.answers })
+        body: JSON.stringify({ answers: result.answers })
       });
       const data = await res.json();
 
@@ -279,9 +242,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return null;
   };
 
-  const getTestHistory = useCallback(() => {
-    return testHistory;
-  }, [testHistory]);
+  const getTestHistory = useCallback(() => testHistory, [testHistory]);
 
   const getAllTestResults = useCallback(async (): Promise<any[]> => {
     try {
@@ -302,9 +263,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const getAllStudents = useCallback(async (): Promise<any[]> => {
     try {
-      const res = await fetch(apiUrl('/history_students'), {
-        headers: getAuthHeaders()
-      });
+      const res = await fetch(apiUrl('/history_students'), { headers: getAuthHeaders() });
       const data = await res.json();
       return data.data || [];
     } catch (e) {
@@ -321,7 +280,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         login,
         logout,
         updateUser,
-        register,
         startAsGuest,
         saveTestResult,
         getTestHistory,

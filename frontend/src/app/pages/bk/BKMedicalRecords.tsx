@@ -21,23 +21,17 @@ export const BKMedicalRecords: React.FC = () => {
       return;
     }
 
-    const savedRecords = localStorage.getItem('medicalRecords');
-    if (savedRecords) {
-      setMedicalRecords(JSON.parse(savedRecords));
-    }
   }, [user, navigate]);
 
   const handleSaveMedicalRecord = (record: MedicalRecord) => {
     const updatedRecords = [...medicalRecords, record];
     setMedicalRecords(updatedRecords);
-    localStorage.setItem('medicalRecords', JSON.stringify(updatedRecords));
     setShowMedicalRecordForm(false);
   };
 
   const handleDeleteMedicalRecord = (id: string) => {
     const updatedRecords = medicalRecords.filter(r => r.id !== id);
     setMedicalRecords(updatedRecords);
-    localStorage.setItem('medicalRecords', JSON.stringify(updatedRecords));
   };
 
   return (
@@ -95,3 +89,4 @@ export const BKMedicalRecords: React.FC = () => {
     </div>
   );
 };
+

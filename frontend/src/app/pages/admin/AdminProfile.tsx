@@ -31,7 +31,7 @@ export const AdminProfile: React.FC = () => {
   const [profilePreview, setProfilePreview] = useState<string | null>(null);
 
   const getAuthHeaders = () => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     return token ? { Authorization: `Bearer ${token}` } : {};
   };
 
@@ -296,3 +296,4 @@ export const AdminProfile: React.FC = () => {
     </div>
   );
 };
+

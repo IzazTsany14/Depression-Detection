@@ -139,7 +139,7 @@ export const Home: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    Daftar/Login untuk Fitur Lengkap
+                    Login untuk Fitur Lengkap
                   </h3>
                   <p className="text-gray-600">
                     Simpan riwayat tes dan dapatkan panduan mengatasi depresi
@@ -176,12 +176,12 @@ export const Home: React.FC = () => {
                     Login
                   </Button>
                 </Link>
-                <Link to="/registration" className="flex-1">
+                <Link to="/login" className="flex-1">
                   <Button
                     size="lg"
                     className="w-full bg-green-600 hover:bg-green-700"
                   >
-                    Daftar
+                    Login
                   </Button>
                 </Link>
               </div>
@@ -257,3 +257,4 @@ export const Home: React.FC = () => {
     </div>
   );
 };
+

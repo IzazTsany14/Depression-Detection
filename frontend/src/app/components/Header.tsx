@@ -12,9 +12,9 @@ export const Header: React.FC = () => {
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="relative flex items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2 flex-shrink-0">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center">
               <Brain className="w-6 h-6 text-white" />
             </div>
@@ -25,7 +25,7 @@ export const Header: React.FC = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden md:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
             <Link to="/" className="text-gray-600 hover:text-blue-600 transition-colors">
               Beranda
             </Link>
@@ -57,7 +57,7 @@ export const Header: React.FC = () => {
           </nav>
 
           {/* User Actions */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-3 ml-auto">
             {user && !isGuest ? (
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
@@ -98,22 +98,18 @@ export const Header: React.FC = () => {
             ) : (
               <>
                 <Link to="/login">
-                  <Button variant="ghost" size="sm">
+                  <Button size="sm" className="bg-blue-600 text-white hover:bg-blue-700">
                     Login
                   </Button>
                 </Link>
-                <Link to="/registration">
-                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                    Daftar
-                  </Button>
-                </Link>
+                
               </>
             )}
           </div>
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2"
+            className="md:hidden p-2 ml-auto"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? (
@@ -205,18 +201,9 @@ export const Header: React.FC = () => {
                   <>
                     <Link
                       to="/login"
-                      className="block px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+                      className="block px-3 py-2 text-center bg-blue-600 text-white font-medium hover:bg-blue-700 rounded-lg"
                       onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Login
-                    </Link>
-                    <Link
-                      to="/registration"
-                      className="block px-3 py-2 text-blue-600 font-medium hover:bg-blue-50 rounded-lg"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Daftar
-                    </Link>
+                    >Login</Link>
                   </>
                 )}
               </div>
@@ -227,3 +214,9 @@ export const Header: React.FC = () => {
     </header>
   );
 };
+
+
+
+
+
+

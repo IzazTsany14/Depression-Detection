@@ -58,11 +58,7 @@ export const BKCounselingSchedule: React.FC = () => {
   }, [user, navigate]);
 
   const loadDummySessions = () => {
-    const storedSessions = localStorage.getItem('counselingSessions');
-    if (storedSessions) {
-      setSessions(JSON.parse(storedSessions));
-    } else {
-      const dummySessions: CounselingSession[] = [
+    const dummySessions: CounselingSession[] = [
         {
           id: '1',
           studentName: 'Dewi Lestari',
@@ -134,9 +130,7 @@ export const BKCounselingSchedule: React.FC = () => {
           notes: '5 peserta - Mindfulness & Stress Management'
         },
       ];
-      setSessions(dummySessions);
-      localStorage.setItem('counselingSessions', JSON.stringify(dummySessions));
-    }
+    setSessions(dummySessions);
   };
 
   const filteredSessions = sessions.filter(session => {
@@ -227,7 +221,6 @@ export const BKCounselingSchedule: React.FC = () => {
           : s
       );
       setSessions(updated);
-      localStorage.setItem('counselingSessions', JSON.stringify(updated));
     } else {
       const newSession: CounselingSession = {
         id: Date.now().toString(),
@@ -237,7 +230,6 @@ export const BKCounselingSchedule: React.FC = () => {
       };
       const updated = [...sessions, newSession];
       setSessions(updated);
-      localStorage.setItem('counselingSessions', JSON.stringify(updated));
     }
     resetForm();
     showSuccessDialog('Data berhasil diperbarui');
@@ -250,7 +242,6 @@ export const BKCounselingSchedule: React.FC = () => {
         : s
     );
     setSessions(updated);
-    localStorage.setItem('counselingSessions', JSON.stringify(updated));
     setShowCompletionForm(null);
     setCompletionNotes('');
     showSuccessDialog('Data berhasil diperbarui');
@@ -264,7 +255,6 @@ export const BKCounselingSchedule: React.FC = () => {
           : s
       );
       setSessions(updated);
-      localStorage.setItem('counselingSessions', JSON.stringify(updated));
       showSuccessDialog('Data berhasil diperbarui');
     }
   };
@@ -965,3 +955,4 @@ export const BKCounselingSchedule: React.FC = () => {
     </div>
   );
 };
+
