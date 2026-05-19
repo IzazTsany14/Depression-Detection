@@ -3,7 +3,7 @@
  * Menangani endpoint /api/auth/*
  */
 import express from 'express';
-import { login, register, logout, getCurrentUser, getStudentByNim } from '../controllers/authController.js';
+import { login, logout, getCurrentUser, getStudentByNim } from '../controllers/authController.js';
 import { verifyToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -17,10 +17,13 @@ router.post('/login', login);
 
 /**
  * POST /api/auth/register
- * Register user baru
- * Body: { email, password, role? }
+ * Registrasi publik dinonaktifkan. User baru hanya dibuat oleh admin.
  */
-router.post('/register', register);
+router.post('/register', (req, res) => {
+  res.status(403).json({
+    message: 'Registrasi publik dinonaktifkan. Akun mahasiswa hanya dapat dibuat oleh admin.'
+  });
+});
 
 /**
  * GET /api/auth/students/nim/:nim
@@ -41,3 +44,4 @@ router.post('/logout', logout);
 router.get('/me', verifyToken, getCurrentUser);
 
 export default router;
+

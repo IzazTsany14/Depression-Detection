@@ -61,8 +61,8 @@ export const GuestResult: React.FC = () => {
             <AlertTriangle className="h-5 w-5 text-amber-600" />
             <AlertDescription className="text-amber-900">
               <strong>Anda menggunakan mode Guest.</strong> Hasil ini tidak akan disimpan setelah Anda meninggalkan website. 
-              <Link to="/registration" className="ml-1 underline font-semibold hover:text-amber-700">
-                Daftar/Login
+              <Link to="/login" className="ml-1 underline font-semibold hover:text-amber-700">
+                Login
               </Link> untuk menyimpan riwayat dan mendapatkan panduan mengatasi depresi.
             </AlertDescription>
           </Alert>
@@ -146,12 +146,12 @@ export const GuestResult: React.FC = () => {
                 Ingin Menyimpan Hasil?
               </h3>
               <p className="text-gray-600 mb-4 text-sm">
-                Daftar sekarang untuk menyimpan riwayat tes, melacak perkembangan, dan mendapatkan panduan personalisasi.
+                Akun mahasiswa hanya dapat dibuat oleh admin. Login jika akun Anda sudah aktif.
               </p>
-              <Link to="/registration">
+              <Link to="/login">
                 <Button className="w-full bg-green-600 hover:bg-green-700">
                   <UserPlus className="w-4 h-4 mr-2" />
-                  Daftar untuk Fitur Lengkap
+                  Login untuk Fitur Lengkap
                 </Button>
               </Link>
             </Card>
@@ -230,3 +230,4 @@ export const GuestResult: React.FC = () => {
     </div>
   );
 };
+

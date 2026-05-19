@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { Button } from '../components/ui/button';
@@ -10,7 +10,6 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { useAuth } from '../context/AuthContext';
 import { Eye, EyeOff, LogIn, AlertCircle, Mail, CheckCircle2, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '../components/ui/alert';
-import { checkEmailExists, sendResetEmail } from '../utils/emailService';
 
 export const Login: React.FC = () => {
   const { login, startAsGuest, user } = useAuth();
@@ -47,14 +46,10 @@ export const Login: React.FC = () => {
     }
 
     setLoading(true);
-    const success = await login(formData.email, formData.password);
+    const loggedInUser = await login(formData.email, formData.password);
     setLoading(false);
 
-    if (success) {
-      // Get user from localStorage to check role
-      const loggedInUser = JSON.parse(localStorage.getItem('user') || '{}');
-
-      // Redirect based on role
+    if (loggedInUser) {
       if (loggedInUser.role === 'admin') {
         navigate('/admin');
       } else if (loggedInUser.role === 'bk') {
@@ -63,7 +58,7 @@ export const Login: React.FC = () => {
         navigate('/dashboard');
       }
     } else {
-      setError('Email atau password salah. Silakan coba lagi.');
+      setError('Login ditolak. Email/password salah atau akun Anda sedang nonaktif.');
     }
   };
 
@@ -74,67 +69,12 @@ export const Login: React.FC = () => {
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!forgotPasswordEmail) {
-      setForgotPasswordMessage({ type: 'error', text: 'Masukkan email terlebih dahulu' });
-      return;
-    }
 
     setForgotPasswordLoading(true);
-
-    // Check if email exists in registered users
-    const emailExists = checkEmailExists(forgotPasswordEmail);
-
-    if (!emailExists) {
-      setForgotPasswordMessage({ 
-        type: 'error', 
-        text: `Email "${forgotPasswordEmail}" belum terdaftar di sistem. Silakan cek kembali atau buat akun baru.` 
-      });
-      setForgotPasswordLoading(false);
-      return;
-    }
-
-    // Get user data for email
-    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-    const adminUsers = JSON.parse(localStorage.getItem('adminAddedUsers') || '[]');
-    const allUsers = [...registeredUsers, ...adminUsers];
-    
-    const userData = allUsers.find((user: any) => user.email.toLowerCase() === forgotPasswordEmail.toLowerCase());
-    
-    if (!userData) {
-      setForgotPasswordMessage({ type: 'error', text: 'Terjadi kesalahan. Silakan coba lagi.' });
-      setForgotPasswordLoading(false);
-      return;
-    }
-
-    // Send reset email
-    try {
-      const response = await sendResetEmail({
-        email: forgotPasswordEmail,
-        name: userData.name,
-        resetLink: '' // Will be generated in the service
-      });
-
-      setForgotPasswordMessage({ 
-        type: response.success ? 'success' : 'error',
-        text: response.message
-      });
-
-      if (response.success) {
-        // Reset form after 3 seconds and close dialog
-        setTimeout(() => {
-          setForgotPasswordEmail('');
-          setForgotPasswordMessage(null);
-          setShowForgotPassword(false);
-        }, 3000);
-      }
-    } catch (error) {
-      setForgotPasswordMessage({ 
-        type: 'error', 
-        text: 'Gagal mengirim email. Silakan coba lagi nanti.' 
-      });
-    }
-
+    setForgotPasswordMessage({
+      type: 'error',
+      text: 'Reset password hanya dapat diproses oleh admin kampus. Silakan hubungi admin untuk mengganti password.'
+    });
     setForgotPasswordLoading(false);
   };
 
@@ -225,12 +165,7 @@ export const Login: React.FC = () => {
             </form>
 
             <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
-                Belum punya akun?{' '}
-                <Link to="/registration" className="text-blue-600 hover:underline font-medium">
-                  Daftar sekarang
-                </Link>
-              </p>
+              <p className="text-sm text-gray-600">Belum punya akun? Hubungi admin kampus untuk pembuatan akun mahasiswa.</p>
             </div>
 
             <div className="relative my-8">
@@ -362,3 +297,8 @@ export const Login: React.FC = () => {
     </div>
   );
 };
+
+
+
+
+

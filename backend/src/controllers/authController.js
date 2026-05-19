@@ -192,7 +192,7 @@ export const login = async (req, res) => {
 
     if (user.is_active === false || user.is_active === 0) {
       return res.status(403).json({
-        message: 'Akun tidak aktif'
+        message: user.role === 'student' ? 'Akses ditolak. Akun mahasiswa Anda sedang nonaktif. Silakan hubungi admin.' : 'Akses ditolak. Akun Anda sedang nonaktif.'
       });
     }
 
@@ -409,7 +409,7 @@ export const register = async (req, res) => {
  */
 export const logout = (req, res) => {
   res.status(200).json({
-    message: 'Logout berhasil. Hapus token dari localStorage di frontend.'
+    message: 'Logout berhasil. Hapus token dari sessionStorage di frontend.'
   });
 };
 
@@ -443,3 +443,4 @@ export const getCurrentUser = async (req, res) => {
     });
   }
 };
+

@@ -48,16 +48,8 @@ export const Dashboard: React.FC = () => {
     const testHistory = getTestHistory();
     setHistory(testHistory);
 
-    // Load counseling schedules
-    const storedSessions = localStorage.getItem('counselingSessions');
-    if (storedSessions) {
-      const sessions = JSON.parse(storedSessions);
-      // Filter for schedules relevant to this student (by name or nim)
-      const userSessions = sessions.filter((s: any) => 
-        s.studentName === user.name || s.studentNim === user.nim
-      );
-      setCounselingSessions(userSessions);
-    }
+    // Jadwal konseling harus berasal dari backend agar tidak bocor di browser storage.
+    setCounselingSessions([]);
   }, [user, navigate, getTestHistory]);
 
   const getColorForLevel = (level: string) => {
@@ -631,3 +623,5 @@ export const Dashboard: React.FC = () => {
     </div>
   );
 };
+
+

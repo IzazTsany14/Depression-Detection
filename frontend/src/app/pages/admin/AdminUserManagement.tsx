@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { useAuth } from '../../context/AuthContext';
 import { apiUrl } from '../../utils/api';
 import { ProfileAvatar } from '../../components/ProfileAvatar';
-import { Users, Search, Plus, Edit2, Trash2, CheckCircle2 } from 'lucide-react';
+import { Users, Search, Plus, Edit2, Trash2, CheckCircle2, XCircle, Power } from 'lucide-react';
 import { showSuccessDialog } from '../../utils/successDialog';
 
 const emptyForm = {
@@ -40,7 +40,7 @@ export const AdminUserManagement: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const getAuthHeaders = () => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     return token ? { Authorization: `Bearer ${token}` } : {};
   };
 
@@ -166,6 +166,28 @@ export const AdminUserManagement: React.FC = () => {
     }
   };
 
+
+  const handleToggleStudentStatus = async (userToToggle: any) => {
+    const isActive = userToToggle.is_active !== 0;
+    const nextStatus = !isActive;
+    const actionLabel = nextStatus ? 'aktifkan' : 'nonaktifkan';
+
+    if (!window.confirm(`Yakin ingin ${actionLabel} mahasiswa ${userToToggle.name}?`)) return;
+
+    try {
+      const res = await fetch(apiUrl(`/users/${userToToggle.account_id || userToToggle.accountId}/status`), {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        body: JSON.stringify({ isActive: nextStatus })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || data.error || 'Gagal mengubah status mahasiswa');
+      await loadUsers();
+      showSuccessDialog(data.message || 'Status mahasiswa berhasil diperbarui');
+    } catch (error: any) {
+      alert(error.message || 'Gagal mengubah status mahasiswa');
+    }
+  };
   const filteredUsers = users.filter((item) => {
     const term = searchTerm.toLowerCase();
     const matchesSearch =
@@ -329,12 +351,32 @@ export const AdminUserManagement: React.FC = () => {
                       <td className="px-6 py-4 text-sm text-gray-600">{item.faculty || '-'}</td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
-                          <CheckCircle2 className="w-4 h-4 text-green-600" />
-                          <span className="text-sm text-green-600">{item.is_active === 0 ? 'Nonaktif' : 'Aktif'}</span>
+                          {item.is_active === 0 ? (
+                            <>
+                              <XCircle className="w-4 h-4 text-red-600" />
+                              <span className="text-sm text-red-600">Nonaktif</span>
+                            </>
+                          ) : (
+                            <>
+                              <CheckCircle2 className="w-4 h-4 text-green-600" />
+                              <span className="text-sm text-green-600">Aktif</span>
+                            </>
+                          )}
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-center gap-2">
+                          {item.role === 'student' && (
+                            <Button
+                              onClick={() => handleToggleStudentStatus(item)}
+                              variant="outline"
+                              size="sm"
+                              className={item.is_active === 0 ? 'text-green-600 hover:bg-green-50' : 'text-orange-600 hover:bg-orange-50'}
+                              title={item.is_active === 0 ? 'Aktifkan mahasiswa' : 'Nonaktifkan mahasiswa'}
+                            >
+                              <Power className="w-4 h-4" />
+                            </Button>
+                          )}
                           <Button onClick={() => handleEditUser(item)} variant="outline" size="sm" title="Edit user">
                             <Edit2 className="w-4 h-4" />
                           </Button>
@@ -478,3 +520,6 @@ const Field = ({
     {error && <p className="text-xs text-red-600 mt-1">{error}</p>}
   </div>
 );
+
+
+

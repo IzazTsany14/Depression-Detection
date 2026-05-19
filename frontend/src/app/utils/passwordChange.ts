@@ -5,7 +5,7 @@ export const changeAccountPassword = async (
   currentPassword: string,
   newPassword: string
 ) => {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   const res = await fetch(apiUrl(`/users/${accountId}/password`), {
     method: 'PUT',
     headers: {
@@ -25,3 +25,4 @@ export const changeAccountPassword = async (
 
   return data;
 };
+

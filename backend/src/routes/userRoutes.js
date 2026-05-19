@@ -347,6 +347,35 @@ const handlePasswordChange = async (req, res) => {
 router.patch('/:accountId/password', authorizeSelfOrAdmin, handlePasswordChange);
 router.put('/:accountId/password', authorizeSelfOrAdmin, handlePasswordChange);
 
+router.patch('/:accountId/status', authorizeRole('admin'), async (req, res) => {
+  try {
+    const { accountId } = req.params;
+    const { isActive } = req.body;
+
+    if (typeof isActive !== 'boolean') {
+      return res.status(400).json({ message: 'isActive harus bernilai true atau false' });
+    }
+
+    const existingUser = await getUserByAccountId(accountId);
+    if (!existingUser) return res.status(404).json({ message: 'User tidak ditemukan' });
+
+    if (existingUser.role !== 'student') {
+      return res.status(403).json({ message: 'Status aktif/nonaktif hanya dapat diubah untuk mahasiswa' });
+    }
+
+    await pool.query('UPDATE accounts SET is_active = ? WHERE account_id = ?', [isActive ? 1 : 0, accountId]);
+
+    res.json({
+      message: isActive ? 'Mahasiswa berhasil diaktifkan' : 'Mahasiswa berhasil dinonaktifkan',
+      user: await getUserByAccountId(accountId)
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Gagal mengubah status mahasiswa',
+      error: error.message
+    });
+  }
+});
 router.delete('/:accountId', authorizeRole('admin'), async (req, res) => {
   try {
     const [result] = await pool.query('DELETE FROM accounts WHERE account_id = ?', [req.params.accountId]);
@@ -361,3 +390,4 @@ router.delete('/:accountId', authorizeRole('admin'), async (req, res) => {
 });
 
 export default router;
+
