@@ -9,7 +9,7 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178C6?style=for-the-badge&logo=typescript" alt="TypeScript Badge">
   <img src="https://img.shields.io/badge/Styling-TailwindCSS-06B6D4?style=for-the-badge&logo=tailwind-css" alt="Tailwind Badge">
   <img src="https://img.shields.io/badge/Backend-Node.Js-092E20?style=for-the-badge&logo=Node.Js" alt="Node Js Badge">
-  <img src="https://img.shields.io/badge/Database-Supabase_PostgreSQL-3ECF8E?style=for-the-badge&logo=supabase" alt="Supabase PostgreSQL Badge">
+  <img src="https://img.shields.io/badge/Database-MySQL-4479A1?style=for-the-badge&logo=mysql" alt="MySQL Badge">
 </p>
 
 ---
@@ -43,7 +43,7 @@ Sistem ini mengintegrasikan instrumen psikometrik **DASS-21** (Depression Anxiet
 |-----------|------------|
 | **Frontend** | React, TypeScript, Tailwind CSS, Shadcn/UI |
 | **Backend** | Node.Js  |
-| **Database** | Supabase PostgreSQL |
+| **Database** | MySQL / MariaDB |
 | **UI/UX** | Figma (Design System)  |
 
 ---
