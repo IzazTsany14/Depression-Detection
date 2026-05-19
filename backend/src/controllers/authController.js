@@ -132,7 +132,7 @@ export const getStudentByNim = async (req, res) => {
   } catch (error) {
     if (isDatabaseUnavailable(error)) {
       return res.status(503).json({
-        message: 'Database belum terhubung. Pastikan DATABASE_URL Supabase PostgreSQL benar dan schema sudah dijalankan.'
+        message: 'Database belum terhubung. Pastikan MySQL aktif, database depresi tersedia, dan backend/.env sudah benar.'
       });
     }
 
@@ -204,7 +204,7 @@ export const login = async (req, res) => {
   } catch (error) {
     if (isDatabaseUnavailable(error)) {
       return res.status(503).json({
-        message: 'Database belum terhubung. Pastikan DATABASE_URL Supabase PostgreSQL benar dan schema sudah dijalankan.'
+        message: 'Database belum terhubung. Pastikan MySQL aktif, database depresi tersedia, dan backend/.env sudah benar.'
       });
     }
 
@@ -413,7 +413,7 @@ export const getCurrentUser = async (req, res) => {
   } catch (error) {
     if (isDatabaseUnavailable(error)) {
       return res.status(503).json({
-        message: 'Database belum terhubung. Pastikan DATABASE_URL Supabase PostgreSQL benar dan schema sudah dijalankan.'
+        message: 'Database belum terhubung. Pastikan MySQL aktif, database depresi tersedia, dan backend/.env sudah benar.'
       });
     }
 

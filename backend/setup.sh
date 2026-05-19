@@ -39,8 +39,11 @@ echo ""
 if [ ! -f .env ]; then
     echo "⚠️  .env file not found. Creating from template..."
     cat > .env << 'EOF'
-DATABASE_URL=postgresql://postgres.<project-ref>:<password>@<region>.pooler.supabase.com:6543/postgres
-DB_SSL=true
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=
+DB_NAME=depresi
 PORT=5000
 NODE_ENV=development
 JWT_SECRET=your-super-secret-jwt-key
@@ -58,7 +61,7 @@ echo "======================================"
 echo ""
 echo "Next steps:"
 echo "1. Edit backend/.env with your database credentials"
-echo "2. Run database/supabase-schema.sql in Supabase SQL Editor"
+echo "2. Import database/depresi.sql in phpMyAdmin or MySQL CLI"
 echo "3. Run: pnpm dev (development)"
 echo "4. Or:  pnpm start (production)"
 echo ""
