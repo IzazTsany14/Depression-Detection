@@ -1,15 +1,44 @@
 /**
  * Test Controller
  * Menangani CRUD operasi untuk test results (DASS-21)
- * Menerima 21 jawaban, menghitung fuzzy logic, dan menyimpan ke database
+ * Menerima 21 jawaban, menghitung skor DASS-21, dan menyimpan ke database
  */
 import pool from '../config/db.js';
-import { calculateFuzzy, getDepressionDescription } from '../services/fuzzyService.js';
+import { calculateDassResult, getDepressionDescription } from '../services/dassScoringService.js';
 import { v4 as uuidv4 } from 'uuid';
+
+const parseAnswers = (answers) => (
+  typeof answers === 'string' ? JSON.parse(answers) : answers
+);
+
+const getAuthenticatedAccountId = (req) => req.user?.accountId || req.user?.id;
+
+const getStudentIdForAccount = async (accountId) => {
+  const [rows] = await pool.query(
+    'SELECT student_id FROM students WHERE account_id = ? LIMIT 1',
+    [accountId]
+  );
+  return rows[0]?.student_id || null;
+};
+
+const canAccessStudent = async (req, studentId) => {
+  if (req.user?.role !== 'student') return false;
+
+  const authenticatedStudentId = await getStudentIdForAccount(getAuthenticatedAccountId(req));
+  return String(authenticatedStudentId) === String(studentId);
+};
+
+const getTestOwnerStudentId = async (testId) => {
+  const [rows] = await pool.query(
+    'SELECT student_id FROM test_results WHERE test_id = ? LIMIT 1',
+    [testId]
+  );
+  return rows[0]?.student_id || null;
+};
 
 /**
  * Submit test baru
- * Menerima 21 jawaban dari frontend, kalkulasi fuzzy logic, simpan ke database
+ * Menerima 21 jawaban dari frontend, kalkulasi DASS-21, simpan ke database
  * 
  * Request body:
  * {
@@ -19,13 +48,22 @@ import { v4 as uuidv4 } from 'uuid';
  */
 export const submitTest = async (req, res) => {
   try {
-    const { student_id, answers } = req.body;
+    const { answers } = req.body;
 
     // Validasi input
-    if (!student_id || !answers) {
+    if (!answers) {
       return res.status(400).json({ 
-        message: 'student_id dan answers harus diisi' 
+        message: 'answers harus diisi' 
       });
+    }
+
+    if (req.user?.role !== 'student') {
+      return res.status(403).json({ message: 'Hanya mahasiswa yang dapat mengirim test' });
+    }
+
+    const student_id = await getStudentIdForAccount(getAuthenticatedAccountId(req));
+    if (!student_id) {
+      return res.status(403).json({ message: 'Akun mahasiswa pada token tidak ditemukan' });
     }
 
     if (!Array.isArray(answers) || answers.length !== 21) {
@@ -42,9 +80,9 @@ export const submitTest = async (req, res) => {
       });
     }
 
-    // Kalkulasi fuzzy logic
-    const fuzzyResult = calculateFuzzy(answers);
-    const { score, level, fuzzy_score } = fuzzyResult;
+    // Kalkulasi DASS-21 berdasarkan ambang kategori standar.
+    const dassResult = calculateDassResult(answers);
+    const { score, level, severity_score } = dassResult;
 
     // Generate unique test ID
     const test_id = `test-${uuidv4().substring(0, 8)}`;
@@ -55,7 +93,7 @@ export const submitTest = async (req, res) => {
       VALUES (?, ?, NOW(), ?, ?, ?, ?)
     `;
 
-    // Convert answers array ke JSON string (database menge-check json_valid)
+    // Convert answers array ke JSON string untuk kolom JSON MySQL.
     const answersJSON = JSON.stringify(answers);
 
     const result = await pool.query(insertQuery, [
@@ -63,7 +101,7 @@ export const submitTest = async (req, res) => {
       student_id,
       score,
       level,
-      fuzzy_score,
+      severity_score,
       answersJSON
     ]);
 
@@ -77,7 +115,7 @@ export const submitTest = async (req, res) => {
         student_id,
         score,
         level,
-        fuzzy_score,
+        severity_score,
         description,
         timestamp: new Date().toISOString()
       }
@@ -108,6 +146,10 @@ export const getTestsByStudent = async (req, res) => {
       });
     }
 
+    if (!(await canAccessStudent(req, student_id))) {
+      return res.status(403).json({ message: 'Akses ditolak. Anda hanya boleh melihat history milik sendiri' });
+    }
+
     // Query test results untuk student
     const query = `
       SELECT test_id, student_id, date, score, level, fuzzy_score, answers
@@ -121,7 +163,7 @@ export const getTestsByStudent = async (req, res) => {
     // Parse JSON answers kembali ke array
     const parsedResults = results.map(result => ({
       ...result,
-      answers: JSON.parse(result.answers)
+      answers: parseAnswers(result.answers)
     }));
 
     res.status(200).json({
@@ -155,6 +197,17 @@ export const getTestDetail = async (req, res) => {
       });
     }
 
+    const ownerStudentId = await getTestOwnerStudentId(test_id);
+    if (!ownerStudentId) {
+      return res.status(404).json({
+        message: 'Test tidak ditemukan'
+      });
+    }
+
+    if (!(await canAccessStudent(req, ownerStudentId))) {
+      return res.status(403).json({ message: 'Akses ditolak. Anda tidak boleh melihat detail test ini' });
+    }
+
     const query = `
       SELECT test_id, student_id, date, score, level, fuzzy_score, answers
       FROM test_results
@@ -176,7 +229,7 @@ export const getTestDetail = async (req, res) => {
       message: 'Test detail berhasil diambil',
       result: {
         ...result,
-        answers: JSON.parse(result.answers),
+        answers: parseAnswers(result.answers),
         description
       }
     });
@@ -201,6 +254,10 @@ export const getTestStatistics = async (req, res) => {
       return res.status(400).json({ 
         message: 'student_id harus diisi' 
       });
+    }
+
+    if (!(await canAccessStudent(req, student_id))) {
+      return res.status(403).json({ message: 'Akses ditolak. Anda hanya boleh melihat statistik milik sendiri' });
     }
 
     const query = `

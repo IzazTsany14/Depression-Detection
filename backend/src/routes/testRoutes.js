@@ -11,16 +11,18 @@ import {
   getTestStatistics,
   deleteTest
 } from '../controllers/testController.js';
-import { verifyToken } from '../middleware/authMiddleware.js';
+import { authorizeRole, verifyToken } from '../middleware/authMiddleware.js';
 import pool from '../config/db.js';
 
 const router = express.Router();
+
+router.use(verifyToken);
 
 /**
  * GET /api/tests
  * Get semua test results (Untuk Admin/BK)
  */
-router.get('/', async (req, res) => {
+router.get('/', authorizeRole('admin', 'bk'), async (req, res) => {
   try {
     const query = `
       SELECT
@@ -49,7 +51,7 @@ router.get('/', async (req, res) => {
  * Submit test baru dengan 21 jawaban
  * Body: { student_id, answers: [0,1,2,...] }
  */
-router.post('/submit', submitTest);
+router.post('/submit', authorizeRole('student'), submitTest);
 
 /**
  * GET /api/tests/student/:student_id
@@ -73,6 +75,6 @@ router.get('/statistics/:student_id', getTestStatistics);
  * DELETE /api/tests/:test_id
  * Delete test result
  */
-router.delete('/:test_id', deleteTest);
+router.delete('/:test_id', authorizeRole('admin'), deleteTest);
 
 export default router;

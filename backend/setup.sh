@@ -39,9 +39,10 @@ echo ""
 if [ ! -f .env ]; then
     echo "⚠️  .env file not found. Creating from template..."
     cat > .env << 'EOF'
-DB_HOST=localhost
+DB_HOST=127.0.0.1
+DB_PORT=3306
 DB_USER=root
-DB_PASSWORD=your_password_here
+DB_PASSWORD=
 DB_NAME=depresi
 PORT=5000
 NODE_ENV=development
@@ -60,7 +61,7 @@ echo "======================================"
 echo ""
 echo "Next steps:"
 echo "1. Edit backend/.env with your database credentials"
-echo "2. Make sure MySQL is running"
+echo "2. Import database/depresi.sql in phpMyAdmin or MySQL CLI"
 echo "3. Run: pnpm dev (development)"
 echo "4. Or:  pnpm start (production)"
 echo ""

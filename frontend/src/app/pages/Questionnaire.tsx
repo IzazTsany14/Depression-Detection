@@ -8,9 +8,9 @@ import { Progress } from '../components/ui/progress';
 import { RadioGroup, RadioGroupItem } from '../components/ui/radio-group';
 import { Label } from '../components/ui/label';
 import { useAuth } from '../context/AuthContext';
-import { DASS21_QUESTIONS, ANSWER_OPTIONS } from './bk/dass21Questions';
-import { calculateDepressionScore, getDepressionLevel } from '../utils/fuzzyLogic';
-import { ArrowLeft, ArrowRight, AlertCircle } from 'lucide-react';
+import { ConfigurableQuestion, loadQuestionConfigs } from './bk/questionConfig';
+import { calculateDepressionScore, getDepressionLevel } from '../utils/dassScoring';
+import { ArrowLeft, ArrowRight, AlertCircle, ShieldAlert } from 'lucide-react';
 import { Alert, AlertDescription } from '../components/ui/alert';
 
 export const Questionnaire: React.FC = () => {
@@ -18,8 +18,15 @@ export const Questionnaire: React.FC = () => {
   const navigate = useNavigate();
   
   const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [questions, setQuestions] = useState<ConfigurableQuestion[]>([]);
   const [answers, setAnswers] = useState<number[]>(new Array(21).fill(-1));
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    const loadedQuestions = loadQuestionConfigs().sort((a, b) => a.id - b.id);
+    setQuestions(loadedQuestions);
+    setAnswers(new Array(loadedQuestions.length).fill(-1));
+  }, []);
 
   useEffect(() => {
     // If neither guest nor logged in, redirect to home
@@ -41,7 +48,7 @@ export const Questionnaire: React.FC = () => {
       return;
     }
 
-    if (currentQuestion < DASS21_QUESTIONS.length - 1) {
+    if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
       setError('');
     }
@@ -54,14 +61,14 @@ export const Questionnaire: React.FC = () => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (answers[currentQuestion] === -1) {
       setError('Silakan pilih salah satu jawaban sebelum melanjutkan');
       return;
     }
 
     // Check if all questions are answered
-    if (answers.some(a => a === -1)) {
+    if (answers.length !== questions.length || answers.some(a => a === -1)) {
       setError('Mohon jawab semua pertanyaan sebelum menyelesaikan tes');
       return;
     }
@@ -79,8 +86,12 @@ export const Questionnaire: React.FC = () => {
         level: level.level,
         answers: answers,
       };
-      saveTestResult(result);
-      navigate('/result/registered');
+      try {
+        const savedResult = await saveTestResult(result);
+        navigate('/result/registered', { state: { result: savedResult || result } });
+      } catch (error: any) {
+        setError(error.message || 'Gagal menyimpan hasil tes');
+      }
     } else {
       // For guest, store answers temporarily
       setCurrentTestAnswers(answers);
@@ -88,8 +99,12 @@ export const Questionnaire: React.FC = () => {
     }
   };
 
-  const progress = ((currentQuestion + 1) / DASS21_QUESTIONS.length) * 100;
-  const question = DASS21_QUESTIONS[currentQuestion];
+  const progress = questions.length > 0 ? ((currentQuestion + 1) / questions.length) * 100 : 0;
+  const question = questions[currentQuestion];
+
+  if (!question) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white">
@@ -107,11 +122,18 @@ export const Questionnaire: React.FC = () => {
             </Alert>
           )}
 
+          <Alert className="mb-6 bg-blue-50 border-blue-200">
+            <ShieldAlert className="h-4 w-4 text-blue-600" />
+            <AlertDescription className="text-blue-900">
+              DASS-21 adalah alat skrining awal, bukan diagnosis medis. Jawab sesuai kondisi dalam seminggu terakhir; jika merasa tidak aman atau muncul dorongan menyakiti diri, segera hubungi orang terdekat, BK, atau layanan darurat.
+            </AlertDescription>
+          </Alert>
+
           {/* Progress Bar */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-lg font-semibold text-gray-900">
-                Pertanyaan {currentQuestion + 1} dari {DASS21_QUESTIONS.length}
+                Pertanyaan {currentQuestion + 1} dari {questions.length}
               </h2>
               <span className="text-sm text-gray-600">
                 {Math.round(progress)}% selesai
@@ -148,21 +170,21 @@ export const Questionnaire: React.FC = () => {
               onValueChange={handleAnswerChange}
               className="space-y-3"
             >
-              {ANSWER_OPTIONS.map((option) => (
+              {question.answers.map((option, index) => (
                 <div
-                  key={option.value}
+                  key={`${question.id}-${option.label}-${option.weight}`}
                   className={`flex items-center space-x-3 border-2 rounded-lg p-4 cursor-pointer transition-all ${
-                    answers[currentQuestion] === option.value
+                    answers[currentQuestion] === option.weight
                       ? 'border-blue-600 bg-blue-50'
                       : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
                   }`}
                 >
                   <RadioGroupItem
-                    value={option.value.toString()}
-                    id={`q${currentQuestion}-option${option.value}`}
+                    value={option.weight.toString()}
+                    id={`q${currentQuestion}-option${index}`}
                   />
                   <Label
-                    htmlFor={`q${currentQuestion}-option${option.value}`}
+                    htmlFor={`q${currentQuestion}-option${index}`}
                     className="flex-1 cursor-pointer text-base font-medium"
                   >
                     {option.label}
@@ -185,7 +207,7 @@ export const Questionnaire: React.FC = () => {
               Sebelumnya
             </Button>
 
-            {currentQuestion === DASS21_QUESTIONS.length - 1 ? (
+            {currentQuestion === questions.length - 1 ? (
               <Button
                 size="lg"
                 onClick={handleSubmit}
@@ -210,7 +232,7 @@ export const Questionnaire: React.FC = () => {
           <div className="mt-8 p-4 bg-white rounded-lg border border-gray-200">
             <p className="text-sm text-gray-600 mb-3">Navigasi Cepat:</p>
             <div className="flex flex-wrap gap-2">
-              {DASS21_QUESTIONS.map((_, index) => (
+              {questions.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentQuestion(index)}

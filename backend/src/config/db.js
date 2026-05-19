@@ -1,34 +1,35 @@
 /**
  * Database Configuration
- * Menggunakan mysql2/promise untuk performa async yang optimal.
+ * Menggunakan MySQL/MariaDB dengan database default `depresi`.
  */
 import mysql from 'mysql2/promise';
-import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
-import path from 'path';
+import './env.js';
 
-const envPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../.env');
-dotenv.config({ path: envPath });
+const hasDatabaseConfig = Boolean(process.env.DB_HOST || process.env.DB_USER || process.env.DB_NAME);
 
 const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
+  host: process.env.DB_HOST || '127.0.0.1',
+  port: Number(process.env.DB_PORT || 3306),
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'depresi',
   waitForConnections: true,
-  connectionLimit: 10,
+  connectionLimit: Number(process.env.DB_POOL_SIZE || 10),
   queueLimit: 0,
-  enableKeepAlive: true
+  timezone: 'Z'
 });
 
-pool.getConnection()
-  .then((connection) => {
-    console.log('Database connected successfully');
-    connection.release();
+pool.query('SELECT 1')
+  .then(() => {
+    console.log('MySQL connected successfully');
   })
   .catch((error) => {
     console.error('Database connection failed:', error.message || error.code || error);
-    console.error('Pastikan MySQL berjalan dan database depresi sudah di-import dari database/depresi.sql');
+    console.error('Pastikan MySQL/MariaDB aktif, database `depresi` sudah dibuat, dan backend/.env sudah benar.');
   });
+
+if (!hasDatabaseConfig) {
+  console.warn('Database config tidak lengkap, memakai default MySQL: root@127.0.0.1:3306/depresi');
+}
 
 export default pool;

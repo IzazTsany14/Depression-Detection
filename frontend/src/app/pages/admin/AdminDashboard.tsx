@@ -16,6 +16,18 @@ import {
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 
+const getFacultyShortName = (faculty: string) => {
+  const normalized = faculty.toLowerCase();
+  if (normalized.includes('fisipol') || normalized.includes('sosial')) return 'FISIPOL';
+  if (normalized.includes('ekonomi') || normalized.includes('feb')) return 'FEB';
+  if (normalized.includes('teknik') || normalized.includes('ft')) return 'FT';
+  if (normalized.includes('vokasi') || normalized.includes('fv')) return 'FV';
+  if (normalized.includes('hukum') || normalized.includes('fh')) return 'FH';
+  if (normalized.includes('matematika') || normalized.includes('fmipa')) return 'FMIPA';
+  if (normalized.includes('psdku')) return 'PSDKU';
+  return faculty.length > 14 ? `${faculty.slice(0, 14)}...` : faculty;
+};
+
 export const AdminDashboard: React.FC = () => {
   const { user, getAllTestResults, getAllStudents } = useAuth();
   const navigate = useNavigate();
@@ -110,7 +122,8 @@ export const AdminDashboard: React.FC = () => {
 
   const facultyChartData = Object.entries(facultyData).map(([name, value], index) => ({
     id: `faculty-${index}`,
-    name,
+    name: getFacultyShortName(name),
+    fullName: name,
     mahasiswa: value
   }));
 
@@ -264,12 +277,15 @@ export const AdminDashboard: React.FC = () => {
                   <Users className="w-5 h-5 text-orange-600" />
                   Distribusi Fakultas
                 </h3>
-                <ResponsiveContainer width="100%" height={300}>
+                <ResponsiveContainer width="100%" height={Math.max(300, facultyChartData.length * 48)}>
                   <BarChart data={facultyChartData} layout="vertical">
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis type="number" />
-                    <YAxis dataKey="name" type="category" width={150} />
-                    <Tooltip />
+                    <YAxis dataKey="name" type="category" width={90} tick={{ fontSize: 12 }} />
+                    <Tooltip
+                      formatter={(value) => [`${value} mahasiswa`, 'Jumlah']}
+                      labelFormatter={(_, payload) => payload?.[0]?.payload?.fullName || ''}
+                    />
                     <Legend />
                     <Bar dataKey="mahasiswa" fill="#FF9800">
                       {facultyChartData.map((entry) => (

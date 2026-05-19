@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -9,6 +9,8 @@ import { FileText, Save, Download, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from './ui/alert';
 import jsPDF from 'jspdf';
 import { toast } from 'sonner';
+import { showSuccessDialog } from '../utils/successDialog';
+import { apiUrl } from '../utils/api';
 
 interface MedicalRecordFormProps {
   onSave: (record: MedicalRecord) => void;
@@ -39,6 +41,7 @@ export interface MedicalRecord {
 interface Student {
   name: string;
   nim: string;
+  nik?: string;
   faculty?: string;
   major?: string;
   semester?: number;
@@ -51,55 +54,84 @@ export const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ onSave, on
     depressionLevel: 'Normal',
   });
   const [notFound, setNotFound] = useState(false);
+  const [loadingStudent, setLoadingStudent] = useState(false);
 
   const handleChange = (field: keyof MedicalRecord, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleNikChange = (nik: string) => {
-    handleChange('nik', nik);
-    
-    if (nik.trim() === '') {
-      setFormData(prev => ({
-        ...prev,
-        studentName: '',
-        nim: '',
-        faculty: '',
-        major: '',
-        semester: ''
-      }));
-      setNotFound(false);
-      return;
-    }
+  const handleNimChange = (nim: string) => {
+    handleChange('nim', nim);
 
-    const [student, setStudent] = useState<Student | null>(null); 
-    // Akan diganti fetch dari Database
-    
-    if (student) {
+    if (nim.trim() === '') {
       setFormData(prev => ({
         ...prev,
-        nik: nik,
-        studentName: student.name,
-        nim: student.nim,
-        faculty: student.faculty || '',
-        major: student.major || '',
-        semester: student.semester ? student.semester.toString() : ''
-      }));
-      setNotFound(false);
-      toast.success('Data mahasiswa ditemukan');
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        nik: nik,
         studentName: '',
+        nik: '',
         nim: '',
         faculty: '',
         major: '',
         semester: ''
       }));
-      setNotFound(true);
+      setNotFound(false);
     }
   };
+
+  useEffect(() => {
+    const nim = String(formData.nim || '').trim();
+
+    if (!nim || nim.length < 6) return;
+
+    const timeout = window.setTimeout(async () => {
+      setLoadingStudent(true);
+
+      try {
+        const res = await fetch(apiUrl(`/auth/students/nim/${encodeURIComponent(nim)}`));
+        const data = await res.json();
+        let student = res.ok ? data.student as Student : null;
+
+        if (!student) {
+          const fallbackRes = await fetch(apiUrl('/students'));
+          const fallbackData = await fallbackRes.json();
+
+          if (fallbackRes.ok) {
+            student = (fallbackData.data || []).find((item: Student) => String(item.nim) === nim) || null;
+          }
+        }
+
+        if (!student) {
+          setFormData(prev => ({
+            ...prev,
+            studentName: '',
+            nik: '',
+            faculty: '',
+            major: '',
+            semester: ''
+          }));
+          setNotFound(true);
+          return;
+        }
+
+        setFormData(prev => ({
+          ...prev,
+          studentName: student.name || '',
+          nik: student.nik || '',
+          nim: student.nim || nim,
+          faculty: student.faculty || '',
+          major: student.major || '',
+          semester: student.semester ? student.semester.toString() : ''
+        }));
+        setNotFound(false);
+        toast.success('Data mahasiswa ditemukan');
+      } catch {
+        setNotFound(true);
+      } finally {
+        setLoadingStudent(false);
+      }
+    }, 300);
+
+    return () => window.clearTimeout(timeout);
+  }, [formData.nim]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -132,7 +164,7 @@ export const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ onSave, on
     };
 
     onSave(record);
-    toast.success('Rekam medis berhasil disimpan');
+    showSuccessDialog('Data berhasil diperbarui');
   };
 
   return (
@@ -150,24 +182,26 @@ export const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ onSave, on
         <div className="space-y-4">
           <h4 className="font-semibold text-lg text-gray-900 border-b pb-2">Data Mahasiswa</h4>
           
-          {/* NIK Search Field - First */}
+          {/* NIM Search Field - First */}
           <div>
-            <Label htmlFor="nik">NIK (Nomor Induk Kependudukan) *</Label>
+            <Label htmlFor="nimSearch">NIM (Nomor Induk Mahasiswa) *</Label>
             <Input
-              id="nik"
-              value={formData.nik || ''}
-              onChange={(e) => handleNikChange(e.target.value)}
-              placeholder="Masukkan NIK untuk mencari data mahasiswa"
+              id="nimSearch"
+              value={formData.nim || ''}
+              onChange={(e) => handleNimChange(e.target.value)}
+              placeholder="Masukkan NIM untuk mencari data mahasiswa"
               required
             />
-            <p className="text-xs text-gray-500 mt-1">Data lainnya akan terisi otomatis setelah NIK dimasukkan</p>
+            <p className="text-xs text-gray-500 mt-1">
+              {loadingStudent ? 'Mencari data mahasiswa...' : 'Data lainnya akan terisi otomatis setelah NIM dimasukkan'}
+            </p>
           </div>
 
-          {notFound && formData.nik && (
+          {notFound && formData.nim && (
             <Alert className="bg-red-50 border-red-300">
               <AlertCircle className="h-5 w-5 text-red-600" />
               <AlertDescription className="text-red-900">
-                NIK tidak ditemukan dalam sistem. Mohon periksa kembali nomor NIK.
+                NIM tidak ditemukan dalam sistem. Mohon periksa kembali nomor NIM.
               </AlertDescription>
             </Alert>
           )}

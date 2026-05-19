@@ -6,6 +6,7 @@ import { Download, Eye, Trash2, FileText } from 'lucide-react';
 import { MedicalRecord } from './MedicalRecordForm';
 import jsPDF from 'jspdf';
 import { toast } from 'sonner';
+import { showSuccessDialog } from '../utils/successDialog';
 
 interface MedicalRecordListProps {
   records: MedicalRecord[];
@@ -241,7 +242,7 @@ export const MedicalRecordList: React.FC<MedicalRecordListProps> = ({ records, o
               onClick={() => {
                 if (confirm('Yakin ingin menghapus rekam medis ini?')) {
                   onDelete(record.id);
-                  toast.success('Rekam medis berhasil dihapus');
+                  showSuccessDialog('Data berhasil dihapus');
                 }
               }}
             >

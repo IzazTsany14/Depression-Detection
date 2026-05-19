@@ -45,9 +45,10 @@ REM Check if .env exists
 if not exist .env (
     echo ⚠️  .env file not found. Creating from template...
     (
-        echo DB_HOST=localhost
+        echo DB_HOST=127.0.0.1
+        echo DB_PORT=3306
         echo DB_USER=root
-        echo DB_PASSWORD=your_password_here
+        echo DB_PASSWORD=
         echo DB_NAME=depresi
         echo PORT=5000
         echo NODE_ENV=development
@@ -66,7 +67,7 @@ echo ======================================
 echo.
 echo Next steps:
 echo 1. Edit backend\.env with your database credentials
-echo 2. Make sure MySQL is running
+echo 2. Import database\depresi.sql in phpMyAdmin or MySQL CLI
 echo 3. Run: pnpm dev (development^)
 echo 4. Or:  pnpm start (production^)
 echo.

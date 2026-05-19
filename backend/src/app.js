@@ -4,7 +4,7 @@
  */
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
+import './config/env.js';
 import pool from './config/db.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -15,20 +15,34 @@ import testRoutes from './routes/testRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 
 // Import middleware
-import { errorHandler } from './middleware/authMiddleware.js';
-
-dotenv.config();
+import { authorizeRole, errorHandler, verifyToken } from './middleware/authMiddleware.js';
 
 const app = express();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // ============ MIDDLEWARE ============
 
-/**
- * CORS Configuration
- * Mengizinkan request dari frontend (React Vite di localhost:5173)
- */
-app.use(cors());
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  ...(process.env.FRONTEND_URLS || process.env.FRONTEND_URL || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+];
+const allowedOriginSet = new Set(allowedOrigins);
+
+app.use(cors({
+  origin(origin, callback) {
+    if (!origin || allowedOriginSet.has(origin)) {
+      callback(null, true);
+      return;
+    }
+
+    callback(new Error(`Origin ${origin} tidak diizinkan oleh CORS`));
+  },
+  credentials: true
+}));
 
 /**
  * Body Parser
@@ -38,7 +52,7 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
 
-app.get('/api/students', async (req, res) => {
+app.get('/api/history_students', verifyToken, authorizeRole('admin', 'bk'), async (req, res) => {
   try {
     const query = `
       SELECT

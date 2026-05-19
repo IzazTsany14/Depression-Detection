@@ -68,7 +68,7 @@ export const AdminQuestionManagement: React.FC = () => {
             <Card className="p-4 border-l-4 border-l-purple-500">
               <div className="text-sm text-gray-600">Bobot per Jawaban</div>
               <div className="text-2xl font-bold">0-3</div>
-              <div className="text-xs text-gray-500 mt-1">Dapat dikustomisasi</div>
+              <div className="text-xs text-gray-500 mt-1">Standar dan terbalik sesuai pertanyaan</div>
             </Card>
           </div>
 
@@ -77,8 +77,9 @@ export const AdminQuestionManagement: React.FC = () => {
             <div className="text-sm">
               <strong>💡 Panduan:</strong>
               <ul className="list-disc list-inside mt-2 space-y-1 text-xs text-gray-700">
-                <li>Klik tombol "Edit" untuk mengubah pertanyaan atau bobot jawaban</li>
-                <li>Gunakan tombol "Acak Bobot" untuk mengacak nilai bobot (0-3) setiap jawaban</li>
+                <li>Klik tombol "Edit" untuk mengubah teks pertanyaan</li>
+                <li>Pertanyaan gejala memakai bobot standar: Tidak pernah=0 sampai Sangat sering=3</li>
+                <li>Pertanyaan positif memakai bobot terbalik: Tidak pernah=3 sampai Sangat sering=0</li>
                 <li>Perubahan disimpan ke penyimpanan lokal browser</li>
                 <li>Klik "Simpan Semua Perubahan" untuk menyimpan semua modifikasi</li>
               </ul>

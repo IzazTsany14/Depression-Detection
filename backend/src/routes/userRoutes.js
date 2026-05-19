@@ -5,10 +5,34 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import pool from '../config/db.js';
+import { authorizeRole, verifyToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const profileUploadDir = path.resolve(__dirname, '../../uploads/profiles');
+
+const facultyFolderMap = [
+  { pattern: /fisipol|ilmu sosial/i, folder: 'fisipol' },
+  { pattern: /feb|ekonomi/i, folder: 'feb' },
+  { pattern: /ft|teknik/i, folder: 'ft' },
+  { pattern: /fv|vokasi/i, folder: 'fv' },
+  { pattern: /fh|hukum/i, folder: 'fh' },
+  { pattern: /fmipa|matematika|pengetahuan alam/i, folder: 'fmipa' },
+  { pattern: /psdku/i, folder: 'psdku' }
+];
+
+const getProfileFolder = (role, faculty) => {
+  if (role !== 'student') return 'staff';
+
+  const matchedFaculty = facultyFolderMap.find(({ pattern }) => pattern.test(faculty || ''));
+  if (matchedFaculty) return matchedFaculty.folder;
+
+  return String(faculty || 'unknown')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'unknown';
+};
 
 const getUsersQuery = `
   SELECT
@@ -47,12 +71,41 @@ const normalizeUser = (user) => ({
   profilePicture: user.profile_picture
 });
 
+const verifyStoredPassword = async (plainPassword, storedPassword) => {
+  if (typeof storedPassword === 'string' && storedPassword.startsWith('$2')) {
+    return bcrypt.compare(plainPassword, storedPassword);
+  }
+
+  return plainPassword === storedPassword;
+};
+
 const getUserByAccountId = async (accountId) => {
   const [rows] = await pool.query(`${getUsersQuery} WHERE a.account_id = ? LIMIT 1`, [accountId]);
   return rows[0] ? normalizeUser(rows[0]) : null;
 };
 
-const saveProfileImage = async (profileImage, accountId) => {
+const getAccountPassword = async (accountId) => {
+  const [rows] = await pool.query('SELECT password FROM accounts WHERE account_id = ? LIMIT 1', [accountId]);
+  return rows[0]?.password || null;
+};
+
+const getAuthenticatedAccountId = (req) => req.user?.accountId || req.user?.id;
+
+const authorizeSelfOrAdmin = (req, res, next) => {
+  const authenticatedAccountId = getAuthenticatedAccountId(req);
+
+  if (!authenticatedAccountId) {
+    return res.status(401).json({ message: 'User tidak authenticated' });
+  }
+
+  if (req.user.role === 'admin' || authenticatedAccountId === req.params.accountId) {
+    return next();
+  }
+
+  return res.status(403).json({ message: 'Akses ditolak. Anda hanya boleh mengakses data akun sendiri' });
+};
+
+const saveProfileImage = async (profileImage, { accountId, role, faculty }) => {
   if (!profileImage?.dataUrl) return null;
 
   const match = String(profileImage.dataUrl).match(/^data:(image\/(?:png|jpeg));base64,([A-Za-z0-9+/=]+)$/);
@@ -72,14 +125,19 @@ const saveProfileImage = async (profileImage, accountId) => {
     throw error;
   }
 
-  await fs.mkdir(profileUploadDir, { recursive: true });
-  const fileName = `${accountId}-${Date.now()}.${extension}`;
-  await fs.writeFile(path.join(profileUploadDir, fileName), buffer);
+  const folder = getProfileFolder(role, faculty);
+  const accountUploadDir = path.join(profileUploadDir, folder, accountId);
+  const fileName = `profile.${extension}`;
 
-  return `/uploads/profiles/${fileName}`;
+  await fs.mkdir(accountUploadDir, { recursive: true });
+  await fs.writeFile(path.join(accountUploadDir, fileName), buffer);
+
+  return `uploads/profiles/${folder}/${accountId}/${fileName}`;
 };
 
-router.get('/', async (req, res) => {
+router.use(verifyToken);
+
+router.get('/', authorizeRole('admin'), async (req, res) => {
   try {
     const [rows] = await pool.query(`${getUsersQuery} ORDER BY a.role ASC, name ASC`);
     res.json({ data: rows.map(normalizeUser) });
@@ -91,7 +149,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', authorizeRole('admin'), async (req, res) => {
   const connection = await pool.getConnection();
 
   try {
@@ -121,7 +179,7 @@ router.post('/', async (req, res) => {
     }
 
     const accountId = `${role}-${uuidv4().slice(0, 8)}`;
-    const profilePicture = await saveProfileImage(profileImage, accountId);
+    const profilePicture = await saveProfileImage(profileImage, { accountId, role, faculty });
     const hashedPassword = await bcrypt.hash(password, 12);
 
     await connection.beginTransaction();
@@ -162,7 +220,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.put('/:accountId', async (req, res) => {
+router.put('/:accountId', authorizeSelfOrAdmin, async (req, res) => {
   const connection = await pool.getConnection();
 
   try {
@@ -186,11 +244,23 @@ router.put('/:accountId', async (req, res) => {
       profileImage
     } = req.body;
 
-    const profilePicture = await saveProfileImage(profileImage, accountId);
+    if (password && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Akses ditolak. Ubah password harus melalui endpoint password dengan password saat ini' });
+    }
+
+    const profilePicture = await saveProfileImage(profileImage, {
+      accountId,
+      role: existingUser.role,
+      faculty: existingUser.role === 'student' ? (faculty || existingUser.faculty) : null
+    });
     const accountFields = ['email = ?'];
     const accountValues = [email];
 
     if (password) {
+      if (String(password).length < 6) {
+        return res.status(400).json({ message: 'Password minimal 6 karakter' });
+      }
+
       accountFields.push('password = ?');
       accountValues.push(await bcrypt.hash(password, 12));
     }
@@ -236,7 +306,48 @@ router.put('/:accountId', async (req, res) => {
   }
 });
 
-router.delete('/:accountId', async (req, res) => {
+const handlePasswordChange = async (req, res) => {
+  try {
+    const { accountId } = req.params;
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: 'Password saat ini dan password baru wajib diisi' });
+    }
+
+    if (String(newPassword).length < 6) {
+      return res.status(400).json({ message: 'Password minimal 6 karakter' });
+    }
+
+    if (currentPassword === newPassword) {
+      return res.status(400).json({ message: 'Password baru harus berbeda dari password saat ini' });
+    }
+
+    const existingUser = await getUserByAccountId(accountId);
+    if (!existingUser) return res.status(404).json({ message: 'User tidak ditemukan' });
+
+    const storedPassword = await getAccountPassword(accountId);
+    const passwordMatches = await verifyStoredPassword(currentPassword, storedPassword);
+    if (!passwordMatches) {
+      return res.status(401).json({ message: 'Password saat ini salah' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    await pool.query('UPDATE accounts SET password = ? WHERE account_id = ?', [hashedPassword, accountId]);
+
+    res.json({ message: 'Password berhasil diubah' });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Gagal mengubah password',
+      error: error.message
+    });
+  }
+};
+
+router.patch('/:accountId/password', authorizeSelfOrAdmin, handlePasswordChange);
+router.put('/:accountId/password', authorizeSelfOrAdmin, handlePasswordChange);
+
+router.delete('/:accountId', authorizeRole('admin'), async (req, res) => {
   try {
     const [result] = await pool.query('DELETE FROM accounts WHERE account_id = ?', [req.params.accountId]);
     if (result.affectedRows === 0) return res.status(404).json({ message: 'User tidak ditemukan' });

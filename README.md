@@ -1,26 +1,24 @@
 <div align='center'>
   <a href="https://git.io/typing-svg">
-    <img src="https://readme-typing-svg.herokuapp.com?font=Poppins&weight=600&size=38&pause=1000&color=0B84F3&center=true&vCenter=true&width=800&height=70&lines=MindCheck;Sistem+Deteksi+Dini+Tingkat+Depresi;Logika+Fuzzy+%2B+Instrumen+DASS-21" alt="Typing SVG" />
+    <img src="https://readme-typing-svg.herokuapp.com?font=Poppins&weight=600&size=38&pause=1000&color=0B84F3&center=true&vCenter=true&width=800&height=70&lines=MindCheck;Sistem+Deteksi+Dini+Tingkat+Depresi;+DASS-21" alt="Typing SVG" />
   </a>
 </div>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Frontend-React%2F-61DAFB?style=for-the-badge&logo=react" alt="React Badge">
+  <img src="https://img.shields.io/badge/Frontend-React-61DAFB?style=for-the-badge&logo=react" alt="React Badge">
   <img src="https://img.shields.io/badge/Language-TypeScript-3178C6?style=for-the-badge&logo=typescript" alt="TypeScript Badge">
   <img src="https://img.shields.io/badge/Styling-TailwindCSS-06B6D4?style=for-the-badge&logo=tailwind-css" alt="Tailwind Badge">
-  <img src="https://img.shields.io/badge/Backend-Node.Js-092E20?style=for-the-badge&logo=django" alt="Node Js Badge">
+  <img src="https://img.shields.io/badge/Backend-Node.Js-092E20?style=for-the-badge&logo=Node.Js" alt="Node Js Badge">
   <img src="https://img.shields.io/badge/Database-MySQL-4479A1?style=for-the-badge&logo=mysql" alt="MySQL Badge">
 </p>
 
 ---
-## Link priview
-**https://depression-detection-kelompok8.netlify.app/**
 
 ## 🌐 Tentang Proyek
 
 **MindCheck** adalah platform berbasis web yang dikembangkan untuk mendeteksi tingkat depresi secara dini pada mahasiswa, khususnya di lingkungan **Universitas Negeri Surabaya (UNESA)**. 
 
-Sistem ini mengintegrasikan instrumen psikometrik **DASS-21** (Depression Anxiety Stress Scale-21) dengan **Logika Fuzzy** sebagai inti penalaran untuk menangani subjektivitas dan ketidakpastian jawaban pengguna. 
+Sistem ini mengintegrasikan instrumen psikometrik **DASS-21** (Depression Anxiety Stress Scale-21) sebagai inti penalaran untuk menangani subjektivitas dan ketidakpastian jawaban pengguna. 
 
 **Disclaimer**: Proyek ini merupakan instrumen skrining awal dan tidak menggantikan diagnosis klinis dari tenaga profesional (psikolog/psikiater).
 
@@ -41,10 +39,9 @@ Sistem ini mengintegrasikan instrumen psikometrik **DASS-21** (Depression Anxiet
 
 | Komponen | Teknologi |
 |-----------|------------|
-| **Frontend** | React, Next.js, TypeScript, Tailwind CSS, Shadcn/UI |
-| **Logic Engine** |JavaScript (Fuzzy Logic Implementation) |
-| **Backend** | Python (Django Framework)  |
-| **Database** | MySQL (Main DB) & Redis (Caching) |
+| **Frontend** | React, TypeScript, Tailwind CSS, Shadcn/UI |
+| **Backend** | Node.Js  |
+| **Database** | MySQL / MariaDB |
 | **UI/UX** | Figma (Design System)  |
 
 ---

@@ -6,13 +6,8 @@
 import pool from '../config/db.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import dotenv from 'dotenv';
+import '../config/env.js';
 import { v4 as uuidv4 } from 'uuid';
-import { fileURLToPath } from 'url';
-import path from 'path';
-
-const envPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../.env');
-dotenv.config({ path: envPath });
 
 const databaseUnavailableCodes = [
   'ECONNREFUSED',
@@ -20,7 +15,9 @@ const databaseUnavailableCodes = [
   'ENOTFOUND',
   'ETIMEDOUT',
   'ER_BAD_DB_ERROR',
-  'PROTOCOL_CONNECTION_LOST'
+  'PROTOCOL_CONNECTION_LOST',
+  '28P01',
+  '3D000'
 ];
 
 const isDatabaseUnavailable = (error) => (
@@ -28,13 +25,26 @@ const isDatabaseUnavailable = (error) => (
   databaseUnavailableCodes.some((code) => String(error?.message || '').includes(code))
 );
 
+const getJwtSecret = () => {
+  const secret = process.env.JWT_SECRET;
+
+  if (!secret || secret === 'your-secret-key') {
+    const error = new Error('JWT_SECRET belum dikonfigurasi dengan aman di backend/.env');
+    error.status = 500;
+    throw error;
+  }
+
+  return secret;
+};
+
 const signToken = (account) => jwt.sign(
   {
+    sub: account.account_id,
     accountId: account.account_id,
     email: account.email,
     role: account.role
   },
-  process.env.JWT_SECRET || 'your-secret-key',
+  getJwtSecret(),
   { expiresIn: '24h' }
 );
 
@@ -100,6 +110,52 @@ const getUserWithProfile = async (accountId) => {
   };
 };
 
+export const getStudentByNim = async (req, res) => {
+  try {
+    const nim = String(req.params.nim || '').trim();
+
+    if (!nim) {
+      return res.status(400).json({ message: 'NIM harus diisi' });
+    }
+
+    const [rows] = await pool.query(
+      `SELECT
+        s.student_id,
+        s.account_id,
+        s.nim,
+        s.nik,
+        s.name,
+        s.faculty,
+        s.major,
+        s.semester,
+        s.phone_number,
+        a.email
+      FROM students s
+      JOIN accounts a ON s.account_id = a.account_id
+      WHERE s.nim = ?
+      LIMIT 1`,
+      [nim]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Data mahasiswa dengan NIM tersebut tidak ditemukan' });
+    }
+
+    res.json({ student: rows[0] });
+  } catch (error) {
+    if (isDatabaseUnavailable(error)) {
+      return res.status(503).json({
+        message: 'Database belum terhubung. Pastikan MySQL aktif, database depresi tersedia, dan backend/.env sudah benar.'
+      });
+    }
+
+    res.status(500).json({
+      message: 'Gagal mengambil data mahasiswa',
+      error: error.message
+    });
+  }
+};
+
 /**
  * Login user dengan email dan password
  * Memeriksa tabel 'accounts' dan mengembalikan JWT token
@@ -134,7 +190,7 @@ export const login = async (req, res) => {
 
     const user = rows[0];
 
-    if (user.is_active === 0) {
+    if (user.is_active === false || user.is_active === 0) {
       return res.status(403).json({
         message: 'Akun tidak aktif'
       });
@@ -161,7 +217,7 @@ export const login = async (req, res) => {
   } catch (error) {
     if (isDatabaseUnavailable(error)) {
       return res.status(503).json({
-        message: 'Database belum terhubung. Nyalakan MySQL dan pastikan database depresi sudah di-import.'
+        message: 'Database belum terhubung. Pastikan MySQL aktif, database depresi tersedia, dan backend/.env sudah benar.'
       });
     }
 
@@ -209,7 +265,8 @@ export const register = async (req, res) => {
       });
     }
 
-    // Validasi role
+    // Registrasi publik hanya boleh membuat akun mahasiswa.
+    // Akun admin/BK harus dibuat oleh admin melalui /api/users.
     const validRoles = ['student', 'bk', 'admin'];
     if (!validRoles.includes(role)) {
       return res.status(400).json({ 
@@ -217,13 +274,9 @@ export const register = async (req, res) => {
       });
     }
 
-    // Cek apakah email sudah terdaftar
-    const checkQuery = 'SELECT * FROM accounts WHERE email = ?';
-    const [existingUser] = await pool.query(checkQuery, [email]);
-
-    if (existingUser.length > 0) {
-      return res.status(409).json({ 
-        message: 'Email sudah terdaftar' 
+    if (role !== 'student') {
+      return res.status(403).json({
+        message: 'Registrasi admin/BK tidak diizinkan dari endpoint publik'
       });
     }
 
@@ -233,31 +286,72 @@ export const register = async (req, res) => {
     try {
       await connection.beginTransaction();
 
-      accountId = `${role}-${uuidv4().substring(0, 8)}`;
       const hashedPassword = await bcrypt.hash(password, 12);
-      await connection.query(
-        'INSERT INTO accounts (account_id, email, password, role) VALUES (?, ?, ?, ?)',
-        [accountId, email, hashedPassword, role]
-      );
 
       if (role === 'student') {
-        const studentId = `student-${uuidv4().substring(0, 8)}`;
-        const generatedNim = nim || Date.now().toString().slice(-10);
+        if (!nim) {
+          await connection.rollback();
+          return res.status(400).json({ message: 'NIM harus diisi' });
+        }
+
+        const [studentRows] = await connection.query(
+          'SELECT * FROM students WHERE nim = ? LIMIT 1',
+          [nim]
+        );
+
+        if (studentRows.length === 0) {
+          await connection.rollback();
+          return res.status(404).json({ message: 'Data mahasiswa dengan NIM tersebut tidak ditemukan' });
+        }
+
+        const student = studentRows[0];
+        accountId = student.account_id;
+
+        const [emailRows] = await connection.query(
+          'SELECT account_id FROM accounts WHERE email = ? AND account_id <> ? LIMIT 1',
+          [email, accountId]
+        );
+
+        if (emailRows.length > 0) {
+          await connection.rollback();
+          return res.status(409).json({ message: 'Email sudah digunakan akun lain' });
+        }
+
         await connection.query(
-          `INSERT INTO students (student_id, account_id, nim, nik, name, faculty, major, semester)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          'UPDATE accounts SET email = ?, password = ?, role = ?, is_active = 1 WHERE account_id = ?',
+          [email, hashedPassword, role, accountId]
+        );
+
+        await connection.query(
+          `UPDATE students
+           SET nik = COALESCE(?, nik),
+               name = COALESCE(?, name),
+               faculty = COALESCE(?, faculty),
+               major = COALESCE(?, major),
+               semester = COALESCE(?, semester)
+           WHERE account_id = ?`,
           [
-            studentId,
-            accountId,
-            generatedNim,
             nik || null,
-            name || email.split('@')[0],
+            name || null,
             faculty || null,
             major || null,
-            semester || null
+            semester || null,
+            accountId
           ]
         );
       } else if (role === 'bk') {
+        const [existingUser] = await connection.query('SELECT * FROM accounts WHERE email = ? LIMIT 1', [email]);
+        if (existingUser.length > 0) {
+          await connection.rollback();
+          return res.status(409).json({ message: 'Email sudah terdaftar' });
+        }
+
+        accountId = `${role}-${uuidv4().substring(0, 8)}`;
+        await connection.query(
+          'INSERT INTO accounts (account_id, email, password, role) VALUES (?, ?, ?, ?)',
+          [accountId, email, hashedPassword, role]
+        );
+
         const bkId = `bk-${uuidv4().substring(0, 8)}`;
         await connection.query(
           `INSERT INTO bk_staff (bk_id, account_id, nip, nidn, nuptk, name)
@@ -265,6 +359,18 @@ export const register = async (req, res) => {
           [bkId, accountId, nip || null, nidn || null, nuptk || null, name || email.split('@')[0]]
         );
       } else if (role === 'admin') {
+        const [existingUser] = await connection.query('SELECT * FROM accounts WHERE email = ? LIMIT 1', [email]);
+        if (existingUser.length > 0) {
+          await connection.rollback();
+          return res.status(409).json({ message: 'Email sudah terdaftar' });
+        }
+
+        accountId = `${role}-${uuidv4().substring(0, 8)}`;
+        await connection.query(
+          'INSERT INTO accounts (account_id, email, password, role) VALUES (?, ?, ?, ?)',
+          [accountId, email, hashedPassword, role]
+        );
+
         const adminId = `admin-${uuidv4().substring(0, 8)}`;
         await connection.query(
           'INSERT INTO admins (admin_id, account_id, name, department) VALUES (?, ?, ?, ?)',
@@ -327,7 +433,7 @@ export const getCurrentUser = async (req, res) => {
   } catch (error) {
     if (isDatabaseUnavailable(error)) {
       return res.status(503).json({
-        message: 'Database belum terhubung. Nyalakan MySQL dan pastikan database depresi sudah di-import.'
+        message: 'Database belum terhubung. Pastikan MySQL aktif, database depresi tersedia, dan backend/.env sudah benar.'
       });
     }
 

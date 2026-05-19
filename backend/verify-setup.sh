@@ -44,7 +44,7 @@ FILES=(
     "src/middleware/authMiddleware.js"
     "src/routes/authRoutes.js"
     "src/routes/testRoutes.js"
-    "src/services/fuzzyService.js"
+    "src/services/dassScoringService.js"
     "package.json"
     ".env"
 )
@@ -72,7 +72,7 @@ echo "Checking dependencies in package.json..."
 if grep -q "express" package.json; then
     echo -e "${GREEN}✓${NC} express"
 fi
-if grep -q "mysql2" package.json; then
+if grep -q "\"mysql2\"" package.json; then
     echo -e "${GREEN}✓${NC} mysql2"
 fi
 if grep -q "jsonwebtoken" package.json; then
@@ -88,14 +88,8 @@ fi
 # Check .env
 echo ""
 echo "Checking .env configuration..."
-if grep -q "DB_HOST" .env; then
-    echo -e "${GREEN}✓${NC} DB_HOST configured"
-fi
-if grep -q "DB_USER" .env; then
-    echo -e "${GREEN}✓${NC} DB_USER configured"
-fi
-if grep -q "DB_PASSWORD" .env; then
-    echo -e "${GREEN}✓${NC} DB_PASSWORD configured"
+if grep -q "DB_NAME=depresi" .env; then
+    echo -e "${GREEN}✓${NC} MySQL database configured"
 fi
 if grep -q "JWT_SECRET" .env; then
     echo -e "${GREEN}✓${NC} JWT_SECRET configured"
@@ -115,7 +109,7 @@ echo "✅ Backend verification complete!"
 echo ""
 echo "Next steps:"
 echo "1. Update .env with your database credentials"
-echo "2. Make sure MySQL is running"
+echo "2. Import database/depresi.sql in phpMyAdmin or MySQL CLI"
 echo "3. Run: pnpm install (if not done yet)"
 echo "4. Run: pnpm dev"
 echo ""

@@ -51,6 +51,7 @@ if [ ! -f ".env" ]; then
     echo "Creating .env template..."
     cat > .env << 'EOF'
 DB_HOST=localhost
+DB_PORT=3306
 DB_USER=root
 DB_PASSWORD=
 DB_NAME=depresi
@@ -89,8 +90,8 @@ echo ""
 echo "1. Edit backend/.env with your MySQL credentials:"
 echo "   - DB_PASSWORD: your MySQL password"
 echo ""
-echo "2. Verify MySQL database:"
-echo "   mysql -u root -p depresi -e 'SHOW TABLES;'"
+echo "2. Import database schema:"
+echo "   mysql -u root -p < database/depresi.sql"
 echo ""
 echo "3. Start Backend (Terminal 1):"
 echo "   cd backend"

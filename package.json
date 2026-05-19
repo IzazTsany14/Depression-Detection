@@ -1,15 +1,16 @@
 {
-  "name": "@figma/my-make-file",
+  "name": "depression-detection",
   "private": true,
-  "version": "0.0.1",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "build": "vite build",
-    "dev": "start /B cmd /C \"npm --prefix backend start\" && vite --host 127.0.0.1 --port 5173",
+    "dev": "node scripts/dev.js",
     "dev:frontend": "vite",
     "dev:backend": "npm --prefix backend start"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.1",
     "@mui/icons-material": "7.3.5",
@@ -45,7 +46,6 @@
     "clsx": "2.1.1",
     "cmdk": "1.1.1",
     "date-fns": "3.6.0",
-    "emailjs-com": "^3.2.0",
     "embla-carousel-react": "8.6.0",
     "input-otp": "1.4.2",
     "jspdf": "^4.2.1",

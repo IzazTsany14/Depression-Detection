@@ -18,12 +18,18 @@ import {
   LogOut,
   Book,
   Download,
+  Eye,
   Clock,
   CheckCircle2,
-  XCircle
+  XCircle,
+  AlertTriangle,
+  MessageCircle
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { generateTestResultPDF, downloadPDF } from '../../utils/pdfGenerator';
+import { getDisplayLevel, getLevelDescription } from '../../utils/assessment';
+import { ProfileAvatar } from '../../components/ProfileAvatar';
+import { BK_CONTACTS, createConsultationMessage, getWhatsAppUrl, isSevereLevel } from '../../utils/bkContacts';
 
 export const Dashboard: React.FC = () => {
   const { user, getTestHistory, logout } = useAuth();
@@ -74,6 +80,7 @@ export const Dashboard: React.FC = () => {
   // Calculate statistics
   const totalTests = history.length;
   const latestTest = history.length > 0 ? history[history.length - 1] : null;
+  const shouldShowSevereBanner = isSevereLevel(latestTest?.level);
   const averageScore = history.length > 0 
     ? Math.round(history.reduce((sum, test) => sum + test.score, 0) / history.length)
     : 0;
@@ -88,12 +95,13 @@ export const Dashboard: React.FC = () => {
   const handleDownloadTestPDF = (test: any) => {
     const testStyle = getColorForLevel(test.level);
     const pdf = generateTestResultPDF({
-      level: test.level,
+      level: getDisplayLevel(test.level),
       score: test.score,
       date: test.date,
       name: user?.name,
       color: testStyle.color,
       emoji: testStyle.emoji,
+      description: getLevelDescription(test.level),
     });
     
     const filename = `hasil-tes-dass21-${new Date(test.date).getTime()}.pdf`;
@@ -120,6 +128,46 @@ export const Dashboard: React.FC = () => {
             </p>
           </div>
 
+          {shouldShowSevereBanner && (
+            <div className="mb-8 rounded-lg border-2 border-red-700 bg-red-600 p-5 text-white shadow-lg">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-white/15">
+                    <AlertTriangle className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold">Perlu Konsultasi BK</h2>
+                    <p className="mt-1 text-sm text-red-50">
+                      Hasil tes terakhir Anda berada pada kategori {getDisplayLevel(latestTest?.level)}. Notifikasi ini akan tetap muncul sampai tes berikutnya berada pada kategori Sedang, Ringan, atau Normal.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  {BK_CONTACTS.map((contact) => (
+                    <a
+                      key={contact.whatsappNumber}
+                      href={getWhatsAppUrl(contact.whatsappNumber, createConsultationMessage({
+                        bkName: contact.label,
+                        studentName: user.name,
+                        nim: user.nim,
+                        studyProgram: user.major,
+                        faculty: user.faculty,
+                        latestCategory: getDisplayLevel(latestTest?.level),
+                      }))}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Button className="w-full bg-white text-red-700 hover:bg-red-50 sm:w-auto">
+                        <MessageCircle className="mr-2 h-4 w-4" />
+                        {contact.phone}
+                      </Button>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Stats Cards */}
           <div className="grid md:grid-cols-3 gap-6 mb-8">
             <Card className="p-6 hover:shadow-lg transition-shadow">
@@ -139,7 +187,7 @@ export const Dashboard: React.FC = () => {
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Tes Terakhir</p>
                   <p className="text-lg font-bold text-gray-900">
-                    {latestTest ? latestTest.level : '-'}
+                    {latestTest ? getDisplayLevel(latestTest.level) : '-'}
                   </p>
                   {latestTest && (
                     <p className="text-sm text-gray-500">
@@ -352,9 +400,18 @@ export const Dashboard: React.FC = () => {
                     {history.slice().reverse().map((test, index) => {
                       const testStyle = getColorForLevel(test.level);
                       return (
-                        <div 
+                        <div
                           key={test.id}
-                          className="p-4 rounded-lg border-2 flex items-center justify-between hover:shadow-md transition-shadow"
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => navigate('/result/registered', { state: { result: test } })}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                              event.preventDefault();
+                              navigate('/result/registered', { state: { result: test } });
+                            }
+                          }}
+                          className="w-full cursor-pointer text-left p-4 rounded-lg border-2 flex items-center justify-between hover:shadow-md transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500"
                           style={{ 
                             backgroundColor: testStyle.bgColor,
                             borderColor: testStyle.color
@@ -381,14 +438,28 @@ export const Dashboard: React.FC = () => {
                           <div className="flex items-center gap-4">
                             <div className="text-right">
                               <p className="font-bold text-lg" style={{ color: testStyle.color }}>
-                                {test.level}
+                                {getDisplayLevel(test.level)}
                               </p>
                               <p className="text-sm text-gray-600">
                                 Skor: {test.score}
                               </p>
                             </div>
                             <Button
-                              onClick={() => handleDownloadTestPDF(test)}
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                navigate('/result/registered', { state: { result: test } });
+                              }}
+                              size="sm"
+                              variant="outline"
+                              title="Lihat detail hasil tes"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                handleDownloadTestPDF(test);
+                              }}
                               size="sm"
                               className="bg-blue-600 hover:bg-blue-700"
                               title="Unduh hasil test sebagai PDF"
@@ -425,12 +496,17 @@ export const Dashboard: React.FC = () => {
                 </h3>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
-                      <User className="w-8 h-8 text-white" />
-                    </div>
+                    <ProfileAvatar
+                      profilePicture={user.profile_picture}
+                      cacheKey={user.profileUpdatedAt}
+                      className="w-16 h-16"
+                      iconClassName="w-8 h-8 text-white"
+                      fallbackClassName="bg-gradient-to-br from-blue-400 to-blue-600"
+                      alt={`Foto profil ${user.name}`}
+                    />
                     <div>
                       <p className="font-semibold text-gray-900">{user.name}</p>
-                      <p className="text-sm text-gray-500">Registered User</p>
+                      <p className="text-sm text-gray-500">Mahasiswa</p>
                     </div>
                   </div>
                   
@@ -438,6 +514,16 @@ export const Dashboard: React.FC = () => {
                     <div className="flex items-center gap-3 text-gray-700">
                       <Mail className="w-4 h-4 text-gray-400" />
                       <span className="text-sm">{user.email}</span>
+                    </div>
+                    <div className="flex items-start gap-3 text-gray-700">
+                      <User className="w-4 h-4 text-gray-400 mt-0.5" />
+                      <div className="text-sm space-y-1">
+                        <p>NIM: {user.nim || '-'}</p>
+                        <p>NIK: {user.nik || '-'}</p>
+                        <p>Fakultas: {user.faculty || '-'}</p>
+                        <p>Program Studi: {user.major || '-'}</p>
+                        <p>Semester: {user.semester || '-'}</p>
+                      </div>
                     </div>
                     <div className="flex items-center gap-3 text-gray-700">
                       <Shield className="w-4 h-4 text-gray-400" />
@@ -482,11 +568,34 @@ export const Dashboard: React.FC = () => {
                 <p className="text-sm text-gray-700 mb-4">
                   Jika Anda merasa perlu berbicara dengan seseorang, jangan ragu untuk menghubungi layanan kesehatan mental.
                 </p>
-                <Link to="/guide">
-                  <Button size="sm" className="w-full bg-green-600 hover:bg-green-700">
-                    Lihat Kontak Bantuan
-                  </Button>
-                </Link>
+                <div className="space-y-2">
+                  {BK_CONTACTS.map((contact) => (
+                    <a
+                      key={contact.whatsappNumber}
+                      href={getWhatsAppUrl(contact.whatsappNumber, createConsultationMessage({
+                        bkName: contact.label,
+                        studentName: user.name,
+                        nim: user.nim,
+                        studyProgram: user.major,
+                        faculty: user.faculty,
+                        latestCategory: latestTest ? getDisplayLevel(latestTest.level) : undefined,
+                      }))}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block"
+                    >
+                      <Button size="sm" className="w-full bg-green-600 hover:bg-green-700">
+                        <MessageCircle className="mr-2 h-4 w-4" />
+                        WhatsApp {contact.phone}
+                      </Button>
+                    </a>
+                  ))}
+                  <Link to="/guide" className="block">
+                    <Button size="sm" variant="outline" className="w-full">
+                      Lihat Kontak Bantuan
+                    </Button>
+                  </Link>
+                </div>
               </Card>
 
               {/* Account Settings */}
@@ -495,9 +604,13 @@ export const Dashboard: React.FC = () => {
                   Pengaturan Akun
                 </h3>
                 <div className="space-y-2">
-                  <Button variant="ghost" className="w-full justify-start" disabled>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    onClick={() => navigate('/student/profile')}
+                  >
                     <Settings className="w-4 h-4 mr-2" />
-                    Pengaturan (Segera)
+                    Pengaturan Profil
                   </Button>
                   <Button 
                     variant="ghost" 

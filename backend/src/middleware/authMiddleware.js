@@ -4,18 +4,26 @@
  * Memeriksa role user untuk authorization
  */
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
-import path from 'path';
+import '../config/env.js';
+import pool from '../config/db.js';
 
-const envPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../.env');
-dotenv.config({ path: envPath });
+const getJwtSecret = () => {
+  const secret = process.env.JWT_SECRET;
+
+  if (!secret || secret === 'your-secret-key') {
+    const error = new Error('JWT_SECRET belum dikonfigurasi dengan aman di backend/.env');
+    error.status = 500;
+    throw error;
+  }
+
+  return secret;
+};
 
 /**
  * Middleware untuk verifikasi JWT token
  * Token harus dikirim di header: Authorization: Bearer <token>
  */
-export const verifyToken = (req, res, next) => {
+export const verifyToken = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
@@ -31,11 +39,47 @@ export const verifyToken = (req, res, next) => {
       ? authHeader.slice(7)
       : authHeader;
 
-    // Verifikasi dan decode token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    // Verifikasi signature token lebih dulu, lalu validasi lagi ke database.
+    const decoded = jwt.verify(token, getJwtSecret());
+    const accountId = decoded.accountId || decoded.id || decoded.sub;
 
-    // Simpan user info di request object untuk digunakan di controller
-    req.user = decoded;
+    if (!accountId) {
+      return res.status(401).json({ message: 'Token tidak memiliki identitas akun yang valid' });
+    }
+
+    const [rows] = await pool.query(
+      `SELECT
+        a.account_id,
+        a.email,
+        a.role,
+        a.is_active,
+        COALESCE(s.student_id, b.bk_id, ad.admin_id, a.account_id) AS profile_id
+       FROM accounts a
+       LEFT JOIN students s ON a.account_id = s.account_id AND a.role = 'student'
+       LEFT JOIN bk_staff b ON a.account_id = b.account_id AND a.role = 'bk'
+       LEFT JOIN admins ad ON a.account_id = ad.account_id AND a.role = 'admin'
+       WHERE a.account_id = ?
+       LIMIT 1`,
+      [accountId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(401).json({ message: 'Akun pada token tidak ditemukan' });
+    }
+
+    const account = rows[0];
+    if (account.is_active === false || account.is_active === 0) {
+      return res.status(403).json({ message: 'Akun pada token sudah tidak aktif' });
+    }
+
+    // Role/email/profile_id diambil dari database, bukan dipercaya dari payload token.
+    req.user = {
+      ...decoded,
+      id: account.profile_id,
+      accountId: account.account_id,
+      email: account.email,
+      role: account.role
+    };
     next();
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
@@ -43,7 +87,7 @@ export const verifyToken = (req, res, next) => {
     } else if (error.name === 'JsonWebTokenError') {
       return res.status(401).json({ message: 'Token tidak valid' });
     }
-    res.status(500).json({ message: 'Error verifikasi token', error: error.message });
+    res.status(error.status || 500).json({ message: 'Error verifikasi token', error: error.message });
   }
 };
 

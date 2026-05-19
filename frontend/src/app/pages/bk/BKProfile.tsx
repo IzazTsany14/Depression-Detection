@@ -7,9 +7,12 @@ import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Alert, AlertDescription } from '../../components/ui/alert';
 import { useAuth } from '../../context/AuthContext';
-import { Lock, AlertCircle, CheckCircle2, ImagePlus } from 'lucide-react';
+import { Lock, AlertCircle, ImagePlus } from 'lucide-react';
 import { ProfileAvatar } from '../../components/ProfileAvatar';
+import { apiUrl } from '../../utils/api';
 import { readProfileImageFile } from '../../utils/profileUpdate';
+import { showSuccessDialog } from '../../utils/successDialog';
+import { changeAccountPassword } from '../../utils/passwordChange';
 
 export const BKProfile: React.FC = () => {
   const { user, updateUser } = useAuth();
@@ -25,9 +28,18 @@ export const BKProfile: React.FC = () => {
     confirmPassword: ''
   });
   const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [profileImage, setProfileImage] = useState<{ dataUrl: string; fileName: string } | null>(null);
   const [profilePreview, setProfilePreview] = useState<string | null>(null);
+
+  const getAuthHeaders = (): Record<string, string> => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      return { Authorization: `Bearer ${token}` };
+    }
+    return {};
+  };
 
   useEffect(() => {
     if (!user || user.role !== 'bk') {
@@ -68,9 +80,9 @@ export const BKProfile: React.FC = () => {
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch(`/api/users/${user?.accountId || user?.id}`, {
+      const res = await fetch(apiUrl(`/users/${user?.accountId || user?.id}`), {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
@@ -85,15 +97,15 @@ export const BKProfile: React.FC = () => {
       const updatedUser = updateUser(data.user);
       setProfilePreview(updatedUser.profile_picture || null);
       setProfileImage(null);
-      setMessage({ type: 'success', text: 'Profil berhasil diperbarui' });
+      showSuccessDialog('Data berhasil diperbarui');
     } catch (error: any) {
       setMessage({ type: 'error', text: error.message || 'Gagal memperbarui profil' });
     }
   };
 
-  const handleChangePassword = (e: React.FormEvent) => {
+  const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (formData.newPassword !== formData.confirmPassword) {
       setMessage({ type: 'error', text: 'Password baru tidak cocok' });
       return;
@@ -104,16 +116,27 @@ export const BKProfile: React.FC = () => {
       return;
     }
 
-    // TODO: Implement actual password change logic
-    setMessage({ type: 'success', text: 'Password berhasil diubah' });
-    setShowPasswordForm(false);
-    setFormData(prev => ({
-      ...prev,
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: ''
-    }));
-    setTimeout(() => setMessage(null), 3000);
+    try {
+      setIsChangingPassword(true);
+      await changeAccountPassword(
+        String(user?.accountId || user?.id),
+        formData.currentPassword,
+        formData.newPassword
+      );
+      setMessage({ type: 'success', text: 'Password berhasil diubah. Gunakan password baru saat login berikutnya.' });
+      showSuccessDialog('Password berhasil diubah');
+      setShowPasswordForm(false);
+      setFormData(prev => ({
+        ...prev,
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      }));
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.message || 'Gagal mengubah password' });
+    } finally {
+      setIsChangingPassword(false);
+    }
   };
 
   return (
@@ -130,11 +153,7 @@ export const BKProfile: React.FC = () => {
           <div className="max-w-2xl">
             {message && (
               <Alert className={`mb-6 ${message.type === 'success' ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}`}>
-                {message.type === 'success' ? (
-                  <CheckCircle2 className={`h-5 w-5 ${message.type === 'success' ? 'text-green-600' : 'text-red-600'}`} />
-                ) : (
-                  <AlertCircle className="h-5 w-5 text-red-600" />
-                )}
+                <AlertCircle className={`h-5 w-5 ${message.type === 'success' ? 'text-green-600' : 'text-red-600'}`} />
                 <AlertDescription className={message.type === 'success' ? 'text-green-900' : 'text-red-900'}>
                   {message.text}
                 </AlertDescription>
@@ -163,7 +182,7 @@ export const BKProfile: React.FC = () => {
                   <Label htmlFor="profileImage">Foto Profil PNG/JPG</Label>
                   <div className="mt-2 flex items-center gap-3">
                     <Input id="profileImage" type="file" accept="image/png,image/jpeg" onChange={handleProfileImageChange}
-                    className="
+                      className="
                     file:mr-5
                     file:rounded-md
                     file:border-0
@@ -248,8 +267,11 @@ export const BKProfile: React.FC = () => {
               </h3>
 
               {!showPasswordForm ? (
-                <Button 
-                  onClick={() => setShowPasswordForm(true)}
+                <Button
+                  onClick={() => {
+                    setMessage(null);
+                    setShowPasswordForm(true);
+                  }}
                   variant="outline"
                   className="text-purple-600 border-purple-300"
                 >
@@ -294,12 +316,13 @@ export const BKProfile: React.FC = () => {
                   </div>
 
                   <div className="flex gap-2 pt-4">
-                    <Button type="submit" className="bg-purple-600 hover:bg-purple-700">
-                      Simpan Password Baru
+                    <Button type="submit" disabled={isChangingPassword} className="bg-purple-600 hover:bg-purple-700">
+                      {isChangingPassword ? 'Menyimpan...' : 'Simpan Password Baru'}
                     </Button>
-                    <Button 
+                    <Button
                       type="button"
                       variant="outline"
+                      disabled={isChangingPassword}
                       onClick={() => setShowPasswordForm(false)}
                     >
                       Batal

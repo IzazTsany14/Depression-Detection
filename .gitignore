@@ -10,6 +10,7 @@ build/
 
 # Guidelines folder (as requested)
 guidelines/
+.agents/
 
 # Environment variables
 .env
@@ -19,6 +20,7 @@ guidelines/
 .env.production.local
 
 # Logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

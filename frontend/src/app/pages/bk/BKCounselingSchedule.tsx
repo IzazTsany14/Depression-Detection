@@ -5,6 +5,7 @@ import { Card } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { useAuth } from '../../context/AuthContext';
 import { Calendar, Clock, Plus, CheckCircle2, XCircle, AlertCircle, User, Phone, Mail } from 'lucide-react';
+import { showSuccessDialog } from '../../utils/successDialog';
 
 interface CounselingSession {
   id: string;
@@ -239,7 +240,7 @@ export const BKCounselingSchedule: React.FC = () => {
       localStorage.setItem('counselingSessions', JSON.stringify(updated));
     }
     resetForm();
-    alert('Jadwal berhasil disimpan!');
+    showSuccessDialog('Data berhasil diperbarui');
   };
 
   const handleCompleteSession = (sessionId: string) => {
@@ -252,7 +253,7 @@ export const BKCounselingSchedule: React.FC = () => {
     localStorage.setItem('counselingSessions', JSON.stringify(updated));
     setShowCompletionForm(null);
     setCompletionNotes('');
-    alert('Jadwal berhasil ditandai sebagai selesai!');
+    showSuccessDialog('Data berhasil diperbarui');
   };
 
   const handleCancelSession = (sessionId: string) => {
@@ -264,7 +265,7 @@ export const BKCounselingSchedule: React.FC = () => {
       );
       setSessions(updated);
       localStorage.setItem('counselingSessions', JSON.stringify(updated));
-      alert('Jadwal berhasil dibatalkan!');
+      showSuccessDialog('Data berhasil diperbarui');
     }
   };
 

@@ -5,8 +5,10 @@ import { Card } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../../components/ui/dialog';
 import { useAuth } from '../../context/AuthContext';
+import { apiUrl } from '../../utils/api';
 import { ProfileAvatar } from '../../components/ProfileAvatar';
 import { Users, Search, Plus, Edit2, Trash2, CheckCircle2 } from 'lucide-react';
+import { showSuccessDialog } from '../../utils/successDialog';
 
 const emptyForm = {
   name: '',
@@ -17,7 +19,6 @@ const emptyForm = {
   nip: '',
   nidn: '',
   nuptk: '',
-  department: '',
   faculty: '',
   major: '',
   semester: '1',
@@ -38,10 +39,17 @@ export const AdminUserManagement: React.FC = () => {
   const [formData, setFormData] = useState(emptyForm);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('token');
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
   const loadUsers = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/users');
+      const res = await fetch(apiUrl('/users'), {
+        headers: getAuthHeaders()
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || data.error || 'Gagal mengambil user');
       setUsers(data.data || []);
@@ -107,7 +115,6 @@ export const AdminUserManagement: React.FC = () => {
       nip: userToEdit.nip || '',
       nidn: userToEdit.nidn || '',
       nuptk: userToEdit.nuptk || '',
-      department: userToEdit.department || '',
       faculty: userToEdit.faculty || '',
       major: userToEdit.major || '',
       semester: String(userToEdit.semester || '1'),
@@ -125,9 +132,9 @@ export const AdminUserManagement: React.FC = () => {
     };
 
     try {
-      const res = await fetch(editingUser ? `/api/users/${editingUser.account_id || editingUser.accountId}` : '/api/users', {
+      const res = await fetch(editingUser ? apiUrl(`/users/${editingUser.account_id || editingUser.accountId}`) : apiUrl('/users'), {
         method: editingUser ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify(payload),
       });
       const data = await res.json();
@@ -136,7 +143,7 @@ export const AdminUserManagement: React.FC = () => {
       await loadUsers();
       resetForm();
       setShowDialog(false);
-      alert(editingUser ? 'User berhasil diperbarui' : 'User berhasil ditambahkan');
+      showSuccessDialog(editingUser ? 'Data berhasil diperbarui' : 'Data berhasil ditambahkan');
     } catch (error: any) {
       alert(error.message || 'Gagal menyimpan user');
     }
@@ -146,11 +153,14 @@ export const AdminUserManagement: React.FC = () => {
     if (!window.confirm(`Hapus user ${userToDelete.name}? Data profile dan relasinya akan terhapus dari database.`)) return;
 
     try {
-      const res = await fetch(`/api/users/${userToDelete.account_id || userToDelete.accountId}`, { method: 'DELETE' });
+      const res = await fetch(apiUrl(`/users/${userToDelete.account_id || userToDelete.accountId}`), {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || data.error || 'Gagal menghapus user');
       await loadUsers();
-      alert('User berhasil dihapus');
+      showSuccessDialog('Data berhasil dihapus');
     } catch (error: any) {
       alert(error.message || 'Gagal menghapus user');
     }
@@ -351,31 +361,33 @@ export const AdminUserManagement: React.FC = () => {
             if (!open) resetForm();
             setShowDialog(open);
           }}>
-            <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
-              <DialogHeader>
+            <DialogContent className="max-h-[90vh] w-[calc(100vw-2rem)] max-w-3xl overflow-hidden p-0 flex flex-col">
+              <DialogHeader className="border-b px-6 py-5">
                 <DialogTitle>{editingUser ? 'Edit User' : 'Tambah User Baru'}</DialogTitle>
                 <DialogDescription>
                   Data akan disimpan ke MySQL. Foto profil diubah dari halaman profil masing-masing user.
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="overflow-y-auto flex-1 px-4">
+              <div className="min-h-0 flex-1 overflow-y-auto px-6">
                 {!selectedUserType && !editingUser ? (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4">
+                  <div className="grid grid-cols-1 gap-4 py-5 sm:grid-cols-2 lg:grid-cols-3">
                     {(['student', 'bk', 'admin'] as const).map((role) => (
                       <button
                         key={role}
                         onClick={() => setSelectedUserType(role)}
-                        className="p-6 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all"
+                        className="min-w-0 rounded-lg border-2 border-gray-200 p-5 text-center transition-all hover:border-blue-500 hover:bg-blue-50"
                       >
                         <Users className="w-10 h-10 mx-auto mb-3 text-blue-600" />
-                        <h3 className="font-semibold text-gray-900 mb-2">{getRoleLabel(role)}</h3>
-                        <p className="text-sm text-gray-600">Tambah user {getRoleLabel(role).toLowerCase()}</p>
+                        <h3 className="mb-2 text-base font-semibold leading-snug text-gray-900">{getRoleLabel(role)}</h3>
+                        <p className="mx-auto max-w-[14rem] text-sm leading-snug text-gray-600">
+                          Tambah user {getRoleLabel(role).toLowerCase()}
+                        </p>
                       </button>
                     ))}
                   </div>
                 ) : (
-                  <div className="space-y-4 py-4">
+                  <div className="space-y-4 py-5">
                     {!editingUser && (
                       <Button variant="outline" onClick={() => setSelectedUserType(null)} className="w-full">
                         Kembali Pilih Tipe User
@@ -395,12 +407,12 @@ export const AdminUserManagement: React.FC = () => {
 
                     {selectedUserType === 'student' && (
                       <>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                           <Field label="NIM *" value={formData.nim} error={errors.nim} onChange={(value) => setFormData({ ...formData, nim: value })} />
                           <Field label="NIK *" value={formData.nik} error={errors.nik} onChange={(value) => setFormData({ ...formData, nik: value })} />
                         </div>
                         <Field label="Fakultas *" value={formData.faculty} error={errors.faculty} onChange={(value) => setFormData({ ...formData, faculty: value })} />
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                           <Field label="Jurusan *" value={formData.major} error={errors.major} onChange={(value) => setFormData({ ...formData, major: value })} />
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Semester</label>
@@ -413,21 +425,17 @@ export const AdminUserManagement: React.FC = () => {
                     )}
 
                     {selectedUserType === 'bk' && (
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                         <Field label="NIP" value={formData.nip} onChange={(value) => setFormData({ ...formData, nip: value })} />
                         <Field label="NIDN" value={formData.nidn} onChange={(value) => setFormData({ ...formData, nidn: value })} />
                         <Field label="NUPTK" value={formData.nuptk} onChange={(value) => setFormData({ ...formData, nuptk: value })} />
                       </div>
                     )}
-
-                    {selectedUserType === 'admin' && (
-                      <Field label="Departemen" value={formData.department} onChange={(value) => setFormData({ ...formData, department: value })} />
-                    )}
                   </div>
                 )}
               </div>
 
-              <div className="flex gap-2 pt-4 border-t mt-4">
+              <div className="flex flex-col gap-2 border-t px-6 py-4 sm:flex-row">
                 <Button variant="outline" onClick={() => { resetForm(); setShowDialog(false); }} className="flex-1">
                   Batal
                 </Button>
@@ -458,13 +466,13 @@ const Field = ({
   error?: string;
   placeholder?: string;
 }) => (
-  <div>
+  <div className="min-w-0">
     <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
     <input
       type={type}
       value={value}
       onChange={(event) => onChange(event.target.value)}
-      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+      className="w-full min-w-0 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
       placeholder={placeholder}
     />
     {error && <p className="text-xs text-red-600 mt-1">{error}</p>}

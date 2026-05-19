@@ -1,3 +1,5 @@
+import { backendUrl } from './api';
+
 const DEFAULT_PROFILE_PICTURE = '/uploads/profiles/default.jpg';
 
 export const getProfilePictureUrl = (profilePicture?: string | null): string => {
@@ -7,7 +9,8 @@ export const getProfilePictureUrl = (profilePicture?: string | null): string => 
     return picture;
   }
 
-  return picture.startsWith('/') ? picture : `/${picture}`;
+  const normalizedPicture = picture.startsWith('/') ? picture : `/${picture}`;
+  return normalizedPicture.startsWith('/uploads/') ? backendUrl(normalizedPicture) : normalizedPicture;
 };
 
 export const hasProfilePicture = (profilePicture?: string | null): boolean => {

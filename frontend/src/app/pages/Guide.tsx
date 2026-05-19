@@ -27,6 +27,8 @@ import {
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { PDFViewer } from '../components/PDFViewer';
+import { getDisplayLevel, isEmergencyLevel } from '../utils/assessment';
+import { BK_CONTACTS, createConsultationMessage, getWhatsAppUrl } from '../utils/bkContacts';
 
 export const Guide: React.FC = () => {
   const { user, getTestHistory } = useAuth();
@@ -84,6 +86,7 @@ export const Guide: React.FC = () => {
   };
 
   const recommendation = latestResult ? getRecommendationByLevel(latestResult.level) : null;
+  const showHighRiskSelfCare = latestResult ? isEmergencyLevel(latestResult.level) : false;
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white">
@@ -121,7 +124,7 @@ export const Guide: React.FC = () => {
                     {recommendation.title}
                   </h2>
                   <p className="text-gray-700 mb-4">
-                    Berdasarkan hasil tes terakhir Anda (<strong>Tingkat Depresi: {latestResult.level}</strong>), {recommendation.description}
+                    Berdasarkan hasil tes terakhir Anda (<strong>Tingkat Depresi: {getDisplayLevel(latestResult.level)}</strong>), {recommendation.description}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {recommendation.focus.map((focus, index) => (
@@ -161,6 +164,88 @@ export const Guide: React.FC = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 Strategi Penanganan Mandiri
               </h2>
+
+              {showHighRiskSelfCare && (
+                <Card className="p-6 bg-red-50 border-2 border-red-200">
+                  <div className="flex flex-col gap-5">
+                    <div className="flex items-start gap-4">
+                      <AlertTriangle className="w-8 h-8 text-red-600 flex-shrink-0 mt-1" />
+                      <div>
+                        <h3 className="text-xl font-semibold text-red-900 mb-2">
+                          Penanganan Mandiri Saat Kondisi Parah atau Sangat Parah
+                        </h3>
+                        <p className="text-red-800">
+                          Langkah mandiri di bawah ini bertujuan menjaga keselamatan sampai Anda mendapat bantuan.
+                          Tetap prioritaskan menghubungi BK, keluarga, teman tepercaya, psikolog, psikiater, atau layanan darurat.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="rounded-lg bg-white p-4 border border-red-100">
+                        <h4 className="font-semibold text-gray-900 mb-2">1. Amankan diri sekarang</h4>
+                        <p className="text-sm text-gray-700">
+                          Pindah ke tempat yang lebih ramai atau dekat orang tepercaya. Jauhkan benda atau situasi yang bisa membahayakan diri.
+                        </p>
+                      </div>
+                      <div className="rounded-lg bg-white p-4 border border-red-100">
+                        <h4 className="font-semibold text-gray-900 mb-2">2. Jangan sendirian</h4>
+                        <p className="text-sm text-gray-700">
+                          Kirim pesan singkat seperti "Aku sedang tidak aman, bisa temani aku?" kepada teman, keluarga, dosen wali, atau BK.
+                        </p>
+                      </div>
+                      <div className="rounded-lg bg-white p-4 border border-red-100">
+                        <h4 className="font-semibold text-gray-900 mb-2">3. Turunkan intensitas 10 menit</h4>
+                        <p className="text-sm text-gray-700">
+                          Tarik napas perlahan, minum air, duduk dengan kaki menapak, lalu sebutkan 5 benda yang terlihat dan 4 suara yang terdengar.
+                        </p>
+                      </div>
+                      <div className="rounded-lg bg-white p-4 border border-red-100">
+                        <h4 className="font-semibold text-gray-900 mb-2">4. Tunda keputusan besar</h4>
+                        <p className="text-sm text-gray-700">
+                          Jangan membuat keputusan penting saat emosi sedang memuncak. Fokus pada satu langkah kecil yang aman untuk 24 jam ke depan.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="rounded-lg bg-white p-4 border border-red-100">
+                      <h4 className="font-semibold text-gray-900 mb-3">Hubungi bantuan cepat</h4>
+                      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        {BK_CONTACTS.map((contact) => (
+                          <a
+                            key={contact.whatsappNumber}
+                            href={getWhatsAppUrl(contact.whatsappNumber, createConsultationMessage({
+                              bkName: contact.label,
+                              studentName: user?.name,
+                              nim: user?.nim,
+                              studyProgram: user?.major,
+                              faculty: user?.faculty,
+                              latestCategory: latestResult ? getDisplayLevel(latestResult.level) : undefined,
+                            }))}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-700"
+                          >
+                            WhatsApp {contact.label}
+                          </a>
+                        ))}
+                        <a
+                          href="tel:112"
+                          className="inline-flex items-center justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-700"
+                        >
+                          Darurat 112
+                        </a>
+                        <a
+                          href="tel:119"
+                          className="inline-flex items-center justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-700"
+                        >
+                          Hotline 119
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              )}
 
               <div className="grid md:grid-cols-2 gap-6">
                 {/* Physical Health */}
@@ -454,6 +539,31 @@ export const Guide: React.FC = () => {
                 </div>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="bg-white p-4 rounded-lg">
+                    <h4 className="font-semibold text-gray-800 mb-2">BK UNESA</h4>
+                    <p className="text-lg font-bold text-blue-600 mb-1">WhatsApp BK</p>
+                    <p className="text-sm text-gray-600">Layanan konseling kampus dan rujukan bantuan profesional</p>
+                    <div className="mt-3 space-y-2">
+                      {BK_CONTACTS.map((contact) => (
+                        <a
+                          key={contact.whatsappNumber}
+                          href={getWhatsAppUrl(contact.whatsappNumber, createConsultationMessage({
+                            bkName: contact.label,
+                            studentName: user?.name,
+                            nim: user?.nim,
+                            studyProgram: user?.major,
+                            faculty: user?.faculty,
+                            latestCategory: latestResult ? getDisplayLevel(latestResult.level) : undefined,
+                          }))}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex w-full items-center justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-700"
+                        >
+                          {contact.phone}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="bg-white p-4 rounded-lg">
                     <h4 className="font-semibold text-gray-800 mb-2">Hotline Nasional</h4>
                     <p className="text-2xl font-bold text-blue-600 mb-1">119 (ext. 8)</p>
                     <p className="text-sm text-gray-600">Pencegahan Bunuh Diri</p>
@@ -468,11 +578,6 @@ export const Guide: React.FC = () => {
                     <p className="text-2xl font-bold text-blue-600 mb-1">021-9696-9293</p>
                     <p className="text-sm text-gray-600">Senin-Jumat 09:00-17:00</p>
                   </div>
-                  <div className="bg-white p-4 rounded-lg">
-                    <h4 className="font-semibold text-gray-800 mb-2">Crisis Center Kemenkes</h4>
-                    <p className="text-2xl font-bold text-blue-600 mb-1">500-454</p>
-                    <p className="text-sm text-gray-600">24 Jam</p>
-                  </div>
                 </div>
               </Card>
 
@@ -483,8 +588,8 @@ export const Guide: React.FC = () => {
                   Layanan Konseling Kampus
                 </h3>
                 <p className="text-gray-700 mb-4">
-                  Banyak universitas menyediakan layanan konseling gratis untuk mahasiswa. 
-                  Hubungi bagian kemahasiswaan atau Unit Pelayanan Psikologi kampus Anda.
+                  Untuk mahasiswa UNESA, hubungi BK UNESA atau bagian kemahasiswaan fakultas untuk membuat janji konseling. 
+                  Layanan ini dapat menjadi pintu awal untuk dukungan psikologis dan rujukan profesional bila diperlukan.
                 </p>
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600">
@@ -638,7 +743,7 @@ export const Guide: React.FC = () => {
                 <BookOpen className="h-5 w-5 text-purple-600" />
                 <AlertDescription className="text-purple-900">
                   Berikut adalah dokumen referensi penelitian yang menjadi dasar pengembangan sistem ini.
-                  Dokumen ini berisi informasi tentang metode DASS-21 dan logika fuzzy yang digunakan.
+                  Dokumen ini berisi informasi tentang metode DASS-21 yang digunakan.
                 </AlertDescription>
               </Alert>
 
