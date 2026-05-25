@@ -72,8 +72,8 @@ echo "Checking dependencies in package.json..."
 if grep -q "express" package.json; then
     echo -e "${GREEN}✓${NC} express"
 fi
-if grep -q "\"mysql2\"" package.json; then
-    echo -e "${GREEN}✓${NC} mysql2"
+if grep -q "\"pg\"" package.json; then
+    echo -e "${GREEN}✓${NC} pg"
 fi
 if grep -q "jsonwebtoken" package.json; then
     echo -e "${GREEN}✓${NC} jsonwebtoken"
@@ -88,8 +88,8 @@ fi
 # Check .env
 echo ""
 echo "Checking .env configuration..."
-if grep -q "DB_NAME=depresi" .env; then
-    echo -e "${GREEN}✓${NC} MySQL database configured"
+if grep -q "DATABASE_URL" .env; then
+    echo -e "${GREEN}✓${NC} Supabase PostgreSQL database configured"
 fi
 if grep -q "JWT_SECRET" .env; then
     echo -e "${GREEN}✓${NC} JWT_SECRET configured"
@@ -108,8 +108,8 @@ echo "======================================================"
 echo "✅ Backend verification complete!"
 echo ""
 echo "Next steps:"
-echo "1. Update .env with your database credentials"
-echo "2. Import database/depresi.sql in phpMyAdmin or MySQL CLI"
+echo "1. Update .env with your Supabase DATABASE_URL"
+echo "2. Run database/supabase-schema.sql in Supabase SQL Editor"
 echo "3. Run: pnpm install (if not done yet)"
 echo "4. Run: pnpm dev"
 echo ""

@@ -58,17 +58,14 @@ if not exist .env (
     echo WARNING: .env file not found!
     echo Creating .env template...
     (
-        echo DB_HOST=localhost
-        echo DB_PORT=3306
-        echo DB_USER=root
-        echo DB_PASSWORD=
-        echo DB_NAME=depresi
+        echo DATABASE_URL=postgresql://postgres.your-project-ref:your_database_password@aws-0-your-region.pooler.supabase.com:6543/postgres?sslmode=require
+        echo DB_SSL=true
         echo PORT=5000
         echo NODE_ENV=development
         echo JWT_SECRET=your-secret-key
         echo FRONTEND_URL=http://localhost:5173
     ) > .env
-    echo .env created. Please edit with your MySQL credentials.
+    echo .env created. Please edit with your Supabase DATABASE_URL.
 )
 
 cd /d ..
@@ -97,11 +94,9 @@ echo ========================================
 echo.
 echo NEXT STEPS:
 echo.
-echo 1. Edit backend\.env with your MySQL credentials:
-echo    - DB_PASSWORD: your MySQL password
+echo 1. Edit .env with your Supabase DATABASE_URL
 echo.
-echo 2. Import database schema:
-echo    mysql -u root -p ^< database\depresi.sql
+echo 2. Run database\supabase-schema.sql in Supabase SQL Editor
 echo.
 echo 3. Start Backend (Terminal 1):
 echo    cd backend
@@ -115,6 +110,6 @@ echo    http://localhost:5173
 echo.
 echo Documentation:
 echo - FULLSTACK_SETUP.md - Complete setup guide
-echo - MYSQL_SETUP.md - MySQL configuration
+echo - database\supabase-schema.sql - Supabase PostgreSQL schema
 echo.
 pause

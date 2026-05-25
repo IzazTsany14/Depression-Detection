@@ -363,7 +363,7 @@ router.patch('/:accountId/status', authorizeRole('admin'), async (req, res) => {
       return res.status(403).json({ message: 'Status aktif/nonaktif hanya dapat diubah untuk mahasiswa' });
     }
 
-    await pool.query('UPDATE accounts SET is_active = ? WHERE account_id = ?', [isActive ? 1 : 0, accountId]);
+    await pool.query('UPDATE accounts SET is_active = ? WHERE account_id = ?', [isActive, accountId]);
 
     res.json({
       message: isActive ? 'Mahasiswa berhasil diaktifkan' : 'Mahasiswa berhasil dinonaktifkan',
