@@ -22,27 +22,52 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // ============ MIDDLEWARE ============
 
-const allowedOrigins = [
+const normalizeOrigin = (origin) => origin?.replace(/\/$/, '');
+
+const configuredOrigins = [
   'http://localhost:5173',
   'http://127.0.0.1:5173',
+  process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '',
   ...(process.env.FRONTEND_URLS || process.env.FRONTEND_URL || '')
     .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean)
-];
-const allowedOriginSet = new Set(allowedOrigins);
+].map(normalizeOrigin);
 
-app.use(cors({
-  origin(origin, callback) {
-    if (!origin || allowedOriginSet.has(origin)) {
-      callback(null, true);
+const allowedOrigins = new Set(configuredOrigins);
+const isVercelPreviewOrigin = (origin) => {
+  try {
+    return new URL(origin).hostname.endsWith('.vercel.app');
+  } catch {
+    return false;
+  }
+};
+
+const isSameHostOrigin = (req, origin) => {
+  try {
+    return new URL(origin).host === req.get('host');
+  } catch {
+    return false;
+  }
+};
+app.use(cors((req, callback) => ({
+  origin(origin, originCallback) {
+    const normalizedOrigin = normalizeOrigin(origin);
+
+    if (
+      !normalizedOrigin ||
+      allowedOrigins.has(normalizedOrigin) ||
+      isSameHostOrigin(req, normalizedOrigin) ||
+      isVercelPreviewOrigin(normalizedOrigin)
+    ) {
+      originCallback(null, true);
       return;
     }
 
-    callback(new Error(`Origin ${origin} tidak diizinkan oleh CORS`));
+    originCallback(new Error(`Origin ${origin} tidak diizinkan oleh CORS`));
   },
   credentials: true
-}));
+})));
 
 /**
  * Body Parser
