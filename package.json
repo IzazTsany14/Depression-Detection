@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
-    "vercel-build": "npm --prefix backend install && vite build",
+    "vercel-build": "vite build",
     "dev": "node scripts/dev.js",
     "install:backend": "npm --prefix backend install",
     "dev:frontend": "vite",
