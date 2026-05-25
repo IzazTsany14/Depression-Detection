@@ -28,37 +28,35 @@ export const ResetPassword: React.FC = () => {
   const [isVerifying, setIsVerifying] = useState(true);
 
   const token = searchParams.get('token');
-  const email = searchParams.get('email');
-
   // Verify token on component mount
   useEffect(() => {
-    if (!token || !email) {
+    if (!token) {
       setMessage({ 
         type: 'error', 
-        text: 'Link reset password tidak valid. Parameter tidak lengkap.' 
+        text: 'Link reset password tidak valid. Token tidak ditemukan.' 
       });
       setIsVerifying(false);
       return;
     }
 
-    // Verify token validity
-    if (verifyResetToken(token)) {
-      setIsValidToken(true);
-    } else {
-      setMessage({ 
-        type: 'error', 
-        text: 'Link reset password telah kadaluarsa atau tidak valid. Silakan minta link baru.' 
-      });
-    }
-
-    setIsVerifying(false);
-  }, [token, email]);
+    verifyResetToken(token)
+      .then(() => {
+        setIsValidToken(true);
+      })
+      .catch((error: any) => {
+        setMessage({
+          type: 'error',
+          text: error.message || 'Link reset password telah kadaluarsa atau tidak valid. Silakan minta link baru.'
+        });
+      })
+      .finally(() => setIsVerifying(false));
+  }, [token]);
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleResetPassword = (e: React.FormEvent) => {
+  const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.newPassword || !formData.confirmPassword) {
@@ -78,25 +76,22 @@ export const ResetPassword: React.FC = () => {
 
     setLoading(true);
 
-    // Attempt to reset password
-    const success = resetPassword(email!, token!, formData.newPassword);
-
-    if (success) {
+    try {
+      await resetPassword(token!, formData.newPassword);
       setMessage(null);
       showSuccessDialog('Password berhasil direset');
 
-      // Redirect to login after 3 seconds
       setTimeout(() => {
         navigate('/login');
       }, 3000);
-    } else {
+    } catch (error: any) {
       setMessage({ 
         type: 'error', 
-        text: 'Gagal mereset password. Silakan coba lagi atau minta link baru.' 
+        text: error.message || 'Gagal mereset password. Silakan coba lagi atau minta link baru.' 
       });
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   if (isVerifying) {

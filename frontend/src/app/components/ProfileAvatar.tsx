@@ -25,7 +25,7 @@ export const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
     if (!hasImage) return '';
 
     const url = getProfilePictureUrl(profilePicture);
-    if (!cacheKey) return url;
+    if (!cacheKey || /^(data:|blob:)/i.test(url)) return url;
 
     const separator = url.includes('?') ? '&' : '?';
     return `${url}${separator}v=${encodeURIComponent(String(cacheKey))}`;

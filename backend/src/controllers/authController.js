@@ -8,6 +8,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import '../config/env.js';
 import { v4 as uuidv4 } from 'uuid';
+import crypto from 'crypto';
 
 const databaseUnavailableCodes = [
   'ECONNREFUSED',
@@ -54,6 +55,92 @@ const verifyPassword = async (plainPassword, storedPassword) => {
   }
 
   return plainPassword === storedPassword;
+};
+
+const resetTokenExpiryMinutes = 30;
+
+const getPublicAppUrl = (req) => {
+  const configuredUrl = process.env.FRONTEND_URL || process.env.APP_URL;
+  if (configuredUrl) return configuredUrl.replace(/\/$/, '');
+
+  const origin = req.get('origin');
+  if (origin) return origin.replace(/\/$/, '');
+
+  return `${req.protocol}://${req.get('host')}`.replace(/\/$/, '');
+};
+
+const ensurePasswordResetTable = async () => {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS password_reset_tokens (
+      token_id varchar(50) NOT NULL,
+      account_id varchar(50) NOT NULL,
+      token_hash varchar(64) NOT NULL,
+      expires_at datetime NOT NULL,
+      used_at datetime DEFAULT NULL,
+      created_at timestamp NOT NULL DEFAULT current_timestamp(),
+      PRIMARY KEY (token_id),
+      UNIQUE KEY token_hash (token_hash),
+      KEY account_id (account_id),
+      CONSTRAINT password_reset_tokens_account_fk
+        FOREIGN KEY (account_id) REFERENCES accounts (account_id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+  `);
+};
+
+const hashResetToken = (token) => crypto.createHash('sha256').update(token).digest('hex');
+
+const getResetTokenRecord = async (token) => {
+  await ensurePasswordResetTable();
+  const [rows] = await pool.query(
+    `SELECT prt.*, a.email
+     FROM password_reset_tokens prt
+     JOIN accounts a ON prt.account_id = a.account_id
+     WHERE prt.token_hash = ?
+       AND prt.used_at IS NULL
+       AND prt.expires_at > NOW()
+     LIMIT 1`,
+    [hashResetToken(token)]
+  );
+
+  return rows[0] || null;
+};
+
+const isEmailJsPlaceholder = (value) => !value || String(value).startsWith('your_');
+
+const sendPasswordResetEmail = async ({ email, name, resetLink }) => {
+  const publicKey = process.env.EMAILJS_PUBLIC_KEY || process.env.VITE_EMAILJS_PUBLIC_KEY;
+  const serviceId = process.env.EMAILJS_SERVICE_ID || process.env.VITE_EMAILJS_SERVICE_ID;
+  const templateId = process.env.EMAILJS_TEMPLATE_ID || process.env.VITE_EMAILJS_TEMPLATE_ID;
+
+  if ([publicKey, serviceId, templateId].some(isEmailJsPlaceholder)) {
+    const error = new Error('EmailJS belum dikonfigurasi. Isi VITE_EMAILJS_PUBLIC_KEY, VITE_EMAILJS_SERVICE_ID, dan VITE_EMAILJS_TEMPLATE_ID di .env.');
+    error.status = 500;
+    throw error;
+  }
+
+  const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      service_id: serviceId,
+      template_id: templateId,
+      user_id: publicKey,
+      template_params: {
+        to_email: email,
+        to_name: name || email,
+        reset_link: resetLink,
+        app_name: 'Depression Detection',
+        expires_in: `${resetTokenExpiryMinutes} menit`
+      }
+    })
+  });
+
+  if (!response.ok) {
+    const message = await response.text();
+    const error = new Error(message || 'Gagal mengirim email reset password');
+    error.status = 502;
+    throw error;
+  }
 };
 
 const getUserWithProfile = async (accountId) => {
@@ -225,6 +312,124 @@ export const login = async (req, res) => {
     res.status(500).json({ 
       message: 'Terjadi kesalahan saat login',
       error: error.message 
+    });
+  }
+};
+
+export const requestPasswordReset = async (req, res) => {
+  try {
+    const email = String(req.body.email || '').trim().toLowerCase();
+
+    if (!email) {
+      return res.status(400).json({ message: 'Email harus diisi' });
+    }
+
+    const [rows] = await pool.query(
+      `SELECT
+        a.account_id,
+        a.email,
+        a.is_active,
+        COALESCE(s.name, b.name, ad.name, a.email) AS name
+       FROM accounts a
+       LEFT JOIN students s ON a.account_id = s.account_id AND a.role = 'student'
+       LEFT JOIN bk_staff b ON a.account_id = b.account_id AND a.role = 'bk'
+       LEFT JOIN admins ad ON a.account_id = ad.account_id AND a.role = 'admin'
+       WHERE LOWER(a.email) = ?
+       LIMIT 1`,
+      [email]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Email tidak terdaftar' });
+    }
+
+    const account = rows[0];
+    if (account.is_active === false || account.is_active === 0) {
+      return res.status(403).json({ message: 'Akun sedang nonaktif. Silakan hubungi admin.' });
+    }
+
+    await ensurePasswordResetTable();
+    await pool.query(
+      'UPDATE password_reset_tokens SET used_at = NOW() WHERE account_id = ? AND used_at IS NULL',
+      [account.account_id]
+    );
+
+    const token = crypto.randomBytes(32).toString('hex');
+    const resetLink = `${getPublicAppUrl(req)}/reset-password?token=${encodeURIComponent(token)}`;
+
+    await pool.query(
+      `INSERT INTO password_reset_tokens (token_id, account_id, token_hash, expires_at)
+       VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL ? MINUTE))`,
+      [`reset-${uuidv4().slice(0, 8)}`, account.account_id, hashResetToken(token), resetTokenExpiryMinutes]
+    );
+
+    await sendPasswordResetEmail({
+      email: account.email,
+      name: account.name,
+      resetLink
+    });
+
+    res.json({ message: 'Link reset password berhasil dikirim ke email terdaftar.' });
+  } catch (error) {
+    if (isDatabaseUnavailable(error)) {
+      return res.status(503).json({
+        message: 'Database belum terhubung. Pastikan MySQL aktif, database depresi tersedia, dan backend/.env sudah benar.'
+      });
+    }
+
+    res.status(error.status || 500).json({
+      message: error.status === 500 ? error.message : 'Gagal mengirim link reset password',
+      error: error.message
+    });
+  }
+};
+
+export const verifyPasswordResetToken = async (req, res) => {
+  try {
+    const token = String(req.query.token || req.body.token || '').trim();
+    if (!token) return res.status(400).json({ message: 'Token reset password wajib diisi' });
+
+    const record = await getResetTokenRecord(token);
+    if (!record) {
+      return res.status(400).json({ message: 'Link reset password tidak valid atau sudah kadaluarsa' });
+    }
+
+    res.json({ valid: true, email: record.email });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Gagal memverifikasi link reset password',
+      error: error.message
+    });
+  }
+};
+
+export const resetPasswordWithToken = async (req, res) => {
+  try {
+    const token = String(req.body.token || '').trim();
+    const newPassword = String(req.body.newPassword || '');
+
+    if (!token || !newPassword) {
+      return res.status(400).json({ message: 'Token dan password baru wajib diisi' });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: 'Password minimal 6 karakter' });
+    }
+
+    const record = await getResetTokenRecord(token);
+    if (!record) {
+      return res.status(400).json({ message: 'Link reset password tidak valid atau sudah kadaluarsa' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    await pool.query('UPDATE accounts SET password = ? WHERE account_id = ?', [hashedPassword, record.account_id]);
+    await pool.query('UPDATE password_reset_tokens SET used_at = NOW() WHERE token_id = ?', [record.token_id]);
+
+    res.json({ message: 'Password berhasil direset. Silakan login dengan password baru.' });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Gagal mereset password',
+      error: error.message
     });
   }
 };

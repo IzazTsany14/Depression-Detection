@@ -3,7 +3,15 @@
  * Menangani endpoint /api/auth/*
  */
 import express from 'express';
-import { login, logout, getCurrentUser, getStudentByNim } from '../controllers/authController.js';
+import {
+  login,
+  logout,
+  getCurrentUser,
+  getStudentByNim,
+  requestPasswordReset,
+  resetPasswordWithToken,
+  verifyPasswordResetToken
+} from '../controllers/authController.js';
 import { verifyToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -14,6 +22,10 @@ const router = express.Router();
  * Body: { email, password }
  */
 router.post('/login', login);
+
+router.post('/forgot-password', requestPasswordReset);
+router.get('/reset-password/verify', verifyPasswordResetToken);
+router.post('/reset-password', resetPasswordWithToken);
 
 /**
  * POST /api/auth/register
