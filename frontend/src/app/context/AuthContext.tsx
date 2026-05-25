@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { apiUrl } from '../utils/api';
+import { apiUrl, fetchWithTimeout } from '../utils/api';
 
 interface User {
   id: string;
@@ -169,11 +169,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string): Promise<User | null> => {
     try {
-      const res = await fetch(apiUrl('/auth/login'), {
+      const res = await fetchWithTimeout(apiUrl('/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
-      });
+      }, 15000);
       const data = await res.json();
 
       if (res.ok && data.user) {
@@ -191,7 +191,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return null;
     } catch (error) {
       console.error('Network Error Login:', error);
-      alert('Gagal terhubung ke backend. Pastikan URL API backend sudah benar.');
+      alert('Gagal terhubung ke backend. Pastikan URL API backend sudah benar dan backend Railway sudah aktif.');
       return null;
     }
   };
