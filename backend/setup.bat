@@ -45,11 +45,8 @@ REM Check if .env exists
 if not exist .env (
     echo ⚠️  .env file not found. Creating from template...
     (
-        echo DB_HOST=127.0.0.1
-        echo DB_PORT=3306
-        echo DB_USER=root
-        echo DB_PASSWORD=
-        echo DB_NAME=depresi
+        echo DATABASE_URL=postgresql://postgres.your-project-ref:your_database_password@aws-0-your-region.pooler.supabase.com:6543/postgres?sslmode=require
+        echo DB_SSL=true
         echo PORT=5000
         echo NODE_ENV=development
         echo JWT_SECRET=your-super-secret-jwt-key
@@ -66,8 +63,8 @@ echo ✅ Setup complete!
 echo ======================================
 echo.
 echo Next steps:
-echo 1. Edit backend\.env with your database credentials
-echo 2. Import database\depresi.sql in phpMyAdmin or MySQL CLI
+echo 1. Edit backend\.env with your Supabase DATABASE_URL
+echo 2. Run database\supabase-schema.sql in Supabase SQL Editor
 echo 3. Run: pnpm dev (development^)
 echo 4. Or:  pnpm start (production^)
 echo.

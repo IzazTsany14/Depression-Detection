@@ -90,10 +90,10 @@ export const submitTest = async (req, res) => {
     // Simpan ke database (sesuai tabel test_results Anda)
     const insertQuery = `
       INSERT INTO test_results (test_id, student_id, date, score, level, fuzzy_score, answers)
-      VALUES (?, ?, NOW(), ?, ?, ?, ?)
+      VALUES (?, ?, NOW(), ?, ?, ?, ?::jsonb)
     `;
 
-    // Convert answers array ke JSON string untuk kolom JSON MySQL.
+    // Convert answers array ke JSON string untuk kolom jsonb PostgreSQL.
     const answersJSON = JSON.stringify(answers);
 
     const result = await pool.query(insertQuery, [

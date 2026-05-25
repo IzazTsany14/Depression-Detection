@@ -75,15 +75,21 @@ const ensurePasswordResetTable = async () => {
       token_id varchar(50) NOT NULL,
       account_id varchar(50) NOT NULL,
       token_hash varchar(64) NOT NULL,
-      expires_at datetime NOT NULL,
-      used_at datetime DEFAULT NULL,
-      created_at timestamp NOT NULL DEFAULT current_timestamp(),
+      expires_at timestamp NOT NULL,
+      used_at timestamp DEFAULT NULL,
+      created_at timestamptz NOT NULL DEFAULT now(),
       PRIMARY KEY (token_id),
-      UNIQUE KEY token_hash (token_hash),
-      KEY account_id (account_id),
       CONSTRAINT password_reset_tokens_account_fk
         FOREIGN KEY (account_id) REFERENCES accounts (account_id) ON DELETE CASCADE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+    )
+  `);
+  await pool.query(`
+    CREATE UNIQUE INDEX IF NOT EXISTS password_reset_tokens_token_hash_key
+    ON password_reset_tokens (token_hash)
+  `);
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS password_reset_tokens_account_id_idx
+    ON password_reset_tokens (account_id)
   `);
 };
 
@@ -232,7 +238,7 @@ export const getStudentByNim = async (req, res) => {
   } catch (error) {
     if (isDatabaseUnavailable(error)) {
       return res.status(503).json({
-        message: 'Database belum terhubung. Pastikan MySQL aktif, database depresi tersedia, dan backend/.env sudah benar.'
+        message: 'Database belum terhubung. Pastikan DATABASE_URL Supabase PostgreSQL benar dan schema sudah dijalankan.'
       });
     }
 
@@ -304,7 +310,7 @@ export const login = async (req, res) => {
   } catch (error) {
     if (isDatabaseUnavailable(error)) {
       return res.status(503).json({
-        message: 'Database belum terhubung. Pastikan MySQL aktif, database depresi tersedia, dan backend/.env sudah benar.'
+        message: 'Database belum terhubung. Pastikan DATABASE_URL Supabase PostgreSQL benar dan schema sudah dijalankan.'
       });
     }
 
@@ -359,7 +365,7 @@ export const requestPasswordReset = async (req, res) => {
 
     await pool.query(
       `INSERT INTO password_reset_tokens (token_id, account_id, token_hash, expires_at)
-       VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL ? MINUTE))`,
+       VALUES (?, ?, ?, NOW() + (? * INTERVAL '1 minute'))`,
       [`reset-${uuidv4().slice(0, 8)}`, account.account_id, hashResetToken(token), resetTokenExpiryMinutes]
     );
 
@@ -373,7 +379,7 @@ export const requestPasswordReset = async (req, res) => {
   } catch (error) {
     if (isDatabaseUnavailable(error)) {
       return res.status(503).json({
-        message: 'Database belum terhubung. Pastikan MySQL aktif, database depresi tersedia, dan backend/.env sudah benar.'
+        message: 'Database belum terhubung. Pastikan DATABASE_URL Supabase PostgreSQL benar dan schema sudah dijalankan.'
       });
     }
 
@@ -638,7 +644,7 @@ export const getCurrentUser = async (req, res) => {
   } catch (error) {
     if (isDatabaseUnavailable(error)) {
       return res.status(503).json({
-        message: 'Database belum terhubung. Pastikan MySQL aktif, database depresi tersedia, dan backend/.env sudah benar.'
+        message: 'Database belum terhubung. Pastikan DATABASE_URL Supabase PostgreSQL benar dan schema sudah dijalankan.'
       });
     }
 
