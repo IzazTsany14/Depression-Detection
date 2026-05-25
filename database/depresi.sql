@@ -67,6 +67,19 @@ CREATE TABLE `students` (
   CONSTRAINT `students_account_fk` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`account_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+CREATE TABLE `password_reset_tokens` (
+  `token_id` varchar(50) NOT NULL,
+  `account_id` varchar(50) NOT NULL,
+  `token_hash` varchar(64) NOT NULL,
+  `expires_at` datetime NOT NULL,
+  `used_at` datetime DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`token_id`),
+  UNIQUE KEY `token_hash` (`token_hash`),
+  KEY `account_id` (`account_id`),
+  CONSTRAINT `password_reset_tokens_account_fk` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`account_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 CREATE TABLE `medical_records` (
   `record_id` varchar(50) NOT NULL,
   `student_id` varchar(50) NOT NULL,

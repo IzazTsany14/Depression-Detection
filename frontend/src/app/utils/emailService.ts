@@ -1,43 +1,39 @@
-import emailjs from '@emailjs/browser';
+import { apiUrl } from './api';
 
-const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || '';
-const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || '';
-const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || '';
+const parseResponse = async (res: Response) => {
+  const contentType = res.headers.get('content-type') || '';
+  const data = contentType.includes('application/json')
+    ? await res.json()
+    : { message: await res.text() };
 
-const isEmailJsConfigured = Boolean(
-  EMAILJS_PUBLIC_KEY &&
-  EMAILJS_SERVICE_ID &&
-  EMAILJS_TEMPLATE_ID
-);
+  if (!res.ok) {
+    throw new Error(data.message || data.error || 'Request gagal diproses');
+  }
 
-if (isEmailJsConfigured) {
-  emailjs.init(EMAILJS_PUBLIC_KEY);
-}
-
-interface SendResetEmailParams {
-  email: string;
-  name: string;
-  resetLink: string;
-}
-
-interface SendResetEmailResponse {
-  success: boolean;
-  message: string;
-}
-
-export const generateResetToken = (): string => {
-  throw new Error('Reset token tidak boleh dibuat di browser. Gunakan proses admin/backend.');
+  return data;
 };
 
-export const sendResetEmail = async (_params: SendResetEmailParams): Promise<SendResetEmailResponse> => {
-  return {
-    success: false,
-    message: 'Reset password dinonaktifkan dari sisi publik. Silakan hubungi admin kampus.'
-  };
+export const requestPasswordResetEmail = async (email: string) => {
+  const res = await fetch(apiUrl('/auth/forgot-password'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email })
+  });
+
+  return parseResponse(res);
 };
 
-export const checkEmailExists = (_email: string): boolean => false;
+export const verifyResetToken = async (token: string) => {
+  const res = await fetch(apiUrl(`/auth/reset-password/verify?token=${encodeURIComponent(token)}`));
+  return parseResponse(res);
+};
 
-export const verifyResetToken = (_token: string): boolean => false;
+export const resetPassword = async (token: string, newPassword: string) => {
+  const res = await fetch(apiUrl('/auth/reset-password'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token, newPassword })
+  });
 
-export const resetPassword = (_email: string, _token: string, _newPassword: string): boolean => false;
+  return parseResponse(res);
+};

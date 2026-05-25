@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { useAuth } from '../context/AuthContext';
 import { Eye, EyeOff, LogIn, AlertCircle, Mail, CheckCircle2, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '../components/ui/alert';
+import { requestPasswordResetEmail } from '../utils/emailService';
 
 export const Login: React.FC = () => {
   const { login, startAsGuest, user } = useAuth();
@@ -70,12 +71,28 @@ export const Login: React.FC = () => {
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!forgotPasswordEmail.trim()) {
+      setForgotPasswordMessage({ type: 'error', text: 'Email harus diisi' });
+      return;
+    }
+
     setForgotPasswordLoading(true);
-    setForgotPasswordMessage({
-      type: 'error',
-      text: 'Reset password hanya dapat diproses oleh admin kampus. Silakan hubungi admin untuk mengganti password.'
-    });
-    setForgotPasswordLoading(false);
+    setForgotPasswordMessage(null);
+
+    try {
+      const data = await requestPasswordResetEmail(forgotPasswordEmail);
+      setForgotPasswordMessage({
+        type: 'success',
+        text: data.message || 'Link reset password berhasil dikirim ke email terdaftar.'
+      });
+    } catch (error: any) {
+      setForgotPasswordMessage({
+        type: 'error',
+        text: error.message || 'Gagal mengirim link reset password'
+      });
+    } finally {
+      setForgotPasswordLoading(false);
+    }
   };
 
   return (

@@ -12,6 +12,7 @@ import { apiUrl } from '../../utils/api';
 import { readProfileImageFile } from '../../utils/profileUpdate';
 import { showSuccessDialog } from '../../utils/successDialog';
 import { changeAccountPassword } from '../../utils/passwordChange';
+import { PasswordInput } from '../../components/PasswordInput';
 
 export const StudentProfile: React.FC = () => {
   const { user, updateUser } = useAuth();
@@ -174,6 +175,7 @@ export const StudentProfile: React.FC = () => {
               <div className="flex items-center gap-6 mb-8">
                 <ProfileAvatar
                   profilePicture={profilePreview}
+                  cacheKey={user?.profileUpdatedAt}
                   className="w-24 h-24"
                   iconClassName="w-12 h-12 text-white"
                   fallbackClassName="bg-gradient-to-br from-purple-400 to-purple-600"
@@ -326,9 +328,8 @@ export const StudentProfile: React.FC = () => {
                 <form onSubmit={handleChangePassword} className="space-y-4">
                   <div>
                     <Label htmlFor="currentPassword">Password Saat Ini</Label>
-                    <Input
+                    <PasswordInput
                       id="currentPassword"
-                      type="password"
                       value={formData.currentPassword}
                       onChange={(e) => handleChange('currentPassword', e.target.value)}
                       placeholder="Masukkan password saat ini"
@@ -338,9 +339,8 @@ export const StudentProfile: React.FC = () => {
 
                   <div>
                     <Label htmlFor="newPassword">Password Baru</Label>
-                    <Input
+                    <PasswordInput
                       id="newPassword"
-                      type="password"
                       value={formData.newPassword}
                       onChange={(e) => handleChange('newPassword', e.target.value)}
                       placeholder="Masukkan password baru"
@@ -350,9 +350,8 @@ export const StudentProfile: React.FC = () => {
 
                   <div>
                     <Label htmlFor="confirmPassword">Konfirmasi Password Baru</Label>
-                    <Input
+                    <PasswordInput
                       id="confirmPassword"
-                      type="password"
                       value={formData.confirmPassword}
                       onChange={(e) => handleChange('confirmPassword', e.target.value)}
                       placeholder="Konfirmasi password baru"
