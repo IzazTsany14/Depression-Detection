@@ -50,24 +50,26 @@ const isSameHostOrigin = (req, origin) => {
     return false;
   }
 };
-app.use(cors((req, callback) => ({
-  origin(origin, originCallback) {
-    const normalizedOrigin = normalizeOrigin(origin);
+app.use(cors((req, callback) => {
+  callback(null, {
+    origin(origin, originCallback) {
+      const normalizedOrigin = normalizeOrigin(origin);
 
-    if (
-      !normalizedOrigin ||
-      allowedOrigins.has(normalizedOrigin) ||
-      isSameHostOrigin(req, normalizedOrigin) ||
-      isVercelPreviewOrigin(normalizedOrigin)
-    ) {
-      originCallback(null, true);
-      return;
-    }
+      if (
+        !normalizedOrigin ||
+        allowedOrigins.has(normalizedOrigin) ||
+        isSameHostOrigin(req, normalizedOrigin) ||
+        isVercelPreviewOrigin(normalizedOrigin)
+      ) {
+        originCallback(null, true);
+        return;
+      }
 
-    originCallback(new Error(`Origin ${origin} tidak diizinkan oleh CORS`));
-  },
-  credentials: true
-})));
+      originCallback(new Error(`Origin ${origin} tidak diizinkan oleh CORS`));
+    },
+    credentials: true
+  });
+}));
 
 /**
  * Body Parser

@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 const PRODUCTION_API_BASE_URL = 'https://depression-detection-production.up.railway.app/api';
 const configuredApiBaseUrl = import.meta.env.VITE_API_URL;
 const shouldUseProductionApiFallback = (
@@ -29,8 +31,8 @@ export const backendUrl = (path: string) => {
 };
 
 export const fetchWithTimeout = async (
-  input: RequestInfo | URL,
-  init: RequestInit = {},
+  input: Parameters<typeof fetch>[0],
+  init: Parameters<typeof fetch>[1] = {},
   timeoutMs = 15000
 ) => {
   const controller = new AbortController();
@@ -39,7 +41,7 @@ export const fetchWithTimeout = async (
   try {
     return await fetch(input, {
       ...init,
-      signal: init.signal || controller.signal
+      signal: init?.signal || controller.signal
     });
   } finally {
     window.clearTimeout(timeout);
