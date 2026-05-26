@@ -1,6 +1,6 @@
 <div align='center'>
   <a href="https://git.io/typing-svg">
-    <img src="https://readme-typing-svg.herokuapp.com?font=Poppins&weight=600&size=38&pause=1000&color=0B84F3&center=true&vCenter=true&width=800&height=70&lines=MindCheck;Sistem+Deteksi+Dini+Tingkat+Depresi;+DASS-21" alt="Typing SVG" />
+    <img src="https://readme-typing-svg.herokuapp.com?font=Poppins&weight=600&size=38&pause=1000&color=0B84F3&center=true&vCenter=true&width=800&height=70&lines=MindCheck;Sistem+Deteksi+Dini+Tingkat+Depresi;+DASS-21(Depression Anxiety Stress Scale-21)" alt="Typing SVG" />
   </a>
 </div>
 
@@ -9,7 +9,7 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178C6?style=for-the-badge&logo=typescript" alt="TypeScript Badge">
   <img src="https://img.shields.io/badge/Styling-TailwindCSS-06B6D4?style=for-the-badge&logo=tailwind-css" alt="Tailwind Badge">
   <img src="https://img.shields.io/badge/Backend-Express.Js-092E20?style=for-the-badge&logo=Express.Js" alt="Node Js Badge">
-  <img src="https://img.shields.io/badge/Database-MySQL-4479A1?style=for-the-badge&logo=mysql" alt="MySQL Badge">
+  <img src="https://img.shields.io/badge/Database-Supabase-4479A1?style=for-the-badge&logo=Supabase" alt="Supabase Badge">
 </p>
 
 ---

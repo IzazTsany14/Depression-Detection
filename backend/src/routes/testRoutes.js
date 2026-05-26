@@ -27,10 +27,10 @@ router.get('/', authorizeRole('admin', 'bk'), async (req, res) => {
     const query = `
       SELECT
         t.*,
-        s.name as userName,
-        s.nim as userNim,
-        s.faculty as userFaculty,
-        a.email as userEmail
+        s.name AS "userName",
+        s.nim AS "userNim",
+        s.faculty AS "userFaculty",
+        a.email AS "userEmail"
       FROM test_results t 
       JOIN students s ON t.student_id = s.student_id
       JOIN accounts a ON s.account_id = a.account_id

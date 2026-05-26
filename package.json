@@ -7,6 +7,7 @@
     "build": "vite build",
     "vercel-build": "vite build",
     "dev": "node scripts/dev.js",
+    "db:seed": "node scripts/seed-supabase.js",
     "install:backend": "npm --prefix backend install",
     "dev:frontend": "vite",
     "dev:backend": "npm --prefix backend start"
