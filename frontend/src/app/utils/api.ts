@@ -1,18 +1,8 @@
 /// <reference types="vite/client" />
 
-const PRODUCTION_API_BASE_URL = 'https://depression-detection-production.up.railway.app/api';
 const configuredApiBaseUrl = import.meta.env.VITE_API_URL;
-const shouldUseProductionApiFallback = (
-  typeof window !== 'undefined' &&
-  window.location.hostname.endsWith('.vercel.app') &&
-  (!configuredApiBaseUrl || configuredApiBaseUrl === '/api')
-);
 
-export const API_BASE_URL = (
-  shouldUseProductionApiFallback
-    ? PRODUCTION_API_BASE_URL
-    : configuredApiBaseUrl || '/api'
-).replace(/\/$/, '');
+export const API_BASE_URL = (configuredApiBaseUrl || '/api').replace(/\/$/, '');
 
 export const apiUrl = (path: string) => {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;

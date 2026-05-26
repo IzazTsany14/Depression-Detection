@@ -191,7 +191,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return null;
     } catch (error) {
       console.error('Network Error Login:', error);
-      alert('Gagal terhubung ke backend. Pastikan URL API backend sudah benar dan backend Railway sudah aktif.');
+      alert('Gagal terhubung ke backend. Pastikan API Vercel dan koneksi Supabase sudah benar.');
       return null;
     }
   };
