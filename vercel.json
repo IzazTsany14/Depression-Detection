@@ -4,15 +4,16 @@
   "functions": {
     "api/index.js": {
       "maxDuration": 30
-    },
-    "api/[...path].js": {
-      "maxDuration": 30
     }
   },
   "rewrites": [
     {
+      "source": "/api/(.*)",
+      "destination": "/api"
+    },
+    {
       "source": "/uploads/(.*)",
-      "destination": "/api/uploads/$1"
+      "destination": "/api"
     },
     {
       "source": "/(.*)",
