@@ -13,6 +13,7 @@ import { fileURLToPath } from 'url';
 import authRoutes from './routes/authRoutes.js';
 import testRoutes from './routes/testRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import medicalRecordRoutes from './routes/medicalRecordRoutes.js';
 
 // Import middleware
 import { authorizeRole, errorHandler, verifyToken } from './middleware/authMiddleware.js';
@@ -130,6 +131,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/tests', testRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/medical-records', medicalRecordRoutes);
 
 /**
  * Root endpoint

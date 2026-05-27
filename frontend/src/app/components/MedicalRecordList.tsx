@@ -10,7 +10,7 @@ import { showSuccessDialog } from '../utils/successDialog';
 
 interface MedicalRecordListProps {
   records: MedicalRecord[];
-  onDelete: (id: string) => void;
+  onDelete: (id: string) => Promise<void> | void;
   onView: (record: MedicalRecord) => void;
 }
 
@@ -239,10 +239,14 @@ export const MedicalRecordList: React.FC<MedicalRecordListProps> = ({ records, o
             <Button
               size="sm"
               variant="destructive"
-              onClick={() => {
+              onClick={async () => {
                 if (confirm('Yakin ingin menghapus rekam medis ini?')) {
-                  onDelete(record.id);
-                  showSuccessDialog('Data berhasil dihapus');
+                  try {
+                    await onDelete(record.id);
+                    showSuccessDialog('Data berhasil dihapus');
+                  } catch {
+                    toast.error('Gagal menghapus rekam medis');
+                  }
                 }
               }}
             >

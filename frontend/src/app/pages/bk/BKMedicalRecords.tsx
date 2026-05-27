@@ -7,6 +7,8 @@ import { MedicalRecordForm, MedicalRecord } from '../../components/MedicalRecord
 import { MedicalRecordList } from '../../components/MedicalRecordList';
 import { MedicalRecordDetail } from '../../components/MedicalRecordDetail';
 import { Plus } from 'lucide-react';
+import { apiUrl } from '../../utils/api';
+import { toast } from 'sonner';
 
 export const BKMedicalRecords: React.FC = () => {
   const { user } = useAuth();
@@ -14,6 +16,36 @@ export const BKMedicalRecords: React.FC = () => {
   const [showMedicalRecordForm, setShowMedicalRecordForm] = useState(false);
   const [medicalRecords, setMedicalRecords] = useState<MedicalRecord[]>([]);
   const [selectedRecord, setSelectedRecord] = useState<MedicalRecord | null>(null);
+  const [loadingRecords, setLoadingRecords] = useState(true);
+
+  const getAuthHeaders = () => {
+    const token = sessionStorage.getItem('token');
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
+  const loadMedicalRecords = async () => {
+    setLoadingRecords(true);
+    try {
+      const res = await fetch(apiUrl('/medical-records'), {
+        cache: 'no-store',
+        headers: {
+          ...getAuthHeaders(),
+          'Cache-Control': 'no-cache'
+        }
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Gagal mengambil data rekam medis');
+      }
+
+      setMedicalRecords(data.data || []);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Gagal mengambil data rekam medis');
+    } finally {
+      setLoadingRecords(false);
+    }
+  };
 
   useEffect(() => {
     if (!user || user.role !== 'bk') {
@@ -21,17 +53,46 @@ export const BKMedicalRecords: React.FC = () => {
       return;
     }
 
+    loadMedicalRecords();
   }, [user, navigate]);
 
-  const handleSaveMedicalRecord = (record: MedicalRecord) => {
-    const updatedRecords = [...medicalRecords, record];
-    setMedicalRecords(updatedRecords);
+  const handleSaveMedicalRecord = async (record: MedicalRecord) => {
+    const res = await fetch(apiUrl('/medical-records'), {
+      method: 'POST',
+      headers: {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(record)
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.message || data.error || 'Gagal menyimpan rekam medis');
+    }
+
+    setMedicalRecords(prev => [data.record, ...prev]);
     setShowMedicalRecordForm(false);
   };
 
-  const handleDeleteMedicalRecord = (id: string) => {
-    const updatedRecords = medicalRecords.filter(r => r.id !== id);
-    setMedicalRecords(updatedRecords);
+  const handleDeleteMedicalRecord = async (id: string) => {
+    try {
+      const res = await fetch(apiUrl(`/medical-records/${encodeURIComponent(id)}`), {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Gagal menghapus rekam medis');
+      }
+
+      setMedicalRecords(prev => prev.filter(r => r.id !== id));
+      if (selectedRecord?.id === id) setSelectedRecord(null);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Gagal menghapus rekam medis');
+      throw error;
+    }
   };
 
   return (
@@ -70,6 +131,10 @@ export const BKMedicalRecords: React.FC = () => {
               onSave={handleSaveMedicalRecord}
               onCancel={() => setShowMedicalRecordForm(false)}
             />
+          ) : loadingRecords ? (
+            <div className="rounded-lg border border-purple-100 bg-white p-8 text-center text-gray-600">
+              Memuat rekam medis...
+            </div>
           ) : (
             <MedicalRecordList
               records={medicalRecords}

@@ -13,7 +13,7 @@ import { showSuccessDialog } from '../utils/successDialog';
 import { apiUrl } from '../utils/api';
 
 interface MedicalRecordFormProps {
-  onSave: (record: MedicalRecord) => void;
+  onSave: (record: MedicalRecord) => Promise<void> | void;
   onCancel: () => void;
 }
 
@@ -55,6 +55,7 @@ export const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ onSave, on
   });
   const [notFound, setNotFound] = useState(false);
   const [loadingStudent, setLoadingStudent] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const handleChange = (field: keyof MedicalRecord, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -133,7 +134,7 @@ export const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ onSave, on
     return () => window.clearTimeout(timeout);
   }, [formData.nim]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validasi form
@@ -163,8 +164,15 @@ export const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ onSave, on
       createdAt: new Date().toISOString(),
     };
 
-    onSave(record);
-    showSuccessDialog('Data berhasil diperbarui');
+    setSaving(true);
+    try {
+      await onSave(record);
+      showSuccessDialog('Rekam medis berhasil disimpan');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Gagal menyimpan rekam medis');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -408,9 +416,9 @@ export const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ onSave, on
 
         {/* Form Actions */}
         <div className="flex gap-3 pt-4 border-t">
-          <Button type="submit" className="flex-1 bg-purple-600 hover:bg-purple-700">
+          <Button type="submit" disabled={saving} className="flex-1 bg-purple-600 hover:bg-purple-700">
             <Save className="w-4 h-4 mr-2" />
-            Simpan Rekam Medis
+            {saving ? 'Menyimpan...' : 'Simpan Rekam Medis'}
           </Button>
           <Button type="button" variant="outline" onClick={onCancel} className="flex-1">
             Batal

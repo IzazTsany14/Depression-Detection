@@ -57,9 +57,16 @@ create table if not exists medical_records (
   student_id varchar(50) not null references students(student_id) on delete cascade,
   bk_id varchar(50) not null references bk_staff(bk_id) on delete cascade,
   consultation_date timestamp not null,
+  consultation_type varchar(50) default 'Individual',
   complaint text,
   diagnosis text,
+  depression_level varchar(50) default 'Normal',
+  interventions text,
   recommendation text,
+  follow_up_date timestamp,
+  counselor_name varchar(100),
+  counselor_notes text,
+  created_at timestamptz not null default now(),
   status medical_record_status default 'open'
 );
 
@@ -85,6 +92,9 @@ create table if not exists password_reset_tokens (
 create index if not exists idx_bk_name on bk_staff(name);
 create index if not exists idx_nim on students(nim);
 create index if not exists idx_student_name on students(name);
+create index if not exists idx_medical_records_student_id on medical_records(student_id);
+create index if not exists idx_medical_records_bk_id on medical_records(bk_id);
+create index if not exists idx_medical_records_consultation_date on medical_records(consultation_date);
 create index if not exists idx_test_results_student_id on test_results(student_id);
 create index if not exists idx_test_date on test_results(date);
 create index if not exists idx_level on test_results(level);
