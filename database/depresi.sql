@@ -102,7 +102,7 @@ CREATE TABLE `test_results` (
   `date` datetime NOT NULL,
   `score` int(11) NOT NULL,
   `level` varchar(50) NOT NULL,
-  `fuzzy_score` decimal(5,4) NOT NULL,
+  `dass21_score` decimal(5,4) NOT NULL,
   `answers` json NOT NULL,
   PRIMARY KEY (`test_id`),
   KEY `student_id` (`student_id`),
@@ -140,9 +140,9 @@ INSERT INTO `students` (`student_id`, `account_id`, `nim`, `nik`, `name`, `facul
 ('student-004', 'student-004', '2022110030', '3502031997456004', 'Dewi Kusuma', 'Fakultas Ekonomi dan Bisnis (FEB)', 'Akuntansi', 4, NULL),
 ('student-005', 'student-005', '2021110045', '3514121995567005', 'Eko Prasetyo', 'Fakultas Ekonomi dan Bisnis (FEB)', 'Manajemen', 6, NULL);
 
-INSERT INTO `test_results` (`test_id`, `student_id`, `date`, `score`, `level`, `fuzzy_score`, `answers`) VALUES
-('test-001-1', 'student-001', '2026-03-01 10:30:00', 54, 'Parah', 0.8500, JSON_ARRAY(3,3,2,3,2,3,2,3,3,2,3,2,3,2,3,2,3,2,3,2,3)),
-('test-001-2', 'student-001', '2026-04-10 14:20:00', 42, 'Sedang', 0.6800, JSON_ARRAY(2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2)),
-('test-002-1', 'student-002', '2026-04-05 13:30:00', 28, 'Ringan', 0.4500, JSON_ARRAY(1,2,1,1,2,1,2,1,1,2,1,2,1,1,2,1,1,2,1,1,2)),
-('test-003-1', 'student-003', '2026-04-08 15:00:00', 11, 'Normal', 0.1800, JSON_ARRAY(1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1)),
-('test-005-1', 'student-005', '2026-04-12 16:00:00', 63, 'Sangat Parah', 0.9500, JSON_ARRAY(3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3));
+INSERT INTO `test_results` (`test_id`, `student_id`, `date`, `score`, `level`, `dass21_score`, `answers`) VALUES
+('test-001-1', 'student-001', '2026-03-01 10:30:00', 54, 'Parah', 3.0000, JSON_ARRAY(3,3,2,3,2,3,2,3,3,2,3,2,3,2,3,2,3,2,3,2,3)),
+('test-001-2', 'student-001', '2026-04-10 14:20:00', 42, 'Sedang', 2.0000, JSON_ARRAY(2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2)),
+('test-002-1', 'student-002', '2026-04-05 13:30:00', 28, 'Ringan', 1.0000, JSON_ARRAY(1,2,1,1,2,1,2,1,1,2,1,2,1,1,2,1,1,2,1,1,2)),
+('test-003-1', 'student-003', '2026-04-08 15:00:00', 11, 'Normal', 0.0000, JSON_ARRAY(1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1)),
+('test-005-1', 'student-005', '2026-04-12 16:00:00', 63, 'Sangat Parah', 4.0000, JSON_ARRAY(3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3));

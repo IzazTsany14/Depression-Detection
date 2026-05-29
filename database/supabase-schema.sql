@@ -76,7 +76,7 @@ create table if not exists test_results (
   date timestamp not null,
   score integer not null,
   level varchar(50) not null,
-  fuzzy_score numeric(5, 4) not null,
+  dass21_score numeric(5, 4) not null,
   answers jsonb not null
 );
 

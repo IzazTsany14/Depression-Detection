@@ -36,7 +36,7 @@ export function calculateDassResult(answers) {
     return {
       score,
       level,
-      severity_score: getSeverityIndex(level)
+      dass21_score: getSeverityIndex(level)
     };
   } catch (error) {
     throw new Error(`Gagal menghitung skor DASS-21: ${error.message}`);

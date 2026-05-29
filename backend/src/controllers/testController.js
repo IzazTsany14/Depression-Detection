@@ -82,14 +82,14 @@ export const submitTest = async (req, res) => {
 
     // Kalkulasi DASS-21 berdasarkan ambang kategori standar.
     const dassResult = calculateDassResult(answers);
-    const { score, level, severity_score } = dassResult;
+    const { score, level, dass21_score } = dassResult;
 
     // Generate unique test ID
     const test_id = `test-${uuidv4().substring(0, 8)}`;
 
     // Simpan ke database (sesuai tabel test_results Anda)
     const insertQuery = `
-      INSERT INTO test_results (test_id, student_id, date, score, level, fuzzy_score, answers)
+      INSERT INTO test_results (test_id, student_id, date, score, level, dass21_score, answers)
       VALUES (?, ?, NOW(), ?, ?, ?, ?::jsonb)
     `;
 
@@ -101,7 +101,7 @@ export const submitTest = async (req, res) => {
       student_id,
       score,
       level,
-      severity_score,
+      dass21_score,
       answersJSON
     ]);
 
@@ -115,7 +115,7 @@ export const submitTest = async (req, res) => {
         student_id,
         score,
         level,
-        severity_score,
+        dass21_score,
         description,
         timestamp: new Date().toISOString()
       }
@@ -152,7 +152,7 @@ export const getTestsByStudent = async (req, res) => {
 
     // Query test results untuk student
     const query = `
-      SELECT test_id, student_id, date, score, level, fuzzy_score, answers
+      SELECT test_id, student_id, date, score, level, dass21_score, answers
       FROM test_results
       WHERE student_id = ?
       ORDER BY date DESC
@@ -209,7 +209,7 @@ export const getTestDetail = async (req, res) => {
     }
 
     const query = `
-      SELECT test_id, student_id, date, score, level, fuzzy_score, answers
+      SELECT test_id, student_id, date, score, level, dass21_score, answers
       FROM test_results
       WHERE test_id = ?
     `;
