@@ -1,38 +1,10 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
-import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import pool from '../config/db.js';
 import { authorizeRole, verifyToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const profileUploadDir = path.resolve(__dirname, '../../uploads/profiles');
-
-const facultyFolderMap = [
-  { pattern: /fisipol|ilmu sosial/i, folder: 'fisipol' },
-  { pattern: /feb|ekonomi/i, folder: 'feb' },
-  { pattern: /ft|teknik/i, folder: 'ft' },
-  { pattern: /fv|vokasi/i, folder: 'fv' },
-  { pattern: /fh|hukum/i, folder: 'fh' },
-  { pattern: /fmipa|matematika|pengetahuan alam/i, folder: 'fmipa' },
-  { pattern: /psdku/i, folder: 'psdku' }
-];
-
-const getProfileFolder = (role, faculty) => {
-  if (role !== 'student') return 'staff';
-
-  const matchedFaculty = facultyFolderMap.find(({ pattern }) => pattern.test(faculty || ''));
-  if (matchedFaculty) return matchedFaculty.folder;
-
-  return String(faculty || 'unknown')
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '') || 'unknown';
-};
 
 const getUsersQuery = `
   SELECT
@@ -105,7 +77,7 @@ const authorizeSelfOrAdmin = (req, res, next) => {
   return res.status(403).json({ message: 'Akses ditolak. Anda hanya boleh mengakses data akun sendiri' });
 };
 
-const saveProfileImage = async (profileImage, { accountId, role, faculty }) => {
+const saveProfileImage = async (profileImage) => {
   if (!profileImage?.dataUrl) return null;
 
   const match = String(profileImage.dataUrl).match(/^data:(image\/(?:png|jpeg));base64,([A-Za-z0-9+/=]+)$/);
@@ -116,7 +88,6 @@ const saveProfileImage = async (profileImage, { accountId, role, faculty }) => {
   }
 
   const mimeType = match[1];
-  const extension = mimeType === 'image/png' ? 'png' : 'jpg';
   const buffer = Buffer.from(match[2], 'base64');
 
   if (buffer.length > 2 * 1024 * 1024) {
@@ -125,14 +96,7 @@ const saveProfileImage = async (profileImage, { accountId, role, faculty }) => {
     throw error;
   }
 
-  const folder = getProfileFolder(role, faculty);
-  const accountUploadDir = path.join(profileUploadDir, folder, accountId);
-  const fileName = `profile.${extension}`;
-
-  await fs.mkdir(accountUploadDir, { recursive: true });
-  await fs.writeFile(path.join(accountUploadDir, fileName), buffer);
-
-  return `uploads/profiles/${folder}/${accountId}/${fileName}`;
+  return `data:${mimeType};base64,${match[2]}`;
 };
 
 router.use(verifyToken);
@@ -179,7 +143,7 @@ router.post('/', authorizeRole('admin'), async (req, res) => {
     }
 
     const accountId = `${role}-${uuidv4().slice(0, 8)}`;
-    const profilePicture = await saveProfileImage(profileImage, { accountId, role, faculty });
+    const profilePicture = await saveProfileImage(profileImage);
     const hashedPassword = await bcrypt.hash(password, 12);
 
     await connection.beginTransaction();
@@ -212,7 +176,7 @@ router.post('/', authorizeRole('admin'), async (req, res) => {
   } catch (error) {
     await connection.rollback();
     res.status(error.status || 500).json({
-      message: 'Gagal menambahkan user',
+      message: error.message || 'Gagal menambahkan user',
       error: error.message
     });
   } finally {
@@ -248,11 +212,7 @@ router.put('/:accountId', authorizeSelfOrAdmin, async (req, res) => {
       return res.status(403).json({ message: 'Akses ditolak. Ubah password harus melalui endpoint password dengan password saat ini' });
     }
 
-    const profilePicture = await saveProfileImage(profileImage, {
-      accountId,
-      role: existingUser.role,
-      faculty: existingUser.role === 'student' ? (faculty || existingUser.faculty) : null
-    });
+    const profilePicture = await saveProfileImage(profileImage);
     const accountFields = ['email = ?'];
     const accountValues = [email];
 
@@ -298,7 +258,7 @@ router.put('/:accountId', authorizeSelfOrAdmin, async (req, res) => {
   } catch (error) {
     await connection.rollback();
     res.status(error.status || 500).json({
-      message: 'Gagal memperbarui user',
+      message: error.message || 'Gagal memperbarui user',
       error: error.message
     });
   } finally {

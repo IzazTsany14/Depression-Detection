@@ -17,7 +17,7 @@ create table if not exists accounts (
   email varchar(100) not null unique,
   password varchar(255) not null,
   role account_role not null,
-  profile_picture varchar(255),
+  profile_picture text,
   is_active boolean default true,
   last_login timestamp,
   created_at timestamptz not null default now()

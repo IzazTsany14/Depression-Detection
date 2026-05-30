@@ -91,7 +91,7 @@ export const BKProfile: React.FC = () => {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || data.error || 'Gagal memperbarui profil');
+      if (!res.ok) throw new Error(data.error || data.message || 'Gagal memperbarui profil');
       const updatedUser = updateUser(data.user);
       setProfilePreview(updatedUser.profile_picture || null);
       setProfileImage(null);
