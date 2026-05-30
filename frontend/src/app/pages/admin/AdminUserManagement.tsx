@@ -24,6 +24,13 @@ const emptyForm = {
   semester: '1',
 };
 
+const isUserActive = (value: unknown) => (
+  value === true ||
+  value === 1 ||
+  value === '1' ||
+  String(value).toLowerCase() === 'true'
+);
+
 export const AdminUserManagement: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -168,7 +175,7 @@ export const AdminUserManagement: React.FC = () => {
 
 
   const handleToggleStudentStatus = async (userToToggle: any) => {
-    const isActive = userToToggle.is_active !== 0;
+    const isActive = isUserActive(userToToggle.is_active ?? userToToggle.isActive);
     const nextStatus = !isActive;
     const actionLabel = nextStatus ? 'aktifkan' : 'nonaktifkan';
 
@@ -233,9 +240,15 @@ export const AdminUserManagement: React.FC = () => {
 
       <div className="flex-1">
         <main className="p-8">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Manajemen User</h1>
-            <p className="text-gray-600 text-lg">Kelola pengguna langsung dari database Supabase</p>
+          <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">Manajemen User</h1>
+              <p className="text-gray-600 text-lg">Kelola pengguna langsung dari database Supabase</p>
+            </div>
+            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700">
+              <CheckCircle2 className="h-4 w-4" />
+              Terhubung ke Supabase
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -318,23 +331,23 @@ export const AdminUserManagement: React.FC = () => {
             </div>
           </Card>
 
-          <Card>
+          <Card className="overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b-2 border-gray-200">
+                <thead className="border-b border-slate-200 bg-slate-900">
                   <tr>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">User</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Email</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">NIM/NIP</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Role</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Fakultas</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Status</th>
-                    <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">Aksi</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase text-white">Pengguna</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase text-white">Email</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase text-white">NIM/NIP</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase text-white">Peran</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase text-white">Fakultas</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase text-white">Status</th>
+                    <th className="px-6 py-4 text-center text-xs font-semibold uppercase text-white">Aksi</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {filteredUsers.map((item) => (
-                    <tr key={item.account_id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={item.account_id} className={`transition-colors ${isUserActive(item.is_active ?? item.isActive) ? 'hover:bg-gray-50' : 'bg-red-50/40 hover:bg-red-50'}`}>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <ProfileAvatar profilePicture={item.profile_picture} className="w-10 h-10" />
@@ -351,15 +364,15 @@ export const AdminUserManagement: React.FC = () => {
                       <td className="px-6 py-4 text-sm text-gray-600">{item.faculty || '-'}</td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
-                          {item.is_active === 0 ? (
+                          {!isUserActive(item.is_active ?? item.isActive) ? (
                             <>
                               <XCircle className="w-4 h-4 text-red-600" />
-                              <span className="text-sm text-red-600">Nonaktif</span>
+                              <span className="rounded-full bg-red-100 px-2 py-0.5 text-sm font-medium text-red-700">Nonaktif</span>
                             </>
                           ) : (
                             <>
                               <CheckCircle2 className="w-4 h-4 text-green-600" />
-                              <span className="text-sm text-green-600">Aktif</span>
+                              <span className="rounded-full bg-green-100 px-2 py-0.5 text-sm font-medium text-green-700">Aktif</span>
                             </>
                           )}
                         </div>
@@ -371,8 +384,8 @@ export const AdminUserManagement: React.FC = () => {
                               onClick={() => handleToggleStudentStatus(item)}
                               variant="outline"
                               size="sm"
-                              className={item.is_active === 0 ? 'text-green-600 hover:bg-green-50' : 'text-orange-600 hover:bg-orange-50'}
-                              title={item.is_active === 0 ? 'Aktifkan mahasiswa' : 'Nonaktifkan mahasiswa'}
+                              className={!isUserActive(item.is_active ?? item.isActive) ? 'text-green-600 hover:bg-green-50' : 'text-orange-600 hover:bg-orange-50'}
+                              title={!isUserActive(item.is_active ?? item.isActive) ? 'Aktifkan mahasiswa' : 'Nonaktifkan mahasiswa'}
                             >
                               <Power className="w-4 h-4" />
                             </Button>
@@ -407,7 +420,7 @@ export const AdminUserManagement: React.FC = () => {
               <DialogHeader className="border-b px-6 py-5">
                 <DialogTitle>{editingUser ? 'Edit User' : 'Tambah User Baru'}</DialogTitle>
                 <DialogDescription>
-                  Data akan disimpan ke MySQL. Foto profil diubah dari halaman profil masing-masing user.
+                  Data akan disimpan ke Supabase. Foto profil diubah dari halaman profil masing-masing user.
                 </DialogDescription>
               </DialogHeader>
 

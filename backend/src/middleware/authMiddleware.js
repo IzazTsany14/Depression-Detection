@@ -19,6 +19,13 @@ const getJwtSecret = () => {
   return secret;
 };
 
+const isAccountActive = (value) => (
+  value === true ||
+  value === 1 ||
+  value === '1' ||
+  String(value).toLowerCase() === 'true'
+);
+
 /**
  * Middleware untuk verifikasi JWT token
  * Token harus dikirim di header: Authorization: Bearer <token>
@@ -68,7 +75,7 @@ export const verifyToken = async (req, res, next) => {
     }
 
     const account = rows[0];
-    if (account.is_active === false || account.is_active === 0) {
+    if (!isAccountActive(account.is_active)) {
       return res.status(403).json({ message: 'Akun pada token sudah tidak aktif' });
     }
 

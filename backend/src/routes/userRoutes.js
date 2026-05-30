@@ -36,11 +36,20 @@ const getUsersQuery = `
   LEFT JOIN admins ad ON a.account_id = ad.account_id AND a.role = 'admin'
 `;
 
+const isAccountActive = (value) => (
+  value === true ||
+  value === 1 ||
+  value === '1' ||
+  String(value).toLowerCase() === 'true'
+);
+
 const normalizeUser = (user) => ({
   ...user,
   id: user.id || user.account_id,
   accountId: user.account_id,
-  profilePicture: user.profile_picture
+  profilePicture: user.profile_picture,
+  is_active: isAccountActive(user.is_active),
+  isActive: isAccountActive(user.is_active)
 });
 
 const verifyStoredPassword = async (plainPassword, storedPassword) => {

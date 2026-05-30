@@ -57,6 +57,13 @@ const verifyPassword = async (plainPassword, storedPassword) => {
   return plainPassword === storedPassword;
 };
 
+const isAccountActive = (value) => (
+  value === true ||
+  value === 1 ||
+  value === '1' ||
+  String(value).toLowerCase() === 'true'
+);
+
 const resetTokenExpiryMinutes = 30;
 
 const getPublicAppUrl = (req) => {
@@ -283,7 +290,7 @@ export const login = async (req, res) => {
 
     const user = rows[0];
 
-    if (user.is_active === false || user.is_active === 0) {
+    if (!isAccountActive(user.is_active)) {
       return res.status(403).json({
         message: user.role === 'student' ? 'Akses ditolak. Akun mahasiswa Anda sedang nonaktif. Silakan hubungi admin.' : 'Akses ditolak. Akun Anda sedang nonaktif.'
       });
@@ -350,7 +357,7 @@ export const requestPasswordReset = async (req, res) => {
     }
 
     const account = rows[0];
-    if (account.is_active === false || account.is_active === 0) {
+    if (!isAccountActive(account.is_active)) {
       return res.status(403).json({ message: 'Akun sedang nonaktif. Silakan hubungi admin.' });
     }
 
