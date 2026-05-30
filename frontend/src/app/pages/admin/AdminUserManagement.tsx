@@ -235,7 +235,7 @@ export const AdminUserManagement: React.FC = () => {
         <main className="p-8">
           <div className="mb-8">
             <h1 className="text-4xl font-bold text-gray-900 mb-2">Manajemen User</h1>
-            <p className="text-gray-600 text-lg">Kelola pengguna langsung dari database MySQL</p>
+            <p className="text-gray-600 text-lg">Kelola pengguna langsung dari database Supabase</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
