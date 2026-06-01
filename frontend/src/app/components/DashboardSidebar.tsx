@@ -106,9 +106,16 @@ export const DashboardSidebar: React.FC<SidebarProps> = ({ role }) => {
     <div className="w-64 bg-white shadow-xl h-screen flex flex-col sticky top-0">
       {/* Header */}
       <div className={`${headerColor} text-white p-6`}>
-        <h2 className="text-xl font-bold mb-1">
-          {role === 'admin' ? 'Admin Panel' : 'BK Panel'}
-        </h2>
+        <div className="mb-1 flex items-center gap-3">
+          <img
+            src="/mindcheck-logo.svg"
+            alt="MindCheck"
+            className="h-10 w-10 rounded-lg bg-white/15 p-1 shadow-sm"
+          />
+          <h2 className="text-xl font-bold">
+            {role === 'admin' ? 'Admin Panel' : 'BK Panel'}
+          </h2>
+        </div>
         <button
           type="button"
           onClick={() => navigate(role === 'admin' ? '/admin/profile' : '/bk/profile')}

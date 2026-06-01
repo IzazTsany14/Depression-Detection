@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { Brain, LogOut, Menu, X } from 'lucide-react';
+import { LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/button';
 import { ProfileAvatar } from './ProfileAvatar';
@@ -15,9 +15,11 @@ export const Header: React.FC = () => {
         <div className="relative flex items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 flex-shrink-0">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center">
-              <Brain className="w-6 h-6 text-white" />
-            </div>
+            <img
+              src="/mindcheck-logo.svg"
+              alt="MindCheck"
+              className="h-10 w-10 rounded-lg shadow-sm"
+            />
             <div className="hidden sm:block">
               <span className="font-semibold text-gray-900">MindCheck</span>
               <p className="text-xs text-gray-500">Deteksi Dini Depresi</p>
