@@ -38,7 +38,7 @@ Sistem ini mengintegrasikan instrumen psikometrik **DASS-21** (Depression Anxiet
 | Komponen | Teknologi |
 |-----------|------------|
 | **Frontend** | React, TypeScript, Tailwind CSS, Shadcn/UI |
-| **Backend** | Node.Js  |
+| **Backend** | Express.Js  |
 | **Database** | PostgreSQL via Supabase |
 | **UI/UX** | Figma (Design System)  |
 
