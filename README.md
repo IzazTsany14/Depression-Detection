@@ -29,8 +29,7 @@ Sistem ini mengintegrasikan instrumen psikometrik **DASS-21** (Depression Anxiet
 ✅ **Asesmen DASS-21**: 21 pertanyaan tervalidasi dengan skala Likert 0-3.
 📊 **Dashboard Personalisasi**: Statistik riwayat tes, tren kondisi mental, dan ringkasan aktivitas.
 📑 **Laporan PDF**: Unduhan hasil skrining resmi untuk keperluan dokumentasi atau rujukan.
-🚨 **Protokol Darurat**: Notifikasi otomatis dengan kontak bantuan (119 ext 8 & BK UNESA) untuk kategori hasil "Parah" dan "Sangat Parah".
-🛡️ **Keamanan & Privasi**: Pengolahan data jawaban di sisi klien (*client-side*) dan enkripsi password.
+🚨 **Protokol Darurat**: Notifikasi otomatis dengan kontak bantuan (119 ext 8 & BK UNESA) untuk kategori hasil "Parah" dan "Sangat Parah".🛡️ **Keamanan & Privasi**: Pengolahan data jawaban di sisi klien (*client-side*) dan enkripsi password.
 
 ---
 
@@ -61,7 +60,7 @@ Berdasarkan dokumen SRS **Sistem Deteksi Dini Tingkat Depresi Mahasiswa**:
 
 ## 🚀 Status Proyek
 
-🟢 **Phase: Implementation & Testing** Sistem saat ini sedang dalam tahap integrasi modul logika fuzzy dan validasi konten klinis oleh Unit BK UNESA.
+🟢 **Phase: Implementation & Testing** Sistem saat ini sedang dalam tahap perkembangan dan validasi konten klinis oleh Unit BK UNESA.
 
 ---
 
