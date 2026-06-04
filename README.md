@@ -27,7 +27,6 @@ Sistem ini mengintegrasikan instrumen psikometrik **DASS-21** (Depression Anxiet
 ## ⚙️ Fitur Utama
 
 ✅ **Asesmen DASS-21**: 21 pertanyaan tervalidasi dengan skala Likert 0-3.
-🧠 **Fuzzy Inference Engine**: Komputasi sisi klien menggunakan metode *Mamdani* (Fuzzifikasi, 125 Aturan, Defuzzifikasi CoA).
 📊 **Dashboard Personalisasi**: Statistik riwayat tes, tren kondisi mental, dan ringkasan aktivitas.
 📑 **Laporan PDF**: Unduhan hasil skrining resmi untuk keperluan dokumentasi atau rujukan.
 🚨 **Protokol Darurat**: Notifikasi otomatis dengan kontak bantuan (119 ext 8 & BK UNESA) untuk kategori hasil "Parah" dan "Sangat Parah".
@@ -41,7 +40,7 @@ Sistem ini mengintegrasikan instrumen psikometrik **DASS-21** (Depression Anxiet
 |-----------|------------|
 | **Frontend** | React, TypeScript, Tailwind CSS, Shadcn/UI |
 | **Backend** | Node.Js  |
-| **Database** | MySQL / MariaDB |
+| **Database** | PostgreSQL via Supabase |
 | **UI/UX** | Figma (Design System)  |
 
 ---
@@ -53,8 +52,8 @@ Berdasarkan dokumen SRS **Sistem Deteksi Dini Tingkat Depresi Mahasiswa**:
 | Nama | NIM | Peran |
 | ------- | -------- | ------- |
 | **[Izaz Tsany Rismawan](https://github.com/IzazTsany14)** | 25051204355 | Fullstack Developer / Lead |
-| **[Lufita Setiati](https://github.com/lupitaaasetia)** | 25051204304 | System Analyst / Documentation |
-| **[Fearda Agnessiya Putri Dardiri](https://github.com/feardaa)** | 25051204332 | UI/UX Designer / Researcher |
+| **[Lufita Setiati](https://github.com/lupitaaasetia)** | 25051204304 | System Analyst / Documentation / QA Engineer |
+| **[Fearda Agnessiya Putri Dardiri](https://github.com/feardaa)** | 25051204332 | UI/UX Designer / Researcher / QA Engineer |
 
 **Dosen Pengampu**: Saifudin Yahya, S.Kom., M.T.I.
 
