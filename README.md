@@ -1,9 +1,3 @@
-<div align='center'>
-  <a href="https://git.io/typing-svg">
-    <img src="https://readme-typing-svg.herokuapp.com?font=Poppins&weight=600&size=38&pause=1000&color=0B84F3&center=true&vCenter=true&width=800&height=70&lines=MindCheck;Sistem+Deteksi+Dini+Tingkat+Depresi;+DASS-21(Depression Anxiety Stress Scale-21)" alt="Typing SVG" />
-  </a>
-</div>
-
 <p align="center">
   <img src="https://img.shields.io/badge/Frontend-React-61DAFB?style=for-the-badge&logo=react" alt="React Badge">
   <img src="https://img.shields.io/badge/Language-TypeScript-3178C6?style=for-the-badge&logo=typescript" alt="TypeScript Badge">
